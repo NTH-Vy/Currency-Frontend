@@ -35,7 +35,6 @@ import {
   Link2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import DOMPurify from 'dompurify';
 
 interface SupportTicket {
   ticket_id: number;
@@ -54,6 +53,10 @@ interface SupportTicket {
   user?: {
     user_id: number;
     username: string;
+    email: string;
+    avatar_url?: string | null;
+    facebook_id?: string | null;
+    google_id?: string | null;
   };
   admin?: {
     user_id: number;
@@ -90,6 +93,20 @@ interface FilterState {
   dateFrom: string;
   dateTo: string;
 }
+
+// Helper lấy avatar URL
+const getUserAvatar = (user?: { avatar_url?: string | null; facebook_id?: string | null; google_id?: string | null }) => {
+  if (!user) return null;
+  if (user.avatar_url) return user.avatar_url;
+  if (user.facebook_id) return `https://graph.facebook.com/${user.facebook_id}/picture?type=large`;
+  if (user.google_id) return `https://lh3.googleusercontent.com/a/${user.google_id}=s96-c`;
+  return null;
+};
+
+// Helper lấy chữ cái đầu
+const getInitials = (name: string) => {
+  return name?.charAt(0)?.toUpperCase() || '?';
+};
 
 // ---------- Custom themed dropdown ----------
 interface SelectOption {
@@ -406,12 +423,12 @@ const SearchSkeleton = () => {
 const TableHeaderSkeleton = () => (
   <tr className="border-b border-white/10 bg-white/5">
     <th className="px-4 py-4 w-16"><div className="h-3 w-8 bg-white/5 rounded animate-pulse" /></th>
-    <th className="px-4 py-4 w-36"><div className="h-3 w-12 bg-white/5 rounded animate-pulse" /></th>
-    <th className="px-4 py-4 w-28"><div className="h-3 w-14 bg-white/5 rounded animate-pulse" /></th>
+    <th className="px-4 py-4 w-48"><div className="h-3 w-12 bg-white/5 rounded animate-pulse" /></th>
+    <th className="px-4 py-4 w-24"><div className="h-3 w-14 bg-white/5 rounded animate-pulse" /></th>
     <th className="px-4 py-4"><div className="h-3 w-16 bg-white/5 rounded animate-pulse" /></th>
     <th className="px-4 py-4 w-24 text-center"><div className="h-3 w-12 bg-white/5 rounded animate-pulse mx-auto" /></th>
-    <th className="px-4 py-4 w-36 text-center"><div className="h-3 w-12 bg-white/5 rounded animate-pulse mx-auto" /></th>
-    <th className="px-4 py-4 w-36"><div className="h-3 w-12 bg-white/5 rounded animate-pulse" /></th>
+    <th className="px-4 py-4 w-32 text-center"><div className="h-3 w-12 bg-white/5 rounded animate-pulse mx-auto" /></th>
+    <th className="px-4 py-4 w-32"><div className="h-3 w-12 bg-white/5 rounded animate-pulse" /></th>
     <th className="px-4 py-4 w-28 text-center"><div className="h-3 w-12 bg-white/5 rounded animate-pulse mx-auto" /></th>
   </tr>
 );
@@ -1101,12 +1118,12 @@ export default function AdminContact() {
                   <thead>
                     <tr className="border-b border-white/10 bg-white/5 text-[8px] text-slate-400 uppercase tracking-[0.2em] font-black">
                       <th className="px-4 py-4 w-16">ID</th>
-                      <th className="px-4 py-4 w-36">User</th>
-                      <th className="px-4 py-4 w-28">Priority</th>
+                      <th className="px-4 py-4 w-48">User</th>
+                      <th className="px-4 py-4 w-24">Priority</th>
                       <th className="px-4 py-4">Subject / Message</th>
                       <th className="px-4 py-4 w-24 text-center">Status</th>
-                      <th className="px-4 py-4 w-36 text-center">Response</th>
-                      <th className="px-4 py-4 w-36">Date</th>
+                      <th className="px-4 py-4 w-32 text-center">Response</th>
+                      <th className="px-4 py-4 w-32">Date</th>
                       <th className="px-4 py-4 w-28 text-center">Actions</th>
                     </tr>
                   </thead>
@@ -1138,18 +1155,45 @@ export default function AdminContact() {
                             <span className="text-indigo-400 font-black text-[11px] whitespace-nowrap">#{ticket.ticket_id}</span>
                           </td>
                           
-                          {/* User */}
+                          {/* User - với Avatar */}
                           <td className="px-4 py-4">
-                            <div className="flex items-center gap-2">
-                              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0">
-                                <span className="text-[8px] text-white font-black">
-                                  {ticket.name?.charAt(0)?.toUpperCase() || "?"}
-                                </span>
-                              </div>
-                              <div className="min-w-0">
-                                <p className="text-white text-xs font-bold truncate">{ticket.name}</p>
-                                <p className="text-[7px] text-slate-500 font-mono truncate">{ticket.email}</p>
-                              </div>
+                            <div className="flex items-center gap-2 min-w-[140px]">
+                              {ticket.user ? (
+                                <>
+                                  {getUserAvatar(ticket.user) ? (
+                                    <img 
+                                      src={getUserAvatar(ticket.user) || ''} 
+                                      alt={ticket.user.username}
+                                      className="w-7 h-7 rounded-full object-cover border border-indigo-500/30 flex-shrink-0"
+                                      onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                      }}
+                                    />
+                                  ) : (
+                                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+                                      <span className="text-[8px] text-white font-black">
+                                        {getInitials(ticket.user.username)}
+                                      </span>
+                                    </div>
+                                  )}
+                                  <div className="min-w-0">
+                                    <p className="text-white text-xs font-bold truncate">@{ticket.user.username}</p>
+                                    <p className="text-[7px] text-slate-500 font-mono truncate">{ticket.user.email}</p>
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-slate-500 to-slate-600 flex items-center justify-center flex-shrink-0">
+                                    <span className="text-[8px] text-white font-black">
+                                      {getInitials(ticket.name)}
+                                    </span>
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="text-white text-xs font-bold truncate">{ticket.name}</p>
+                                    <p className="text-[7px] text-slate-500 font-mono truncate">{ticket.email}</p>
+                                  </div>
+                                </>
+                              )}
                             </div>
                           </td>
                           
@@ -1275,6 +1319,188 @@ export default function AdminContact() {
                 </div>
               </motion.div>
             )}
+
+            {/* Ticket Detail Modal */}
+            <AnimatePresence>
+              {selectedTicket && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setSelectedTicket(null)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') setSelectedTicket(null);
+                  }}
+                  className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="ticket-modal-title"
+                >
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-hidden flex flex-col"
+                  >
+                    {/* Header */}
+                    <div className="p-6 border-b border-white/10">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-3">
+                            <span className="text-indigo-400 font-black text-sm font-mono">#{selectedTicket.ticket_id}</span>
+                            {getStatusBadge(selectedTicket)}
+                            {getPriorityBadge(selectedTicket)}
+                          </div>
+                          <h2 id="ticket-modal-title" className="text-lg font-black text-white font-mono uppercase mb-2">
+                            {selectedTicket.subject || 'Infrastructure Request'}
+                          </h2>
+                          <div className="flex items-center gap-2">
+                            {selectedTicket.user ? (
+                              <>
+                                {getUserAvatar(selectedTicket.user) ? (
+                                  <img 
+                                    src={getUserAvatar(selectedTicket.user) || ''} 
+                                    alt={selectedTicket.user.username}
+                                    className="w-6 h-6 rounded-full object-cover border border-indigo-500/30"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = 'none';
+                                    }}
+                                  />
+                                ) : (
+                                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+                                    <span className="text-[8px] text-white font-black">
+                                      {getInitials(selectedTicket.user.username)}
+                                    </span>
+                                  </div>
+                                )}
+                                <span className="text-xs text-slate-300 font-bold">@{selectedTicket.user.username}</span>
+                              </>
+                            ) : (
+                              <>
+                                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-slate-500 to-slate-600 flex items-center justify-center">
+                                  <span className="text-[8px] text-white font-black">
+                                    {getInitials(selectedTicket.name)}
+                                  </span>
+                                </div>
+                                <span className="text-xs text-slate-300 font-bold">{selectedTicket.name}</span>
+                              </>
+                            )}
+                            <span className="text-[8px] text-slate-500 font-mono">•</span>
+                            <span className="text-[8px] text-slate-500 font-mono">{formatDate(selectedTicket.created_at)}</span>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setSelectedTicket(null)}
+                          className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-all border border-transparent hover:border-white/20"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 overflow-y-auto p-6">
+                      <div className="space-y-6">
+                        {/* User Info */}
+                        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                          <h3 className="text-[8px] font-mono text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                            <User size={10} className="text-indigo-400" />
+                            Contact Information
+                          </h3>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <p className="text-[8px] text-slate-500 font-mono uppercase mb-1">Name</p>
+                              <p className="text-xs text-slate-300 font-bold">{selectedTicket.user ? selectedTicket.user.username : selectedTicket.name}</p>
+                            </div>
+                            <div>
+                              <p className="text-[8px] text-slate-500 font-mono uppercase mb-1">Email</p>
+                              <p className="text-xs text-slate-300 font-bold">{selectedTicket.user ? selectedTicket.user.email : selectedTicket.email}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Message */}
+                        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                          <h3 className="text-[8px] font-mono text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                            <MessageSquare size={10} className="text-indigo-400" />
+                            User Message
+                          </h3>
+                          <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">{selectedTicket.message}</p>
+                        </div>
+
+                        {/* Admin Response */}
+                        {selectedTicket.admin_response ? (
+                          <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4">
+                            <h3 className="text-[8px] font-mono text-emerald-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                              <Reply size={10} />
+                              Admin Response
+                            </h3>
+                            <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">{selectedTicket.admin_response}</p>
+                            {selectedTicket.responded_at && (
+                              <p className="text-[8px] text-slate-500 font-mono mt-3">
+                                Responded at {formatDate(selectedTicket.responded_at)}
+                              </p>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-4">
+                            <h3 className="text-[8px] font-mono text-indigo-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                              <Reply size={10} />
+                              Admin Response
+                            </h3>
+                            <textarea
+                              value={responseText}
+                              onChange={(e) => setResponseText(e.target.value)}
+                              placeholder="Type your response here..."
+                              className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 focus:bg-black/60 transition-all resize-none h-32 font-mono"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="p-6 border-t border-white/10 flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[8px] text-slate-500 font-mono uppercase tracking-wider">Status:</span>
+                        <CustomSelect
+                          value={selectedTicket.status}
+                          onChange={(v) => handleUpdateStatus(selectedTicket.ticket_id, v)}
+                          options={[
+                            { value: "open", label: "Open" },
+                            { value: "in_progress", label: "In Progress" },
+                            { value: "resolved", label: "Resolved" },
+                            { value: "closed", label: "Closed" },
+                          ]}
+                        />
+                      </div>
+                      {!selectedTicket.admin_response && (
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={handleRespond}
+                          disabled={!responseText.trim() || isSubmitting}
+                          className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white transition-all font-mono text-[9px] font-bold uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="animate-spin" size={14} />
+                              Sending...
+                            </>
+                          ) : (
+                            <>
+                              <Send size={14} />
+                              Send Response
+                            </>
+                          )}
+                        </motion.button>
+                      )}
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Delete Confirmation Modal */}
             <AnimatePresence>

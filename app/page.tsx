@@ -428,7 +428,6 @@ export default function Home() {
     subject: '',
     message: ''
   });
-  const [currentUser, setCurrentUser] = useState<{ username?: string; email?: string } | null>(null);
   const [isSubmittingContact, setIsSubmittingContact] = useState(false);
   const [popularNews, setPopularNews] = useState<NewsItem[]>([]);
   const [newsLoading, setNewsLoading] = useState(false);
@@ -956,6 +955,23 @@ export default function Home() {
     }
   }, []);
 
+  // user localStorage
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        setContactForm(prev => ({
+          ...prev,
+          name: userData.username || '',
+          email: userData.email || ''
+        }));
+      } catch (e) {
+        console.error("Error parsing user data:", e);
+      }
+    }
+  }, []);
+
   // ─── WEBSOCKET SETUP ───
   useEffect(() => {
     if (!mounted || !from || !to) return;
@@ -1067,24 +1083,6 @@ export default function Home() {
     const checkAuth = () => {
       const token = localStorage.getItem("token");
       setIsGuest(!token);
-      
-      // Load user data from localStorage
-      if (token) {
-        const userStr = localStorage.getItem("user");
-        if (userStr) {
-          try {
-            const userData = JSON.parse(userStr);
-            setCurrentUser(userData);
-            setContactForm(prev => ({
-              ...prev,
-              name: userData.username || '',
-              email: userData.email || ''
-            }));
-          } catch (e) {
-            console.error("Error parsing user data:", e);
-          }
-        }
-      }
     };
     checkAuth();
     fetchHistory();
@@ -2046,133 +2044,126 @@ export default function Home() {
         {/* ─── 10. CONTACT ─── */}
         <ErrorBoundary>
           <section className="grid lg:grid-cols-12 gap-12 items-start border-t border-white/10 pt-24 pb-16">
-          <div className="lg:col-span-5 space-y-6">
-            <div className="relative">
-              <div className="absolute -left-4 top-0 w-1 h-16 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full" />
-              <h2 className="text-4xl font-black text-white uppercase italic tracking-tight leading-none pl-6">
-                Connect With<br />Our Engineers.
-              </h2>
-            </div>
-            <p className="text-slate-500 text-sm leading-relaxed font-medium max-w-sm pl-6">
-              Facing technical issues or need enterprise solutions? Our rapid response team is always ready.
-            </p>
-            <div className="flex flex-col gap-3 pt-4 pl-6">
-              <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-white/5 to-transparent rounded-xl border border-white/10 w-fit group hover:border-indigo-500/30 transition-all">
-                <Mail className="text-indigo-400" size={16} />
-                <span className="text-xs font-mono font-bold text-slate-300 group-hover:text-indigo-400 transition-colors">viee1525@gmail.com</span>
+            <div className="lg:col-span-5 space-y-6">
+              <div className="relative">
+                <div className="absolute -left-4 top-0 w-1 h-16 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full" />
+                <h2 className="text-4xl font-black text-white uppercase italic tracking-tight leading-none pl-6">
+                  Connect With<br />Our Engineers.
+                </h2>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-white/5 to-transparent rounded-xl border border-white/10 w-fit group hover:border-indigo-500/30 transition-all">
-                <MessageSquare className="text-indigo-400" size={16} />
-                <span className="text-xs font-mono font-bold text-slate-300">( +84 ) 0765687090</span>
+              <p className="text-slate-500 text-sm leading-relaxed font-medium max-w-sm pl-6">
+                Facing technical issues or need enterprise solutions? Our rapid response team is always ready.
+              </p>
+              <div className="flex flex-col gap-3 pt-4 pl-6">
+                <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-white/5 to-transparent rounded-xl border border-white/10 w-fit group hover:border-indigo-500/30 transition-all">
+                  <Mail className="text-indigo-400" size={16} />
+                  <span className="text-xs font-mono font-bold text-slate-300 group-hover:text-indigo-400 transition-colors">viee1525@gmail.com</span>
+                </div>
+                <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-white/5 to-transparent rounded-xl border border-white/10 w-fit group hover:border-indigo-500/30 transition-all">
+                  <MessageSquare className="text-indigo-400" size={16} />
+                  <span className="text-xs font-mono font-bold text-slate-300">( +84 ) 0765687090</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 pl-6 pt-4">
+                <div className={`w-2 h-2 rounded-full ${isWebSocketConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+                <span className="text-[9px] font-mono text-emerald-500">{isWebSocketConnected ? 'All systems operational' : 'Syncing...'}</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 pl-6 pt-4">
-              <div className={`w-2 h-2 rounded-full ${isWebSocketConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-              <span className="text-[9px] font-mono text-emerald-500">{isWebSocketConnected ? 'All systems operational' : 'Syncing...'}</span>
-            </div>
-          </div>
-
-          <div className="lg:col-span-7 relative">
-            <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 blur-3xl rounded-full" />
-            <div className="relative bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-xl p-8 lg:p-10">
-              {!formSubmitted ? (
-                <form onSubmit={handleContactSubmit} className="space-y-5">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-[9px] font-mono font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-1">
-                        <User size={10} /> Identity
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Your Name"
-                        required
-                        value={contactForm.name}
-                        onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
-                        aria-label="Your name"
-                        className="w-full bg-black/40 border border-white/10 focus:border-indigo-500/50 rounded-lg p-3.5 text-sm font-mono text-white outline-none transition-all focus:bg-black/60 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14]"
-                      />
+            <div className="lg:col-span-7 relative">
+              <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 blur-3xl rounded-full" />
+              <div className="relative bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-xl p-8 lg:p-10">
+                {!formSubmitted ? (
+                  <form onSubmit={handleContactSubmit} className="space-y-5">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-[9px] font-mono font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-1">
+                          <User size={10} /> Identity
+                        </label>
+                        <input
+                          type="text"
+                          value={contactForm.name}
+                          disabled
+                          className="w-full bg-black/40 border border-white/10 rounded-lg p-3.5 text-sm font-mono text-white/70 outline-none cursor-not-allowed"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[9px] font-mono font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-1">
+                          <Mail size={10} /> Node Endpoint
+                        </label>
+                        <input
+                          type="email"
+                          value={contactForm.email}
+                          disabled
+                          className="w-full bg-black/40 border border-white/10 rounded-lg p-3.5 text-sm font-mono text-white/70 outline-none cursor-not-allowed"
+                        />
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <label className="text-[9px] font-mono font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-1">
-                        <Mail size={10} /> Node Endpoint
+                        <Send size={10} /> Transmission Data
                       </label>
-                      <input
-                        type="email"
-                        placeholder="name@domain.com"
+                      <textarea
+                        rows={4}
+                        placeholder="Describe infrastructure requests in detail..."
                         required
-                        value={contactForm.email}
-                        onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
-                        disabled={!!currentUser?.email}
-                        aria-label="Your email address"
-                        className={`w-full bg-black/40 border border-white/10 focus:border-indigo-500/50 rounded-lg p-3.5 text-sm font-mono text-white outline-none transition-all focus:bg-black/60 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14] ${currentUser?.email ? 'opacity-60 cursor-not-allowed' : ''}`}
+                        value={contactForm.message}
+                        onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
+                        aria-label="Your message"
+                        className="w-full bg-black/40 border border-white/10 focus:border-indigo-500/50 rounded-lg p-3.5 text-sm font-mono text-white outline-none resize-none transition-all focus:bg-black/60 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14]"
                       />
                     </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[9px] font-mono font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-1">
-                      <Send size={10} /> Transmission Data
-                    </label>
-                    <textarea
-                      rows={4}
-                      placeholder="Describe infrastructure requests in detail..."
-                      required
-                      value={contactForm.message}
-                      onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
-                      aria-label="Your message"
-                      className="w-full bg-black/40 border border-white/10 focus:border-indigo-500/50 rounded-lg p-3.5 text-sm font-mono text-white outline-none resize-none transition-all focus:bg-black/60 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14]"
-                    />
-                  </div>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    type="submit"
-                    disabled={isSubmittingContact}
-                    className="w-full bg-gradient-to-r from-white to-slate-200 text-indigo-950 font-black text-xs uppercase tracking-[0.2em] py-4 rounded-lg flex items-center justify-center gap-3 hover:from-indigo-50 hover:to-white transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14] disabled:opacity-50 disabled:cursor-not-allowed"
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="submit"
+                      disabled={isSubmittingContact}
+                      className="w-full bg-gradient-to-r from-white to-slate-200 text-indigo-950 font-black text-xs uppercase tracking-[0.2em] py-4 rounded-lg flex items-center justify-center gap-3 hover:from-indigo-50 hover:to-white transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isSubmittingContact ? (
+                        <>
+                          <Loader2 size={12} className="animate-spin" />
+                          Transmitting...
+                        </>
+                      ) : (
+                        <>
+                          Transmit Message <Send size={12} />
+                        </>
+                      )}
+                    </motion.button>
+                  </form>
+                ) : (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="py-16 text-center flex flex-col items-center justify-center gap-5"
                   >
-                    {isSubmittingContact ? (
-                      <>
-                        <Loader2 size={12} className="animate-spin" />
-                        Transmitting...
-                      </>
-                    ) : (
-                      <>
-                        Transmit Message <Send size={12} />
-                      </>
-                    )}
-                  </motion.button>
-                </form>
-              ) : (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="py-16 text-center flex flex-col items-center justify-center gap-5"
-                >
-                  <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-400 border border-emerald-500/20">
-                    <CheckCircle2 size={32} />
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-black text-white uppercase italic tracking-tight">Transmission Successful</h4>
-                    <p className="text-slate-500 text-sm mt-2">Your data has been recorded in the response log.</p>
-                  </div>
-                  <button 
-                    onClick={() => setFormSubmitted(false)} 
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        setFormSubmitted(false);
-                      }
-                    }}
-                    aria-label="Send another message"
-                    className="text-indigo-400 text-[10px] font-black uppercase tracking-widest hover:underline mt-2 flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14] rounded px-2 py-1"
-                  >
-                    <RefreshCw size={10} /> Send another query
-                  </button>
-                </motion.div>
-              )}
+                    <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-400 border border-emerald-500/20">
+                      <CheckCircle2 size={32} />
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-black text-white uppercase italic tracking-tight">Transmission Successful</h4>
+                      <p className="text-slate-500 text-sm mt-2">Your data has been recorded in the response log.</p>
+                    </div>
+                    <button 
+                      onClick={() => setFormSubmitted(false)} 
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setFormSubmitted(false);
+                        }
+                      }}
+                      aria-label="Send another message"
+                      className="text-indigo-400 text-[10px] font-black uppercase tracking-widest hover:underline mt-2 flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14] rounded px-2 py-1"
+                    >
+                      <RefreshCw size={10} /> Send another query
+                    </button>
+                  </motion.div>
+                )}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
         </ErrorBoundary>
 
       </main>

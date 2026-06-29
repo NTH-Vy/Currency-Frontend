@@ -345,8 +345,10 @@ const SearchSkeleton = () => {
 
 const TableHeaderSkeleton = () => (
   <tr className="border-b border-white/10 bg-white/5">
+    <th className="px-4 py-4 w-16"><div className="h-3 w-8 bg-white/5 rounded animate-pulse" /></th>
     <th className="px-4 py-4 w-20"><div className="h-3 w-10 bg-white/5 rounded animate-pulse" /></th>
     <th className="px-4 py-4"><div className="h-3 w-16 bg-white/5 rounded animate-pulse" /></th>
+    <th className="px-4 py-4 w-20"><div className="h-3 w-12 bg-white/5 rounded animate-pulse" /></th>
     <th className="px-4 py-4 w-24"><div className="h-3 w-10 bg-white/5 rounded animate-pulse" /></th>
     <th className="px-4 py-4 w-24"><div className="h-3 w-12 bg-white/5 rounded animate-pulse" /></th>
     <th className="px-4 py-4 w-32"><div className="h-3 w-14 bg-white/5 rounded animate-pulse" /></th>
@@ -389,6 +391,9 @@ const TableSkeleton = () => {
                   }}
                 >
                   <td className="px-4 py-4">
+                    <div className="w-8 h-8 rounded-full bg-white/5 animate-pulse" />
+                  </td>
+                  <td className="px-4 py-4">
                     <div className="flex items-center gap-1.5">
                       <div className="w-6 h-6 rounded-lg bg-white/5 animate-pulse" />
                       <div className="h-4 w-10 bg-white/5 rounded animate-pulse" />
@@ -400,6 +405,7 @@ const TableSkeleton = () => {
                       <div className="h-3 w-28 bg-white/5 rounded animate-pulse" />
                     </div>
                   </td>
+                  <td className="px-4 py-4"><div className="h-6 w-16 bg-white/5 rounded-lg animate-pulse" /></td>
                   <td className="px-4 py-4"><div className="h-6 w-16 bg-white/5 rounded-lg animate-pulse" /></td>
                   <td className="px-4 py-4"><div className="h-6 w-20 bg-white/5 rounded-lg animate-pulse" /></td>
                   <td className="px-4 py-4"><div className="h-4 w-24 bg-white/5 rounded animate-pulse" /></td>
@@ -464,8 +470,12 @@ interface UserRegistryItem {
   username: string;
   email: string;
   role: string;
-  is_active: number | boolean; 
+  is_active: number | boolean;
   created_at: string;
+  avatar_url?: string | null;
+  facebook_id?: string | null;
+  google_id?: string | null;
+  login_method?: 'email' | 'google' | 'facebook';
 }
 
 interface SystemActivityItem {
@@ -491,6 +501,53 @@ interface ToastState {
   type: 'success' | 'error' | 'info' | 'warning';
   visible: boolean;
 }
+
+// Helper lấy chữ cái đầu
+const getInitials = (username: string) => {
+  return username?.charAt(0)?.toUpperCase() || '?';
+};
+
+// Helper lấy avatar URL
+const getUserAvatar = (user: UserRegistryItem) => {
+  if (user.avatar_url) return user.avatar_url;
+  if (user.facebook_id) return `https://graph.facebook.com/${user.facebook_id}/picture?type=large`;
+  return null;
+};
+
+// Helper lấy thông tin phương thức đăng nhập
+const getMethodInfo = (method?: string) => {
+  switch(method) {
+    case 'google':
+      return { 
+        icon: (
+          <svg className="w-3 h-3" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+        ),
+        label: 'Google',
+        color: 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+      };
+    case 'facebook':
+      return { 
+        icon: (
+          <svg className="w-3 h-3 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+        ),
+        label: 'Facebook',
+        color: 'bg-blue-600/10 text-blue-400 border-blue-600/20'
+      };
+    default:
+      return { 
+        icon: <Mail size={12} />,
+        label: 'Email',
+        color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+      };
+  }
+};
 
 export default function UserPage() {
   const router = useRouter();
@@ -778,7 +835,7 @@ export default function UserPage() {
       const user = users.find(u => u.user_id === userId);
       if (!user) return;
 
-      const response = await fetch(`http://localhost:8000/api/admin/users/${userId}/toggle-active`, {
+      const response = await fetch(`http://localhost:8000/api/admin/users/${userId}/toggle-status`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -1114,7 +1171,7 @@ export default function UserPage() {
               )}
             </AnimatePresence>
 
-            {/* Users Table */}
+            {/* Users Table with Avatar and Method Columns */}
             <motion.div 
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -1125,8 +1182,10 @@ export default function UserPage() {
                 <table className="w-full text-left font-mono">
                   <thead>
                     <tr className="border-b border-white/10 bg-white/5 text-[8px] text-slate-400 uppercase tracking-[0.2em] font-black">
+                      <th className="px-4 py-4 w-16">Avatar</th>
                       <th className="px-4 py-4 w-20">Node</th>
                       <th className="px-4 py-4">Operator</th>
+                      <th className="px-4 py-4 w-20">Method</th>
                       <th className="px-4 py-4 w-24">Rank</th>
                       <th className="px-4 py-4 w-24">Status</th>
                       <th className="px-4 py-4 w-32">Joined</th>
@@ -1135,9 +1194,10 @@ export default function UserPage() {
                   </thead>
                   <tbody>
                     {users.length === 0 ? (
-                      // Hiển thị 10 dòng trống khi không có dữ liệu
                       [...Array(10)].map((_, idx) => (
                         <tr key={`empty-${idx}`} className="pointer-events-none">
+                          <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+                          <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
                           <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
                           <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
                           <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
@@ -1151,6 +1211,10 @@ export default function UserPage() {
                         {users.map((user, idx) => {
                           const roleColor = getRoleColor(user.role);
                           const formattedDate = formatDate(user.created_at);
+                          const avatarUrl = getUserAvatar(user);
+                          const initials = getInitials(user.username);
+                          const methodInfo = getMethodInfo(user.login_method);
+                          
                           return (
                             <motion.tr 
                               key={user.user_id} 
@@ -1161,6 +1225,31 @@ export default function UserPage() {
                               onMouseLeave={() => setHoveredRow(null)}
                               className="hover:bg-white/5 transition-all group border-b border-white/5"
                             >
+                              {/* Avatar */}
+                              <td className="px-4 py-4">
+                                {avatarUrl ? (
+                                  <img 
+                                    src={avatarUrl} 
+                                    alt={user.username}
+                                    className="w-8 h-8 rounded-full object-cover border border-indigo-500/30"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = 'none';
+                                      const parent = e.currentTarget.parentElement;
+                                      if (parent) {
+                                        const fallback = document.createElement('div');
+                                        fallback.className = 'w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold flex items-center justify-center text-xs uppercase border border-indigo-500/30';
+                                        fallback.textContent = initials;
+                                        parent.appendChild(fallback);
+                                      }
+                                    }}
+                                  />
+                                ) : (
+                                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold flex items-center justify-center text-xs uppercase border border-indigo-500/30">
+                                    {initials}
+                                  </div>
+                                )}
+                              </td>
+                              
                               {/* Node */}
                               <td className="px-4 py-4">
                                 <div className="flex items-center gap-1.5">
@@ -1183,6 +1272,14 @@ export default function UserPage() {
                                   <span className="text-[8px] text-slate-500 font-mono flex items-center gap-1">
                                     <Mail size={8} /> {user.email}
                                   </span>
+                                </div>
+                              </td>
+                              
+                              {/* Method */}
+                              <td className="px-4 py-4">
+                                <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg border ${methodInfo.color}`}>
+                                  {methodInfo.icon}
+                                  <span className="text-[7px] font-black uppercase">{methodInfo.label}</span>
                                 </div>
                               </td>
                               
@@ -1264,9 +1361,11 @@ export default function UserPage() {
                           );
                         })}
                         
-                        {/* Thêm dòng trống để đủ 10 dòng - KHÔNG CÓ GẠCH NGANG */}
+                        {/* Thêm dòng trống để đủ 10 dòng */}
                         {users.length < 10 && [...Array(10 - users.length)].map((_, idx) => (
                           <tr key={`empty-${idx}`} className="pointer-events-none">
+                            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+                            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
                             <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
                             <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
                             <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
@@ -1330,13 +1429,7 @@ export default function UserPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowDeleteConfirm(null)}
-              onKeyDown={(e) => {
-                if (e.key === 'Escape') setShowDeleteConfirm(null);
-              }}
               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="delete-modal-title"
             >
               <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -1349,7 +1442,7 @@ export default function UserPage() {
                   <div className="p-2 bg-red-500/10 rounded-xl border border-red-500/30">
                     <AlertCircle size={20} className="text-red-400" />
                   </div>
-                  <h3 id="delete-modal-title" className="text-sm font-black text-white font-mono uppercase">Delete Operator</h3>
+                  <h3 className="text-sm font-black text-white font-mono uppercase">Delete Operator</h3>
                 </div>
                 <p className="text-slate-400 text-sm mb-6">
                   Are you sure you want to permanently delete this user? This action cannot be undone.
@@ -1357,13 +1450,13 @@ export default function UserPage() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowDeleteConfirm(null)}
-                    className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-all font-mono text-[9px] font-bold uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-white/20"
+                    className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-all font-mono text-[9px] font-bold uppercase tracking-wider"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={() => handleDeleteUser(showDeleteConfirm)}
-                    className="flex-1 px-4 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white transition-all font-mono text-[9px] font-bold uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500/50 flex items-center justify-center gap-2"
+                    className="flex-1 px-4 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white transition-all font-mono text-[9px] font-bold uppercase tracking-wider flex items-center justify-center gap-2"
                   >
                     <Trash2 size={14} />
                     Delete
@@ -1490,7 +1583,7 @@ export default function UserPage() {
           )}
         </AnimatePresence>
 
-        {/* View Modal */}
+        {/* View Modal - với Avatar */}
         <AnimatePresence>
           {viewModal.show && viewModal.data && (
             <motion.div
@@ -1508,12 +1601,31 @@ export default function UserPage() {
                 onClick={(e) => e.stopPropagation()}
                 className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden"
               >
-                <div className="p-6 border-b border-white/10 flex justify-between items-center bg-gradient-to-r from-white/5 to-transparent">
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 bg-sky-500/10 rounded-lg">
-                      <Eye size={14} className="text-sky-400" />
+                <div className="p-6 border-b border-white/10 flex items-center gap-4 bg-gradient-to-r from-white/5 to-transparent">
+                  {getUserAvatar(viewModal.data) ? (
+                    <img 
+                      src={getUserAvatar(viewModal.data) || ''} 
+                      alt={viewModal.data.username}
+                      className="w-12 h-12 rounded-full object-cover border border-indigo-500/30"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        const parent = e.currentTarget.parentElement;
+                        if (parent) {
+                          const fallback = document.createElement('div');
+                          fallback.className = 'w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold flex items-center justify-center text-xl uppercase border border-indigo-500/30';
+                          fallback.textContent = getInitials(viewModal.data.username);
+                          parent.appendChild(fallback);
+                        }
+                      }}
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold flex items-center justify-center text-xl uppercase border border-indigo-500/30">
+                      {getInitials(viewModal.data.username)}
                     </div>
-                    <h3 className="text-base font-black uppercase text-white">View Node Details</h3>
+                  )}
+                  <div className="flex-1">
+                    <h3 className="text-base font-black uppercase text-white">@{viewModal.data.username}</h3>
+                    <p className="text-[7px] text-slate-500 font-mono">Node Details</p>
                   </div>
                   <button 
                     onClick={() => setViewModal({ show: false, data: null })} 

@@ -10,20 +10,26 @@ export default function LoginSuccess() {
 
   useEffect(() => {
     const token = searchParams.get("token");
-    const user = searchParams.get("user");
+    const userParam = searchParams.get("user");
 
-    if (token && user) {
-      // Lưu vào LocalStorage
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", decodeURIComponent(user));
-      
-      // Kích hoạt sự kiện để Header cập nhật
-      window.dispatchEvent(new Event("auth-changed"));
+    if (token && userParam) {
+      try {
+        const userData = JSON.parse(decodeURIComponent(userParam));
+        // Lưu vào LocalStorage
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(userData));
+        
+        // Kích hoạt sự kiện để Header cập nhật
+        window.dispatchEvent(new Event("auth-changed"));
 
-      // Chuyển hướng sau 2 giây để người dùng thấy hiệu ứng
-      setTimeout(() => {
-        router.push("/");
-      }, 1500);
+        // Chuyển hướng sau 2 giây
+        setTimeout(() => {
+          router.push("/");
+        }, 1500);
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+        router.push("/login?error=auth_failed");
+      }
     } else {
       router.push("/login?error=auth_failed");
     }

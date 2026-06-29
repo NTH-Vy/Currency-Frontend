@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
@@ -47,7 +47,10 @@ import {
   ChevronRight,
   MessageCircleMore,
   Reply,
-  Quote
+  Quote,
+  Camera,
+  Upload,
+  X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -58,6 +61,9 @@ type AccountUser = {
   role: string;
   preferred_currency: string | null;
   is_active: number;
+  avatar_url?: string | null;
+  facebook_id?: string | null;
+  google_id?: string | null;
 };
 
 const API_BASE = "/api/laravel";
@@ -123,7 +129,6 @@ interface SystemActivityItem {
   created_at: string;
 }
 
-// Combined activity item type
 type ActivityItem = {
   id: number;
   type: 'comment' | 'reply';
@@ -135,6 +140,26 @@ type ActivityItem = {
   author: string;
   parent_content?: string;
 };
+
+// Helper lấy URL avatar
+function getAvatarUrl(user: AccountUser | null): string | null {
+  if (!user) return null;
+  
+  if (user.avatar_url) {
+    return user.avatar_url;
+  }
+  
+  if (user.facebook_id) {
+    return `https://graph.facebook.com/${user.facebook_id}/picture?type=large`;
+  }
+  
+  return null;
+}
+
+// Helper lấy chữ cái đầu
+function getInitials(username: string): string {
+  return username?.charAt(0)?.toUpperCase() || '?';
+}
 
 export default function UserDashboard() {
   const router = useRouter();
@@ -156,11 +181,28 @@ export default function UserDashboard() {
   const [systemTotal, setSystemTotal] = useState(0);
   const [systemCurrentPage, setSystemCurrentPage] = useState(1);
   const [systemLoading, setSystemLoading] = useState(false);
+  const [conversionHistory, setConversionHistory] = useState<ConversionHistoryItem[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToast({ message, type, visible: true });
     setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 3000);
   };
+
+  // Helper lấy URL avatar
+  const getUserAvatarUrl = useCallback(() => {
+    return getAvatarUrl(user);
+  }, [user]);
+
+  // Helper lấy chữ cái đầu
+  const getUserInitials = useCallback(() => {
+    return user ? getInitials(user.username) : '?';
+  }, [user]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -231,7 +273,6 @@ export default function UserDashboard() {
       setUserComments(comments);
       setRepliesToUser(replies);
       
-      // Combine both into a single activity list
       const combined: ActivityItem[] = [
         ...comments.map((c: UserComment) => ({
           id: c.comment_id,
@@ -257,7 +298,6 @@ export default function UserDashboard() {
         }))
       ];
       
-      // Sort by date (newest first)
       combined.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       setActivityList(combined);
       setActivityTotal(combined.length);
@@ -321,97 +361,125 @@ export default function UserDashboard() {
     }
   }, [user, activeTab, fetchUserComments]);
 
-  const handleDeleteHistoryItem = async (historyId: number) => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    try {
-      const res = await fetch(`${API_BASE}/history/${historyId}`, {
-        method: 'DELETE',
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Accept": "application/json"
-        }
-      });
-      const data = await res.json();
-      if (data.success) {
-        setConversionHistory(prev => prev.filter(item => item.history_id !== historyId));
-        showToast("History item deleted successfully", "success");
-      } else {
-        showToast("Failed to delete history item", "error");
-      }
-    } catch (error) {
-      console.error("Delete history item error:", error);
-      showToast("Failed to delete history item", "error");
+  // Avatar upload handlers
+  const handleAvatarClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
     }
   };
 
-  const handleClearAllHistory = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    if (!confirm("Are you sure you want to clear all conversion history? This action cannot be undone.")) {
+    // Kiểm tra định dạng file
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      showToast('Please upload JPEG, PNG, GIF, or WEBP image', 'error');
       return;
     }
 
-    try {
-      const res = await fetch(`${API_BASE}/history`, {
-        method: 'DELETE',
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Accept": "application/json"
-        }
-      });
-      const data = await res.json();
-      if (data.success) {
-        setConversionHistory([]);
-        setCurrentPage(1);
-        showToast("All history cleared successfully", "success");
-      } else {
-        showToast("Failed to clear history", "error");
-      }
-    } catch (error) {
-      console.error("Clear history error:", error);
-      showToast("Failed to clear history", "error");
-    }
-  };
-
-  const handleDeleteActivity = async (item: ActivityItem) => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    if (!confirm(`Are you sure you want to delete this ${item.type}? This action cannot be undone.`)) {
+    // Kiểm tra kích thước file (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      showToast('Image size must be less than 2MB', 'error');
       return;
     }
 
+    setAvatarFile(file);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setAvatarPreview(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+    setShowAvatarModal(true);
+  };
+
+  const handleUploadAvatar = async () => {
+    if (!avatarFile) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      showToast('Please login first', 'error');
+      return;
+    }
+
+    setUploadingAvatar(true);
     try {
-      const res = await fetch(`${API_BASE}/comments/${item.id}`, {
-        method: 'DELETE',
+      const formData = new FormData();
+      formData.append('avatar', avatarFile);
+
+      const res = await fetch(`${API_BASE}/user/avatar`, {
+        method: 'POST',
         headers: {
-          "Authorization": `Bearer ${token}`,
-          "Accept": "application/json"
-        }
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
       });
+
       const data = await res.json();
-      if (data.success) {
-        showToast(`${item.type === 'comment' ? 'Comment' : 'Reply'} deleted successfully`, "success");
-        // Refresh the list
-        fetchUserComments();
+      
+      if (res.ok && data.success) {
+        // Cập nhật user với avatar mới
+        const updatedUser = {
+          ...user,
+          avatar_url: data.avatar_url,
+        };
+        setUser(updatedUser as AccountUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        window.dispatchEvent(new Event("auth-changed"));
+        
+        showToast('Avatar updated successfully!', 'success');
+        setShowAvatarModal(false);
+        setAvatarFile(null);
+        setAvatarPreview(null);
       } else {
-        showToast("Failed to delete", "error");
+        showToast(data.error || 'Failed to upload avatar', 'error');
       }
     } catch (error) {
-      console.error("Delete activity error:", error);
-      showToast("Failed to delete", "error");
+      console.error('Upload avatar error:', error);
+      showToast('Failed to upload avatar', 'error');
+    } finally {
+      setUploadingAvatar(false);
     }
   };
 
-  // Paginate activity list
-  const activityTotalPages = Math.max(1, Math.ceil(activityTotal / itemsPerPage));
-  const paginatedActivity = activityList.slice(
-    (activityCurrentPage - 1) * itemsPerPage,
-    activityCurrentPage * itemsPerPage
-  );
+  const handleDeleteAvatar = async () => {
+    // Nếu là avatar từ social (FB/Google), không cho xóa
+    if (user?.facebook_id || user?.google_id) {
+      showToast('Cannot delete social avatar. Please update your profile picture on Facebook/Google.', 'error');
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/user/avatar`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        }
+      });
+
+      if (res.ok) {
+        const updatedUser = {
+          ...user,
+          avatar_url: null,
+        };
+        setUser(updatedUser as AccountUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        window.dispatchEvent(new Event("auth-changed"));
+        showToast('Avatar removed', 'success');
+        setShowAvatarModal(false);
+      } else {
+        showToast('Failed to remove avatar', 'error');
+      }
+    } catch (error) {
+      console.error('Delete avatar error:', error);
+      showToast('Failed to remove avatar', 'error');
+    }
+  };
 
   const handleCopyId = () => {
     if (user) {
@@ -425,6 +493,13 @@ export default function UserDashboard() {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
   };
 
+  // Paginated activity
+  const paginatedActivity = activityList.slice(
+    (activityCurrentPage - 1) * itemsPerPage,
+    activityCurrentPage * itemsPerPage
+  );
+
+  const activityTotalPages = Math.max(1, Math.ceil(activityTotal / itemsPerPage));
 
   if (loading) {
     return (
@@ -506,18 +581,17 @@ export default function UserDashboard() {
               </p>
             </div>
             
+            {/* Phần này đã được xóa - chỉ hiển thị tên user */}
             <div className="flex items-center gap-4">
-              <div className="flex flex-col items-end gap-1 font-mono text-right">
-                <span className="text-white text-sm font-black uppercase tracking-wide">{user.username}</span>
+              <div className="flex flex-col items-end gap-0.5 font-mono text-right">
+                <span className="text-sm font-black uppercase tracking-wide text-white">
+                  {user.username}
+                </span>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[7px] text-emerald-400 font-black uppercase tracking-widest">Remote Node Active</span>
-                </div>
-              </div>
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl blur-md opacity-0 group-hover:opacity-100 transition duration-500" />
-                <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-[#191929] to-[#11111a] border border-white/10 flex items-center justify-center text-indigo-400 font-mono font-black text-xl uppercase shadow-inner">
-                  {user.username[0]}
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-lg shadow-emerald-500/30" />
+                  <span className="text-[7px] text-emerald-400 font-black uppercase tracking-widest">
+                    Remote Node Active
+                  </span>
                 </div>
               </div>
             </div>
@@ -525,7 +599,7 @@ export default function UserDashboard() {
 
           <div className="grid lg:grid-cols-12 gap-8">
             
-            {/* Sidebar Navigation */}
+            {/* Sidebar Navigation với Avatar lớn cải tiến */}
             <motion.aside 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -533,6 +607,79 @@ export default function UserDashboard() {
               className="lg:col-span-3"
             >
               <div className="flex flex-col gap-1.5 p-2 bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl sticky top-28 shadow-xl">
+                
+                {/* Large Avatar Circle - Phiên bản cải tiến (đã bỏ badge LIVE) */}
+                <motion.div 
+                  className="relative mx-auto my-4 group/avatar"
+                  whileHover={{ scale: 1.03 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                >
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleAvatarChange}
+                    accept="image/jpeg,image/png,image/jpg,image/gif,image/webp"
+                    className="hidden"
+                  />
+                  
+                  <div 
+                    onClick={handleAvatarClick}
+                    className="relative w-32 h-32 rounded-full cursor-pointer group-hover/avatar:ring-4 ring-indigo-500/40 ring-offset-2 ring-offset-[#0c0c12] transition-all duration-300"
+                  >
+                    {/* Avatar glow effect */}
+                    <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full blur-md opacity-0 group-hover/avatar:opacity-100 transition-all duration-500" />
+                    
+                    {getUserAvatarUrl() ? (
+                      <img
+                        src={getUserAvatarUrl() || ''}
+                        alt={user.username}
+                        className="w-full h-full rounded-full object-cover border-2 border-white/10 group-hover/avatar:border-indigo-400 transition-all duration-300 relative"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const parent = e.currentTarget.parentElement;
+                          if (parent) {
+                            const fallback = document.createElement('div');
+                            fallback.className = 'w-full h-full rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white font-bold flex items-center justify-center text-4xl uppercase shadow-inner border-2 border-white/10 relative';
+                            fallback.textContent = getUserInitials();
+                            parent.appendChild(fallback);
+                          }
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white font-bold flex items-center justify-center text-4xl uppercase shadow-inner border-2 border-white/10 relative">
+                        {getUserInitials()}
+                      </div>
+                    )}
+                    
+                    {/* Hover overlay với hiệu ứng đẹp */}
+                    <div className="absolute inset-0 rounded-full bg-black/50 backdrop-blur-sm opacity-0 group-hover/avatar:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-1">
+                      <Camera size={28} className="text-white drop-shadow-lg" />
+                      <span className="text-[8px] font-bold text-white uppercase tracking-wider drop-shadow-lg">
+                        Change
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Username và role bên dưới avatar */}
+                  <div className="mt-3 text-center">
+                    <p className="text-sm font-bold text-white tracking-wide">
+                      {user.username}
+                    </p>
+                    <div className="flex items-center justify-center gap-2 mt-0.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+                      <span className="text-[8px] font-mono text-indigo-400/70 uppercase tracking-widest">
+                        {user.role || 'User'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Tooltip hint */}
+                  <p className="text-[6px] text-slate-500 text-center mt-1 font-mono opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300">
+                    Click to update profile picture
+                  </p>
+                </motion.div>
+
+                {/* Navigation Buttons */}
                 {tabs.map((tab) => (
                   <motion.button
                     key={tab.id}
@@ -590,29 +737,34 @@ export default function UserDashboard() {
                             Identity Matrix
                           </h3>
                           <div className="flex flex-col gap-3">
+                            {/* Identity - Username (không editable) */}
                             <div className="flex flex-col gap-1.5">
                               <label className="text-[7px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                                <Database size={8} /> Operator ID
-                              </label>
-                              <div className="flex items-center justify-between p-3 bg-black/40 rounded-xl border border-white/10 hover:border-indigo-500/30 transition-all group">
-                                <span className="text-indigo-300 font-mono text-sm font-black tracking-wider">#{user.user_id}</span>
-                                <button 
-                                  onClick={handleCopyId}
-                                  className="p-1 hover:bg-indigo-500/20 rounded transition-all opacity-0 group-hover:opacity-100"
-                                >
-                                  <Copy size={12} className="text-slate-400 hover:text-indigo-400" />
-                                </button>
-                              </div>
-                            </div>
-                            <div className="flex flex-col gap-1.5">
-                              <label className="text-[7px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                                <User size={8} /> Unique Username
+                                <User size={8} /> Identity
                               </label>
                               <div className="flex items-center justify-between p-3 bg-black/40 rounded-xl border border-white/10">
                                 <span className="text-white font-mono text-sm font-bold">{user.username}</span>
                                 <BadgeCheck size={14} className="text-indigo-400" />
                               </div>
                             </div>
+                            
+                            {/* Node Endpoint - Email hoặc Facebook ID (không editable) */}
+                            <div className="flex flex-col gap-1.5">
+                              <label className="text-[7px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
+                                <Mail size={8} /> Node Endpoint
+                              </label>
+                              <div className="flex items-center justify-between p-3 bg-black/40 rounded-xl border border-white/10">
+                                <span className="text-white font-mono text-xs truncate">
+                                  {user.facebook_id ? `FB: ${user.facebook_id}` : user.email}
+                                </span>
+                                <div className="flex items-center gap-1">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                  <span className="text-[6px] text-emerald-400 font-mono">VERIFIED</span>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Email - vẫn hiển thị nhưng không sửa được */}
                             <div className="flex flex-col gap-1.5">
                               <label className="text-[7px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
                                 <Mail size={8} /> Email Node
@@ -949,7 +1101,7 @@ export default function UserDashboard() {
                                       )}
                                       {item.type === 'comment' ? 'Comment' : 'Reply'}
                                     </div>
-                                   </td>
+                                  </td>
                                   <td className="px-6 py-4">
                                     <div className="flex flex-col gap-0.5 max-w-[200px]">
                                       <a 
@@ -962,7 +1114,7 @@ export default function UserDashboard() {
                                         by {item.author}
                                       </span>
                                     </div>
-                                   </td>
+                                  </td>
                                   <td className="px-6 py-4">
                                     <div className="relative group/tooltip">
                                       <p className="text-slate-300 text-[10px] leading-relaxed max-w-[280px] line-clamp-2 font-sans">
@@ -982,7 +1134,7 @@ export default function UserDashboard() {
                                         <span className="line-clamp-1">Replying to: &ldquo;{item.parent_content.substring(0, 40)}&rdquo;</span>
                                       </div>
                                     )}
-                                   </td>
+                                  </td>
                                   <td className="px-6 py-4">
                                     <div className="flex items-center gap-0.5">
                                       {[...Array(5)].map((_, idx) => (
@@ -993,7 +1145,7 @@ export default function UserDashboard() {
                                         />
                                       ))}
                                     </div>
-                                   </td>
+                                  </td>
                                   <td className="px-6 py-4 text-right">
                                     <span className="text-slate-100 font-bold text-[9px]">{formattedDate}</span>
                                   </td>
@@ -1007,14 +1159,31 @@ export default function UserDashboard() {
                                         <ExternalLink size={14} />
                                       </a>
                                       <button
-                                        onClick={() => handleDeleteActivity(item)}
+                                        onClick={() => {
+                                          if (confirm(`Are you sure you want to delete this ${item.type}?`)) {
+                                            fetch(`${API_BASE}/news/${item.news_id}/comment/${item.id}`, {
+                                              method: 'DELETE',
+                                              headers: {
+                                                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                                                'Accept': 'application/json'
+                                              }
+                                            }).then(res => res.json()).then(data => {
+                                              if (data.success) {
+                                                showToast(`${item.type} deleted successfully`, 'success');
+                                                fetchUserComments();
+                                              } else {
+                                                showToast('Failed to delete', 'error');
+                                              }
+                                            }).catch(() => showToast('Failed to delete', 'error'));
+                                          }
+                                        }}
                                         className="p-2 hover:bg-rose-500/20 rounded-lg transition-all text-rose-400 hover:text-rose-300 opacity-0 group-hover:opacity-100"
                                         title={`Delete this ${item.type}`}
                                       >
                                         <Trash2 size={14} />
                                       </button>
                                     </div>
-                                   </td>
+                                  </td>
                                 </motion.tr>
                               );
                             })
@@ -1082,6 +1251,103 @@ export default function UserDashboard() {
           </div>
         </div>
       </main>
+
+      {/* Avatar Upload Modal - Phiên bản cải tiến */}
+      <AnimatePresence>
+        {showAvatarModal && (
+          <>
+            <div
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
+              onClick={() => setShowAvatarModal(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-gradient-to-br from-[#12121c] to-[#0c0c12] border border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden"
+            >
+              <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
+                <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                  <Camera size={18} className="text-indigo-400" />
+                  Update Avatar
+                </h3>
+                <button
+                  onClick={() => setShowAvatarModal(false)}
+                  className="p-2 hover:bg-white/10 rounded-lg transition-all text-slate-400 hover:text-white hover:rotate-90 duration-300"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              
+              <div className="p-6 flex flex-col items-center gap-6">
+                {/* Preview với hiệu ứng glow */}
+                <div className="relative w-40 h-40 rounded-full border-2 border-indigo-500/30 overflow-hidden shadow-xl shadow-indigo-500/10">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full blur-lg opacity-30" />
+                  {avatarPreview ? (
+                    <img
+                      src={avatarPreview}
+                      alt="Avatar preview"
+                      className="w-full h-full object-cover relative z-10"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-white text-6xl font-bold uppercase relative z-10">
+                      {getUserInitials()}
+                    </div>
+                  )}
+                </div>
+                
+                <div className="text-center">
+                  <p className="text-xs text-slate-400">
+                    {avatarFile ? avatarFile.name : 'Choose an image to upload'}
+                  </p>
+                  <p className="text-[8px] text-slate-500 font-mono mt-1">
+                    JPEG, PNG, GIF, WEBP • Max 2MB
+                  </p>
+                </div>
+                
+                <div className="flex gap-3 w-full">
+                  <button
+                    onClick={() => {
+                      setShowAvatarModal(false);
+                      setAvatarFile(null);
+                      setAvatarPreview(null);
+                    }}
+                    className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-bold text-slate-300 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    Cancel
+                  </button>
+                  {!user?.facebook_id && !user?.google_id && (
+                    <button
+                      onClick={handleDeleteAvatar}
+                      className="px-4 py-3 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-xl text-sm font-bold text-rose-400 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
+                  <button
+                    onClick={handleUploadAvatar}
+                    disabled={!avatarFile || uploadingAvatar}
+                    className="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-sm font-bold text-white transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20"
+                  >
+                    {uploadingAvatar ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload size={16} />
+                        Upload
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       <Footer />
 
