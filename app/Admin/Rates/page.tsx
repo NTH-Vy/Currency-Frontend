@@ -30,8 +30,9 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import "../../css/Admin/Rates.css";
+import { BACK_END } from "@/lib/echo";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || `${BACK_END}/api`;
 
 interface RateInstrument {
   rate_id?: number;

@@ -55,8 +55,9 @@ import {
 
 // Import hooks
 import { useRealtimeRates } from "@/hooks/useRealtimeRates";
+import { BACK_END } from "@/lib/echo";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || `${BACK_END}/api`;
 
 const CATEGORIES = ["All", "Forex", "Crypto", "Commodities", "Favorites"];
 const ITEMS_PER_PAGE = 10;

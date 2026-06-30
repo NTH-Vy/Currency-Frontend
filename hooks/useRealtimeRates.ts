@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { echoClient } from '@/lib/echo'; // Sửa lại đường dẫn import cho đúng cấu trúc thư mục của bạn
+import { echoClient, BACK_END } from '@/lib/echo';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || `${BACK_END}/api`;
 
 interface Rate {
   pair: string;

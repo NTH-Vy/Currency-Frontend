@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { BACK_END } from "@/lib/echo";
 import { 
   Trash2, 
   Edit, 
@@ -617,7 +618,7 @@ export default function UserPage() {
       if (filters.dateFrom) params.append('date_from', filters.dateFrom);
       if (filters.dateTo) params.append('date_to', filters.dateTo);
 
-      const response = await fetch(`http://localhost:8000/api/admin/users?${params.toString()}`, {
+      const response = await fetch(`${BACK_END}/api/admin/users?${params.toString()}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Accept': 'application/json'
@@ -793,7 +794,7 @@ export default function UserPage() {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      const url = `http://localhost:8000/api/admin/users`;
+      const url = `${BACK_END}/api/admin/users`;
       const method = userModal.mode === "edit" ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -835,7 +836,7 @@ export default function UserPage() {
       const user = users.find(u => u.user_id === userId);
       if (!user) return;
 
-      const response = await fetch(`http://localhost:8000/api/admin/users/${userId}/toggle-status`, {
+      const response = await fetch(`${BACK_END}/api/admin/users/${userId}/toggle-status`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -866,7 +867,7 @@ export default function UserPage() {
       const token = localStorage.getItem("token");
       const user = users.find(u => u.user_id === userId);
       
-      const response = await fetch(`http://localhost:8000/api/admin/users/${userId}`, {
+      const response = await fetch(`${BACK_END}/api/admin/users/${userId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
