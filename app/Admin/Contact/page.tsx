@@ -558,7 +558,7 @@ const PageSkeleton = () => (
   </div>
 );
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "${BACK_END}/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '${BACK_END}/api';
 
 export default function AdminContact() {
   const router = useRouter();

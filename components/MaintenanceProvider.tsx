@@ -30,7 +30,7 @@ export default function MaintenanceProvider({ children }: { children: React.Reac
     // Proactive maintenance check on mount
     const checkMaintenanceStatus = async () => {
       try {
-        const response = await fetch("${BACK_END}/api/maintenance-status");
+        const response = await fetch('${BACK_END}/api/maintenance-status');
         const data = await response.json();
         
         if (data.maintenance === true && !isAdmin) {

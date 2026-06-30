@@ -5,6 +5,7 @@ import Link from "next/link";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import "../css/User/news.css";
+import { BACK_END } from "@/lib/echo";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Analytics } from "@vercel/analytics/react";
 import { track } from "@vercel/analytics/react";
@@ -187,7 +188,7 @@ export default function NewsPage() {
   const searchDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const scrollPositionRef = useRef<number>(0);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || '${BACK_END}/api';
 
   const showToast = (message: string) => {
     setToast({ message, visible: true });

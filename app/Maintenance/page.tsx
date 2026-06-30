@@ -8,6 +8,7 @@ import {
   Wrench
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { BACK_END } from "@/lib/echo";
 
 export default function MaintenancePage() {
   const [maintenanceData, setMaintenanceData] = useState<any>(null);
@@ -16,7 +17,7 @@ export default function MaintenancePage() {
   useEffect(() => {
     const fetchMaintenanceStatus = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/maintenance-status");
+        const response = await fetch('${BACK_END}/api/maintenance-status');
         const data = await response.json();
         if (data.maintenance) {
           setMaintenanceData(data);

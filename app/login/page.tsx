@@ -7,6 +7,7 @@ import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { Mail, Lock, ShieldCheck, ArrowRight, Loader2, Wifi } from "lucide-react";
 import { motion } from "framer-motion";
+import { BACK_END } from "@/lib/echo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/login", {
+      const res = await fetch('${BACK_END}/api/login', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -46,7 +47,7 @@ export default function LoginPage() {
   const handleSocialLogin = (provider: 'google' | 'facebook') => {
     // Thông thường Laravel Socialite sẽ nhận request tại endpoint này
     // Sau đó redirect sang Google/FB
-    window.location.href = `http://127.0.0.1:8000/api/auth/${provider}/redirect`;
+    window.location.href = `${BACK_END}/api/auth/${provider}/redirect`;
   };
 
   return (

@@ -129,7 +129,7 @@ export default function AdminDashboardView() {
     const loadData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("${BACK_END}/api/admin/statistics", {
+        const response = await fetch('${BACK_END}/api/admin/statistics', {
           headers: { "Authorization": `Bearer ${token}` },
         });
         if (response.ok) {
@@ -164,7 +164,7 @@ export default function AdminDashboardView() {
   const fetchActivityLogs = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("${BACK_END}/api/admin/activity-logs", {
+      const response = await fetch('${BACK_END}/api/admin/activity-logs', {
         headers: { "Authorization": `Bearer ${token}` },
       });
       if (response.ok) {
@@ -192,7 +192,7 @@ export default function AdminDashboardView() {
     setIsPublishing(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("${BACK_END}/api/admin/broadcast-notices", {
+      const response = await fetch('${BACK_END}/api/admin/broadcast-notices', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -228,7 +228,7 @@ export default function AdminDashboardView() {
     setIsResetting(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("${BACK_END}/api/admin/factory-reset", {
+      const response = await fetch('${BACK_END}/api/admin/factory-reset', {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -353,7 +353,7 @@ export default function AdminDashboardView() {
     const fetchSystemHealth = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("${BACK_END}/api/admin/health", {
+        const response = await fetch('${BACK_END}/api/admin/health', {
           headers: { "Authorization": `Bearer ${token}` },
         });
         if (response.ok) {

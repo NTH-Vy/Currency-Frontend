@@ -123,7 +123,7 @@ export default function Header() {
   const [selectedNotification, setSelectedNotification] = useState<NotificationItem | null>(null);
   const [avatarError, setAvatarError] = useState(false);
   const pathname = usePathname();
-  const API_BASE = "${BACK_END}/api";
+  const API_BASE = '${BACK_END}/api';
   
   const userMenuRef = useRef<HTMLDivElement>(null);
 

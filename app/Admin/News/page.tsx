@@ -505,7 +505,7 @@ export default function NewsPage() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "${BACK_END}/api";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || '${BACK_END}/api';
 
   const showToast = (message: string, type: ToastState['type'] = 'info') => {
     setToast({ message, type, visible: true });

@@ -85,7 +85,7 @@ type ActiveInput = 'send' | 'receive';
 
 // ─── CONSTANTS ───
 const GUEST_ALLOWED_CODES = ["USD", "EUR", "GBP", "JPY", "VND"];
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "${BACK_END}/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '${BACK_END}/api';
 const GUEST_HISTORY_KEY = "guest_conversion_history";
 
 // Debounce and timing constants

@@ -576,7 +576,7 @@ export default function NewsDetailPage() {
     cache.set(key, { data, timestamp: Date.now() });
   };
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "${BACK_END}/api";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || '${BACK_END}/api';
 
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToast({ message, type, visible: true });
