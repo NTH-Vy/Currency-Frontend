@@ -24,6 +24,7 @@ import {
   LifeBuoy,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { BACK_END } from "@/lib/echo";
 
 export default function AdminHeader() {
   const router = useRouter();
@@ -83,7 +84,7 @@ export default function AdminHeader() {
     return () => clearInterval(interval);
   }, []);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "${BACK_END}/api";
 
   useEffect(() => {
     const fetchNotifications = async () => {

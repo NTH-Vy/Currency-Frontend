@@ -35,6 +35,7 @@ import {
   Timer
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { BACK_END } from "@/lib/echo";
 
 // ============================================================
 // SKELETON COMPONENTS
@@ -233,7 +234,7 @@ export default function AdminSettingsPage() {
     maintenanceMessage: "The system is undergoing maintenance. Please check back later.",
     maintenanceEstimatedEnd: "",
     publicRegistration: true,
-    apiEndpoint: "http://127.0.0.1:8000/api/v1",
+    apiEndpoint: "${BACK_END}/api/v1",
     apiKey: "CTX-9921-X88-ALPHA-LEDGER-001",
     syncFrequency: "30s",
     authStrict: true,
@@ -249,7 +250,7 @@ export default function AdminSettingsPage() {
     setIsSaving(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://127.0.0.1:8000/api/admin/settings", {
+      const response = await fetch("${BACK_END}/api/admin/settings", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -279,7 +280,7 @@ export default function AdminSettingsPage() {
     
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://127.0.0.1:8000/api/admin/settings", {
+      const response = await fetch("${BACK_END}/api/admin/settings", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -313,7 +314,7 @@ export default function AdminSettingsPage() {
         return;
       }
       
-      const response = await fetch("http://127.0.0.1:8000/api/admin/settings", {
+      const response = await fetch("${BACK_END}/api/admin/settings", {
         headers: {
           "Authorization": `Bearer ${token}`,
           "Accept": "application/json"
@@ -344,7 +345,7 @@ export default function AdminSettingsPage() {
       const token = localStorage.getItem("token");
       if (!token) return;
       
-      const response = await fetch("http://127.0.0.1:8000/api/admin/health", {
+      const response = await fetch("${BACK_END}/api/admin/health", {
         headers: {
           "Authorization": `Bearer ${token}`,
           "Accept": "application/json"
@@ -383,7 +384,7 @@ export default function AdminSettingsPage() {
     const loadSettingsRetry = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://127.0.0.1:8000/api/admin/settings", {
+        const response = await fetch("${BACK_END}/api/admin/settings", {
           headers: { "Authorization": `Bearer ${token}`, "Accept": "application/json" }
         });
         const data = await response.json();

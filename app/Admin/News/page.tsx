@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import DOMPurify from 'dompurify';
+import { BACK_END } from "@/lib/echo";
 
 // ---------- Custom themed dropdown ----------
 interface SelectOption {
@@ -504,7 +505,7 @@ export default function NewsPage() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "${BACK_END}/api";
 
   const showToast = (message: string, type: ToastState['type'] = 'info') => {
     setToast({ message, type, visible: true });

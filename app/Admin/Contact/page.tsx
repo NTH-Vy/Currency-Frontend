@@ -35,6 +35,7 @@ import {
   Link2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { BACK_END } from "@/lib/echo";
 
 interface SupportTicket {
   ticket_id: number;
@@ -557,7 +558,7 @@ const PageSkeleton = () => (
   </div>
 );
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "${BACK_END}/api";
 
 export default function AdminContact() {
   const router = useRouter();

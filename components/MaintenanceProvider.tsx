@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { BACK_END } from "@/lib/echo";
 
 export default function MaintenanceProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -29,7 +30,7 @@ export default function MaintenanceProvider({ children }: { children: React.Reac
     // Proactive maintenance check on mount
     const checkMaintenanceStatus = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/maintenance-status");
+        const response = await fetch("${BACK_END}/api/maintenance-status");
         const data = await response.json();
         
         if (data.maintenance === true && !isAdmin) {

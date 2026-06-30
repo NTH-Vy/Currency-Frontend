@@ -8,6 +8,8 @@ if (typeof window !== 'undefined') {
 // Kiểm tra xem trang web hiện tại có đang chạy HTTPS hay không
 const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
 
+export const BACK_END = process.env.NEXT_PUBLIC_API_BASE;
+
 export const echoClient = typeof window !== 'undefined'
   ? new Echo({
       broadcaster: 'reverb',
@@ -16,7 +18,6 @@ export const echoClient = typeof window !== 'undefined'
       wsPort: parseInt(process.env.NEXT_PUBLIC_REVERB_PORT || '8080', 10),
       wssPort: parseInt(process.env.NEXT_PUBLIC_REVERB_PORT || '8080', 10),
       forceTLS: isHttps, 
-      // Chỉ cho phép DUY NHẤT một transport phù hợp để tránh trình duyệt cố đấm ăn xôi kết nối cả 2
       enabledTransports: isHttps ? ['wss'] : ['ws'],
       disableStats: true,
     })

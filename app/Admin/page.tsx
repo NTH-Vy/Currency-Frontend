@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import "../css/Admin/Dashboard.css";
+import { BACK_END } from "@/lib/echo";
 
 // Định nghĩa cấu trúc dữ liệu triệt để cho Activity Log
 interface ActivityLog {
@@ -128,7 +129,7 @@ export default function AdminDashboardView() {
     const loadData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://127.0.0.1:8000/api/admin/statistics", {
+        const response = await fetch("${BACK_END}/api/admin/statistics", {
           headers: { "Authorization": `Bearer ${token}` },
         });
         if (response.ok) {
@@ -163,7 +164,7 @@ export default function AdminDashboardView() {
   const fetchActivityLogs = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://127.0.0.1:8000/api/admin/activity-logs", {
+      const response = await fetch("${BACK_END}/api/admin/activity-logs", {
         headers: { "Authorization": `Bearer ${token}` },
       });
       if (response.ok) {
@@ -191,7 +192,7 @@ export default function AdminDashboardView() {
     setIsPublishing(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://127.0.0.1:8000/api/admin/broadcast-notices", {
+      const response = await fetch("${BACK_END}/api/admin/broadcast-notices", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -227,7 +228,7 @@ export default function AdminDashboardView() {
     setIsResetting(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://127.0.0.1:8000/api/admin/factory-reset", {
+      const response = await fetch("${BACK_END}/api/admin/factory-reset", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -261,7 +262,7 @@ export default function AdminDashboardView() {
   // Fetch current rate info for Oracle Override
   const fetchCurrentRateInfo = async (pair: string) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/rates/current`);
+      const response = await fetch(`${BACK_END}/api/rates/current`);
       const data = await response.json();
       
       if (data.success && data.rates) {
@@ -315,7 +316,7 @@ export default function AdminDashboardView() {
         source: 'oracle_override'
       };
 
-      const response = await fetch('http://127.0.0.1:8000/api/admin/rates', {
+      const response = await fetch('${BACK_END}/api/admin/rates', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -352,7 +353,7 @@ export default function AdminDashboardView() {
     const fetchSystemHealth = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://127.0.0.1:8000/api/admin/health", {
+        const response = await fetch("${BACK_END}/api/admin/health", {
           headers: { "Authorization": `Bearer ${token}` },
         });
         if (response.ok) {

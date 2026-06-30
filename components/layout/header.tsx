@@ -11,6 +11,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import "../../app/css/User/header.css";
+import { BACK_END } from "@/lib/echo";
 
 interface TickerItem {
   pair: string;
@@ -122,7 +123,7 @@ export default function Header() {
   const [selectedNotification, setSelectedNotification] = useState<NotificationItem | null>(null);
   const [avatarError, setAvatarError] = useState(false);
   const pathname = usePathname();
-  const API_BASE = "http://127.0.0.1:8000/api";
+  const API_BASE = "${BACK_END}/api";
   
   const userMenuRef = useRef<HTMLDivElement>(null);
 

@@ -23,6 +23,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Analytics } from "@vercel/analytics/react";
 import "./css/User/home.css";
 import { track } from "@vercel/analytics/react";
+import { BACK_END } from "@/lib/echo";
 
 interface HistoryItem {
   history_id: number;
@@ -84,7 +85,7 @@ type ActiveInput = 'send' | 'receive';
 
 // ─── CONSTANTS ───
 const GUEST_ALLOWED_CODES = ["USD", "EUR", "GBP", "JPY", "VND"];
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "${BACK_END}/api";
 const GUEST_HISTORY_KEY = "guest_conversion_history";
 
 // Debounce and timing constants
