@@ -8,7 +8,7 @@ if (typeof window !== 'undefined') {
 // Kiểm tra xem trang web hiện tại có đang chạy HTTPS hay không
 const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
 
-export const BACK_END = process.env.NEXT_PUBLIC_API_BASE;
+export const BACK_END = process.env.NEXT_PUBLIC_API_BASE || 'http://127.0.0.1:8000';
 
 export const echoClient = typeof window !== 'undefined'
   ? new Echo({
