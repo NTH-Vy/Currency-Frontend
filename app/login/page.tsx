@@ -22,7 +22,7 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      const res = await fetch('${BACK_END}/api/login', {
+      const res = await fetch(`${BACK_END}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

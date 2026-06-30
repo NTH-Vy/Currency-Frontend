@@ -84,7 +84,7 @@ export default function AdminHeader() {
     return () => clearInterval(interval);
   }, []);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || '${BACK_END}/api';
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || `${BACK_END}/api`;
 
   useEffect(() => {
     const fetchNotifications = async () => {

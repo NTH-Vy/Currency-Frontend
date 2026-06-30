@@ -17,7 +17,7 @@ export default function MaintenancePage() {
   useEffect(() => {
     const fetchMaintenanceStatus = async () => {
       try {
-        const response = await fetch('${BACK_END}/api/maintenance-status');
+        const response = await fetch(`${BACK_END}/api/maintenance-status`);
         const data = await response.json();
         if (data.maintenance) {
           setMaintenanceData(data);

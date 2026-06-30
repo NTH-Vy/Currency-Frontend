@@ -188,7 +188,7 @@ export default function NewsPage() {
   const searchDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const scrollPositionRef = useRef<number>(0);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || '${BACK_END}/api';
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || `${BACK_END}/api`;
 
   const showToast = (message: string) => {
     setToast({ message, visible: true });

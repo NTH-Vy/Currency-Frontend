@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const BACKEND = process.env.API_BASE || process.env.NEXT_PUBLIC_API_BASE || 'http://127.0.0.1:8000';
+const BACKEND = process.env.API_BASE || process.env.NEXT_PUBLIC_API_BASE || `${BACK_END}`;
 
 export async function GET(req: Request) {
   try {

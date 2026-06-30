@@ -570,7 +570,7 @@ export default function AdminReportsPage() {
   const [adminNote, setAdminNote] = useState('');
   const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
 
-  const API_BASE = '${BACK_END}/api';
+  const API_BASE = `${BACK_END}/api`;
 
   const showToast = (message: string, type: ToastState['type'] = 'info') => {
     setToast({ message, type, visible: true });
