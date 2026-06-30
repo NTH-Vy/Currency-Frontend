@@ -39,8 +39,9 @@ interface Article {
   content: string;
   image_url?: string;
   category: string;
-  author: string;
+  author: { username: string }; // Đã sửa từ string sang object để khớp với code sử dụng
   created_at: string;
+  published_at?: string; // Thêm trường này vì có dùng ở dưới
   comments?: Comment[];
   views?: number;
 }
@@ -56,6 +57,7 @@ interface BanStatus {
   banned: boolean;
   ban_reason?: string;
   banned_until?: string;
+  ban_remaining?: string;
 }
 
 interface ToastState {
@@ -697,7 +699,8 @@ export default function NewsDetailPage() {
         }
 
         if (commentsData.status === 'fulfilled' && commentsData.value && commentsData.value.success) {
-          setArticle(prev => ({ ...prev, comments: commentsData.value.data || [] }));
+          // FIX: Thêm kiểm tra điều kiện prev khác null
+          setArticle(prev => prev ? { ...prev, comments: commentsData.value.data || [] } : null);
           setCommentPagination(commentsData.value.pagination);
           setHasMoreComments(commentsData.value.pagination?.current_page < commentsData.value.pagination?.last_page);
         }
@@ -746,7 +749,8 @@ export default function NewsDetailPage() {
         const cachedData = getCachedData(cacheKey);
 
         if (cachedData) {
-          setArticle(prev => ({ ...prev, comments: [...(prev.comments || []), ...cachedData.data] }));
+          // FIX: Thêm kiểm tra điều kiện prev khác null
+          setArticle(prev => prev ? { ...prev, comments: [...(prev.comments || []), ...cachedData.data] } : null);
           setCommentPagination(cachedData.pagination);
           setHasMoreComments(cachedData.pagination?.current_page < cachedData.pagination?.last_page);
           return;
@@ -760,7 +764,8 @@ export default function NewsDetailPage() {
         const data = await res.json();
 
         if (data && data.success) {
-          setArticle(prev => ({ ...prev, comments: [...(prev.comments || []), ...data.data] }));
+          // FIX: Thêm kiểm tra điều kiện prev khác null
+          setArticle(prev => prev ? { ...prev, comments: [...(prev.comments || []), ...data.data] } : null);
           setCommentPagination(data.pagination);
           setHasMoreComments(data.pagination?.current_page < data.pagination?.last_page);
           setCachedData(cacheKey, data);
@@ -844,7 +849,7 @@ export default function NewsDetailPage() {
       content: comment,
       rating: rating,
       user: {
-        user_id: currentUserId,
+        user_id: currentUserId || 0,
         username: 'You',
       },
       likes: 0,
@@ -855,10 +860,11 @@ export default function NewsDetailPage() {
     };
 
     // Add optimistic comment immediately
-    setArticle({
-      ...article,
-      comments: [optimisticComment, ...(article.comments || [])]
-    });
+    // FIX: Thêm kiểm tra điều kiện prev khác null
+    setArticle(prev => prev ? {
+      ...prev,
+      comments: [optimisticComment, ...(prev.comments || [])]
+    } : null);
 
     const originalComment = comment;
     setComment("");
@@ -877,21 +883,23 @@ export default function NewsDetailPage() {
       const data = await res.json();
       if (res.ok) {
         // Replace optimistic comment with real server response
-        setArticle(prev => ({
+        // FIX: Thêm kiểm tra điều kiện prev khác null
+        setArticle(prev => prev ? {
           ...prev,
           comments: prev.comments?.map(c =>
             c.is_optimistic ? { ...data.comment, replies: [] } : c
           ) || []
-        }));
+        } : null);
         showToast("Comment posted successfully!", "success");
         const articleId = Array.isArray(params.id) ? params.id[0] : params.id;
         track('comment_submit', { article_id: String(articleId) });
       } else if (res.status === 403) {
         // User bị ban - remove optimistic comment
-        setArticle(prev => ({
+        // FIX: Thêm kiểm tra điều kiện prev khác null
+        setArticle(prev => prev ? {
           ...prev,
           comments: prev.comments?.filter(c => !c.is_optimistic) || []
-        }));
+        } : null);
         showToast(data.message || "You are banned from commenting", "error");
         setUserBanStatus(data);
         // Restore comment text
@@ -900,10 +908,11 @@ export default function NewsDetailPage() {
         lastCommentSubmissionTime.current = 0;
       } else {
         // Other error - remove optimistic comment
-        setArticle(prev => ({
+        // FIX: Thêm kiểm tra điều kiện prev khác null
+        setArticle(prev => prev ? {
           ...prev,
           comments: prev.comments?.filter(c => !c.is_optimistic) || []
-        }));
+        } : null);
         showToast(data.message || "Failed to post comment", "error");
         // Restore comment text
         setComment(originalComment);
@@ -912,10 +921,11 @@ export default function NewsDetailPage() {
       }
     } catch (error) {
       // Network error - remove optimistic comment
-      setArticle(prev => ({
+      // FIX: Thêm kiểm tra điều kiện prev khác null
+      setArticle(prev => prev ? {
         ...prev,
         comments: prev.comments?.filter(c => !c.is_optimistic) || []
-      }));
+      } : null);
       showToast("Failed to post comment. Please try again.", "error");
       // Restore comment text
       setComment(originalComment);
@@ -950,10 +960,11 @@ export default function NewsDetailPage() {
             return true;
           });
         };
-        setArticle({
-          ...article,
-          comments: removeComment(article.comments, commentId)
-        });
+        // FIX: Thêm kiểm tra điều kiện prev khác null
+        setArticle(prev => prev ? {
+          ...prev,
+          comments: removeComment(prev.comments || [], commentId)
+        } : null);
         showToast("Comment deleted", "success");
       }
     } finally { setIsDeleting(null); }
@@ -992,10 +1003,11 @@ export default function NewsDetailPage() {
             return c;
           });
         };
-        setArticle({
-          ...article,
-          comments: updateComment(article.comments)
-        });
+        // FIX: Thêm kiểm tra điều kiện prev khác null
+        setArticle(prev => prev ? {
+          ...prev,
+          comments: updateComment(prev.comments || [])
+        } : null);
         setEditingCommentId(null);
         setEditContent("");
         showToast("Comment updated", "success");
@@ -1037,10 +1049,11 @@ export default function NewsDetailPage() {
             return c;
           });
         };
-        setArticle({
-          ...article,
-          comments: updateLike(article.comments || [])
-        });
+        // FIX: Thêm kiểm tra điều kiện prev khác null
+        setArticle(prev => prev ? {
+          ...prev,
+          comments: updateLike(prev.comments || [])
+        } : null);
         const articleId = Array.isArray(params.id) ? params.id[0] : params.id;
         track('comment_like', { article_id: String(articleId), comment_id: commentId });
       }
@@ -1076,7 +1089,7 @@ export default function NewsDetailPage() {
       content: replyContent,
       rating: 5,
       user: {
-        user_id: currentUserId,
+        user_id: currentUserId || 0,
         username: 'You',
       },
       likes: 0,
@@ -1098,10 +1111,11 @@ export default function NewsDetailPage() {
         return c;
       });
     };
-    setArticle({
-      ...article,
-      comments: addOptimisticReply(article.comments)
-    });
+    // FIX: Thêm kiểm tra điều kiện prev khác null
+    setArticle(prev => prev ? {
+      ...prev,
+      comments: addOptimisticReply(prev.comments || [])
+    } : null);
 
     const originalReplyContent = replyContent;
     setReplyContent("");
@@ -1136,10 +1150,11 @@ export default function NewsDetailPage() {
             return c;
           });
         };
-        setArticle(prev => ({
+        // FIX: Thêm kiểm tra điều kiện prev khác null
+        setArticle(prev => prev ? {
           ...prev,
-          comments: replaceOptimisticReply(prev.comments)
-        }));
+          comments: replaceOptimisticReply(prev.comments || [])
+        } : null);
         showToast("Reply posted successfully!", "success");
       } else if (res.status === 403) {
         // User bị ban - remove optimistic reply
@@ -1157,10 +1172,11 @@ export default function NewsDetailPage() {
             return c;
           });
         };
-        setArticle(prev => ({
+        // FIX: Thêm kiểm tra điều kiện prev khác null
+        setArticle(prev => prev ? {
           ...prev,
-          comments: removeOptimisticReply(prev.comments)
-        }));
+          comments: removeOptimisticReply(prev.comments || [])
+        } : null);
         showToast(data.message || "You are banned from commenting", "error");
         setUserBanStatus(data);
         // Restore reply text
@@ -1184,10 +1200,11 @@ export default function NewsDetailPage() {
             return c;
           });
         };
-        setArticle(prev => ({
+        // FIX: Thêm kiểm tra điều kiện prev khác null
+        setArticle(prev => prev ? {
           ...prev,
-          comments: removeOptimisticReply(prev.comments)
-        }));
+          comments: removeOptimisticReply(prev.comments || [])
+        } : null);
         showToast(data.message || "Failed to post reply", "error");
         // Restore reply text
         setReplyContent(originalReplyContent);
@@ -1211,10 +1228,11 @@ export default function NewsDetailPage() {
           return c;
         });
       };
-      setArticle(prev => ({
+      // FIX: Thêm kiểm tra điều kiện prev khác null
+      setArticle(prev => prev ? {
         ...prev,
-        comments: removeOptimisticReply(prev.comments)
-      }));
+        comments: removeOptimisticReply(prev.comments || [])
+      } : null);
       showToast("Failed to post reply. Please try again.", "error");
       // Restore reply text
       setReplyContent(originalReplyContent);
@@ -1319,7 +1337,7 @@ export default function NewsDetailPage() {
     
     switch(platform) {
       case 'twitter':
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`, '_blank');
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title || '')}&url=${encodeURIComponent(url)}`, '_blank');
         const articleId = Array.isArray(params.id) ? params.id[0] : params.id;
         track('article_share', { article_id: String(articleId), platform: 'twitter' });
         break;
@@ -1664,7 +1682,7 @@ export default function NewsDetailPage() {
                   {article?.category}
                 </span>
                 <div className="flex items-center gap-3 font-mono text-[9px] text-slate-500 uppercase tracking-wider">
-                  <span className="flex items-center gap-1.5"><Calendar size={10} /> {new Date(article?.published_at).toLocaleDateString()}</span>
+                  <span className="flex items-center gap-1.5"><Calendar size={10} /> {article?.published_at ? new Date(article.published_at).toLocaleDateString() : 'N/A'}</span>
                   <span className="flex items-center gap-1.5 text-indigo-400"><Eye size={10} /> {article?.views || 0} Views</span>
                 </div>
               </div>
@@ -1903,7 +1921,7 @@ export default function NewsDetailPage() {
                       <Loader2 className="animate-spin text-indigo-500 mx-auto mb-2" size={24} />
                       <p className="text-slate-500 font-mono text-[9px] uppercase tracking-wider">Loading comments...</p>
                     </div>
-                  ) : article?.comments?.length > 0 ? (
+                  ) : article?.comments?.length && article.comments.length > 0 ? (
                     <>
                       {article.comments.map((comment: any) => (
                         <CommentItem
@@ -1946,7 +1964,7 @@ export default function NewsDetailPage() {
                         </div>
                       )}
 
-                      {!hasMoreComments && article?.comments?.length > 0 && (
+                      {!hasMoreComments && article?.comments?.length && article.comments.length > 0 && (
                         <div className="text-center py-4">
                           <p className="text-slate-600 font-mono text-[8px] uppercase tracking-wider">No more comments</p>
                         </div>
@@ -1960,8 +1978,8 @@ export default function NewsDetailPage() {
                     </div>
                   )}
                 </div>
-              </motion.section>
-            </ErrorBoundary>
+                </motion.section>
+              </ErrorBoundary>
             </div>
 
             {/* Right Sidebar */}
@@ -2017,7 +2035,7 @@ export default function NewsDetailPage() {
                       const userReplies: any[] = [];
                       const findRepliesToUser = (comments: any[], targetUserId: number) => {
                         comments.forEach(comment => {
-                          if (comment.user?.id === targetUserId && comment.replies?.length > 0) {
+                          if (comment.user?.user_id === targetUserId && comment.replies?.length > 0) {
                             comment.replies.forEach((reply: any) => {
                               userReplies.push({
                                 username: reply.user?.username,

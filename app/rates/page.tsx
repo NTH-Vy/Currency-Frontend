@@ -1366,7 +1366,7 @@ export default function RatesPage() {
                         <div className="flex flex-col">
                           <span className="text-[10px] font-mono font-bold text-white">{alert.base_currency}/{alert.target_currency}</span>
                           <span className={`text-[8px] font-mono ${alert.condition === 'above' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                            {alert.condition} {parseFloat(alert.target_rate).toFixed(4)}
+                            {alert.condition} {alert.target_rate.toFixed(4)}
                           </span>
                         </div>
                         <motion.button

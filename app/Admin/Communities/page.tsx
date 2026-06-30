@@ -1065,7 +1065,7 @@ export default function NewsCommentsModerationView() {
                             >
                               <Newspaper size={8} className="flex-shrink-0" />
                               {comment.news?.title?.slice(0, 15) || `News #${comment.news_id}`}
-                              {comment.news?.title?.length > 15 && '...'}
+                              {comment.news?.title && comment.news.title.length > 15 && '...'}
                             </Link>
                           </td>
                           

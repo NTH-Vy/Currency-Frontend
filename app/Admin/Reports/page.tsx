@@ -704,7 +704,7 @@ export default function AdminReportsPage() {
   };
 
   const getStatusBadge = (status: string) => {
-    const styles: Record<string, { bg: string; icon: JSX.Element; label: string }> = {
+    const styles: Record<string, { bg: string; icon: React.ReactNode; label: string }> = {
       pending: { bg: 'bg-yellow-500/15 border-yellow-500/30 text-yellow-400', icon: <Clock size={10} />, label: 'Pending' },
       approved: { bg: 'bg-red-500/15 border-red-500/30 text-red-400', icon: <Check size={10} />, label: 'Approved' },
       rejected: { bg: 'bg-slate-500/15 border-slate-500/30 text-slate-400', icon: <X size={10} />, label: 'Rejected' }

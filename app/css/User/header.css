@@ -1,0 +1,24 @@
+        @keyframes ticker {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-ticker {
+          animation: ticker 30s linear infinite;
+        }
+        .animate-ticker:hover {
+          animation-play-state: paused;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar {
+          width: 2px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 10px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.15);
+        }

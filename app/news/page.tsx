@@ -243,7 +243,7 @@ export default function NewsPage() {
 
       if (cachedData) {
         setArticles(cachedData.data || []);
-        setLastPage(cachedData.last_page || 1);
+        setLastPage(cachedData.pagination?.last_page || 1);
         setLoading(false);
         return;
       }
@@ -255,9 +255,9 @@ export default function NewsPage() {
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
-      const data: PaginatedResponse<Article> = await res.json();
+      const data: ApiResponse<Article[]> & { pagination?: { last_page: number } } = await res.json();
       setArticles(data.data || []);
-      setLastPage(data.last_page || 1);
+      setLastPage(data.pagination?.last_page || 1);
       setCachedData(cacheKey, data);
     } catch (err) {
       console.error("Fetch error:", err);
@@ -300,6 +300,8 @@ export default function NewsPage() {
   }, [API_BASE, activeCategory]);
 
   useEffect(() => {
+    // Clear cache on mount to ensure fresh data with correct format
+    cache.clear();
     fetchNews();
     fetchTrending();
     fetchBreakingNews();
@@ -552,7 +554,7 @@ export default function NewsPage() {
                     <AnimatePresence mode="popLayout">
                       <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
                         {articles.length > 0 ? (
-                          articles.map((article, i) => (
+                          articles.slice(currentPage === 1 && searchQuery === "" ? 1 : 0).map((article, i) => (
                             <Link key={article.news_id} href={`/news/${article.news_id}`} onClick={() => incrementViewCount(article.news_id)} aria-label={`Read article: ${article.title}`}>
                               <motion.article
                                 layout

@@ -1237,8 +1237,9 @@ export default function UserPage() {
                                       const parent = e.currentTarget.parentElement;
                                       if (parent) {
                                         const fallback = document.createElement('div');
-                                        fallback.className = 'w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold flex items-center justify-center text-xs uppercase border border-indigo-500/30';
-                                        fallback.textContent = initials;
+                                        fallback.className = 'w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold flex items-center justify-center text-xl uppercase border border-indigo-500/30';
+                                        // Fix: Use optional chaining and a fallback string
+                                        fallback.textContent = getInitials(viewModal.data?.username ?? ''); 
                                         parent.appendChild(fallback);
                                       }
                                     }}
@@ -1613,7 +1614,7 @@ export default function UserPage() {
                         if (parent) {
                           const fallback = document.createElement('div');
                           fallback.className = 'w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold flex items-center justify-center text-xl uppercase border border-indigo-500/30';
-                          fallback.textContent = getInitials(viewModal.data.username);
+                          fallback.textContent = getInitials(viewModal.data?.username ?? '');
                           parent.appendChild(fallback);
                         }
                       }}

@@ -17,6 +17,20 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import "../css/Admin/Dashboard.css";
 
+// Định nghĩa cấu trúc dữ liệu triệt để cho Activity Log
+interface ActivityLog {
+  log_id: number;
+  user_id: string;
+  username: string;
+  activity_type: string;
+  description: string;
+  target_type: string;
+  target_id: string;
+  created_at: string;
+  avatar: string;
+  status: string;
+}
+
 export default function AdminDashboardView() {
   const router = useRouter();
   const [ratesCount, setRatesCount] = useState(0);
@@ -27,7 +41,10 @@ export default function AdminDashboardView() {
   const [newsTrend, setNewsTrend] = useState(0);
   const [usersTrend, setUsersTrend] = useState(0);
   const [postsTrend, setPostsTrend] = useState(0);
-  const [activityLogs, setActivityLogs] = useState([]);
+  
+  // Sửa lỗi: Chỉ định rõ mảng chứa các ActivityLog[] thay vì để trống [] (never[])
+  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
+  
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [time, setTime] = useState(new Date());
@@ -79,8 +96,8 @@ export default function AdminDashboardView() {
   const [isOverriding, setIsOverriding] = useState(false);
   const [currentRateInfo, setCurrentRateInfo] = useState<{ price: string; change: string; trend: string; volume: string; lastUpdated: string } | null>(null);
 
-  // Mock data cho activity logs
-  const mockActivityLogs = [
+  // Ép kiểu chuẩn cho mảng dữ liệu mẫu mock data
+  const mockActivityLogs: ActivityLog[] = [
     { log_id: 1, user_id: "U001", username: "0xKaelen", activity_type: "RATE_UPDATE", description: "Modified EUR/USD spread parameters", target_type: "rate", target_id: "eur_usd", created_at: new Date().toISOString(), avatar: "K", status: "success" },
     { log_id: 2, user_id: "U002", username: "VY123", activity_type: "COMMENT", description: "Posted analysis on NFP report", target_type: "post", target_id: "post_42", created_at: new Date(Date.now() - 2*60000).toISOString(), avatar: "V", status: "info" },
     { log_id: 3, user_id: "U003", username: "CipherVault", activity_type: "SECURITY", description: "Two-factor authentication enabled", target_type: "user", target_id: "user_89", created_at: new Date(Date.now() - 7*60000).toISOString(), avatar: "C", status: "warning" },
@@ -244,7 +261,6 @@ export default function AdminDashboardView() {
   // Fetch current rate info for Oracle Override
   const fetchCurrentRateInfo = async (pair: string) => {
     try {
-      const [base, target] = pair.split('/');
       const response = await fetch(`http://127.0.0.1:8000/api/rates/current`);
       const data = await response.json();
       
@@ -577,7 +593,7 @@ export default function AdminDashboardView() {
               />
             </div>
 
-            {/* Activity Ledger - EXTENDED VERSION */}
+            {/* Activity Ledger */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -655,7 +671,7 @@ export default function AdminDashboardView() {
                       </div>
                     </div>
                     
-                    {/* Scrollable list - ĐÃ XÓA THANH CUỘN NGANG */}
+                    {/* Scrollable list */}
                     <div className="flex-grow overflow-y-auto overflow-x-hidden pr-1 space-y-2 mt-2 custom-scrollbar" style={{ maxHeight: '910px' }}>
                       {extendedLogs.map((log: any, idx: number) => (
                         <motion.div
@@ -1083,7 +1099,7 @@ function getStatusColor(status: string): string {
 }
 
 function getPremiumStatusBadge(status: string) {
-  const badges: Record<string, JSX.Element> = {
+  const badges: Record<string, React.ReactNode> = {
     success: (
       <span className="relative inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-full bg-gradient-to-r from-emerald-500/20 to-emerald-600/10 text-emerald-300 font-mono uppercase tracking-wider border border-emerald-500/30">
         <div className="w-1 h-1 rounded-full bg-emerald-400" />

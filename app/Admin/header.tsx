@@ -108,7 +108,7 @@ export default function AdminHeader() {
     };
 
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000); // Poll every 30 seconds
+    const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -216,7 +216,6 @@ export default function AdminHeader() {
                 Network: <span className="text-indigo-400">Verified</span>
               </span>
             </div>
-            {/* duplicate set so the loop reads seamlessly */}
             <div className="flex items-center gap-3 shrink-0">
               <Cpu size={12} className="text-indigo-500" />
               <span>
@@ -252,7 +251,6 @@ export default function AdminHeader() {
             : "bg-gradient-to-b from-[#0a0a0f]/60 to-transparent border-b border-white/[0.06] py-5"
         }`}
       >
-        {/* faint top hairline glow for depth */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent" />
 
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -302,7 +300,7 @@ export default function AdminHeader() {
 
             {/* Actions */}
             <div className="flex items-center gap-3">
-              {/* Notification Button */}
+              {/* Notification Box Integration */}
               <div className="relative">
                 <button
                   onClick={() => {
@@ -311,94 +309,126 @@ export default function AdminHeader() {
                       fetchNotificationsList();
                     }
                   }}
-                  className="relative w-9 h-9 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:border-white/20 hover:bg-white/10 transition-all duration-200"
+                  className="relative p-2 rounded-xl hover:bg-white/5 transition-all duration-200 group"
                 >
-                  <Bell size={17} />
+                  <Bell size={20} className={`transition-colors duration-200 ${notificationDropdownOpen ? 'text-indigo-400' : 'text-slate-400 group-hover:text-white'}`} />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-indigo-600 text-white text-[9px] font-bold rounded-full border-2 border-[#0a0a0f]">
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-[20px] flex items-center justify-center bg-indigo-500 text-white text-[10px] font-bold rounded-full border-2 border-[#0a0a0f]">
                       {formatNotificationCount(unreadCount)}
                     </span>
                   )}
                 </button>
 
-                {/* Notification Dropdown */}
                 <AnimatePresence>
                   {notificationDropdownOpen && (
                     <>
-                      <div
-                        className="fixed inset-0 z-40"
-                        onClick={() => setNotificationDropdownOpen(false)}
-                      />
+                      <div className="fixed inset-0 z-0" onClick={() => setNotificationDropdownOpen(false)} />
                       <motion.div
-                        initial={{ opacity: 0, scale: 0.96, y: 10 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.96, y: 10 }}
-                        transition={{ duration: 0.15, ease: "easeOut" }}
-                        className="absolute right-0 mt-3 w-96 rounded-2xl bg-[#12121c]/95 border border-white/10 shadow-2xl shadow-black/50 p-3 space-y-3 z-50 backdrop-blur-2xl max-h-[500px] overflow-hidden flex flex-col"
+                        initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="absolute right-0 mt-2 w-[380px] bg-[#0f0f1a] border border-white/5 rounded-2xl shadow-2xl shadow-black/70 overflow-hidden z-50"
                       >
-                        {/* Header */}
-                        <div className="flex items-center justify-between p-3 border-b border-white/10">
-                          <h3 className="text-xs font-black text-white uppercase tracking-wider">Notifications</h3>
-                          {unreadCount > 0 && (
+                        {/* Header Area */}
+                        <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/5 bg-[#0a0a14]">
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-sm font-bold text-white tracking-wide">Notifications</h3>
+                            {unreadCount > 0 && (
+                              <span className="px-2 py-0.5 bg-indigo-500 text-white text-[9px] font-bold rounded">
+                                {unreadCount} new
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {unreadCount > 0 && (
+                              <button 
+                                onClick={markAllAsRead}
+                                className="text-[11px] text-indigo-400 hover:text-indigo-300 font-normal transition-colors duration-200"
+                              >
+                                Mark all read
+                              </button>
+                            )}
+                            <div className="w-px h-3 bg-white/5" />
                             <button
-                              onClick={markAllAsRead}
-                              className="text-[9px] font-mono text-indigo-400 hover:text-indigo-300 uppercase tracking-wider transition-colors"
+                              onClick={() => setNotificationDropdownOpen(false)}
+                              className="text-slate-500 hover:text-white transition-colors duration-200"
                             >
-                              Mark all read
+                              <X size={15} />
                             </button>
-                          )}
+                          </div>
                         </div>
 
-                        {/* Notifications List */}
-                        <div className="flex-1 overflow-y-auto space-y-1">
+                        {/* List Content */}
+                        <div className="max-h-[420px] overflow-y-auto scrollbar-thin flex flex-col py-1">
                           {notifications.length === 0 ? (
-                            <div className="py-8 text-center text-slate-500 text-xs">
-                              No notifications
+                            <div className="flex flex-col items-center justify-center py-12 px-5">
+                              <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-3">
+                                <Bell size={22} className="text-slate-600" />
+                              </div>
+                              <p className="text-xs text-slate-400 font-medium">No notifications yet</p>
                             </div>
                           ) : (
-                            notifications.map((notification) => (
-                              <div
+                            notifications.map((notification, index) => (
+                              <motion.div
                                 key={notification.notification_id}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: index * 0.01 }}
                                 onClick={() => markAsRead(notification.notification_id)}
-                                className={`p-3 rounded-xl cursor-pointer transition-all ${
-                                  notification.is_read
-                                    ? 'bg-white/5 hover:bg-white/10'
-                                    : 'bg-indigo-500/10 hover:bg-indigo-500/15 border border-indigo-500/20'
-                                }`}
+                                className={`group flex items-center gap-3 mx-1.5 my-0.5 px-3 py-2 rounded-lg cursor-pointer transition-all duration-150 relative ${
+                                  !notification.is_read 
+                                    ? 'bg-indigo-500/[0.03] hover:bg-white/[0.03]' 
+                                    : 'hover:bg-white/[0.03]'
+                                  }`}
                               >
-                                <div className="flex items-start gap-3">
-                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                    notification.is_read ? 'bg-white/10' : 'bg-indigo-500/20'
-                                  }`}>
-                                    <Bell size={14} className={notification.is_read ? 'text-slate-400' : 'text-indigo-400'} />
+                                {/* Left Slim Avatar Badge */}
+                                <div className="relative flex-shrink-0">
+                                  <div className="relative w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-medium flex items-center justify-center uppercase text-xs ring-1 ring-white/5">
+                                    {(notification.actor_username || 'S').charAt(0).toUpperCase()}
+                                    <div className="absolute -bottom-0.5 -right-0.5 bg-indigo-500 text-white p-0.5 rounded-full ring-2 ring-[#0f0f1a] shadow-sm">
+                                      <Bell size={8} strokeWidth={2.5} />
+                                    </div>
                                   </div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className={`text-xs font-medium truncate ${
-                                      notification.is_read ? 'text-slate-400' : 'text-white'
-                                    }`}>
-                                      {notification.comment_content}
-                                    </p>
-                                    <p className="text-[9px] text-slate-500 font-mono mt-1">
-                                      {notification.actor_username || 'System'}
-                                    </p>
-                                  </div>
-                                  {!notification.is_read && (
-                                    <div className="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0 mt-2" />
-                                  )}
                                 </div>
-                              </div>
+
+                                {/* Main Text Body */}
+                                <div className="flex-1 min-w-0 pr-1">
+                                  <p className="text-[11.5px] leading-snug font-light text-slate-300">
+                                    <span className="font-semibold text-white hover:underline mr-1">
+                                      {notification.actor_username ? `@${notification.actor_username}` : 'System'}
+                                    </span>
+                                    <span className={!notification.is_read ? 'text-slate-200' : 'text-slate-400'}>
+                                      sent a network operational message
+                                    </span>
+                                    {notification.comment_content && (
+                                      <span className="block text-[10.5px] text-slate-500 mt-0.5 line-clamp-1 italic bg-white/[0.02] px-1.5 py-0.5 rounded border border-white/5">
+                                        "{notification.comment_content}"
+                                      </span>
+                                    )}
+                                  </p>
+                                </div>
+
+                                {/* Active Unread Bullet Indicator */}
+                                {!notification.is_read && (
+                                  <div className="flex-shrink-0 flex items-center justify-center pr-0.5">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-sm" />
+                                  </div>
+                                )}
+                              </motion.div>
                             ))
                           )}
                         </div>
 
-                        {/* Footer */}
-                        <div className="pt-2 border-t border-white/10">
+                        {/* Footer Link */}
+                        <div className="border-t border-white/5 px-4 py-2 bg-[#0c0c16]">
                           <Link
                             href="/Admin/Contact"
                             onClick={() => setNotificationDropdownOpen(false)}
-                            className="block w-full text-center py-2 text-[10px] font-mono text-slate-400 hover:text-white uppercase tracking-wider transition-colors"
+                            className="flex items-center justify-center gap-1 text-[11px] text-slate-400 hover:text-white font-light transition-colors duration-200 group"
                           >
-                            View Support Center
+                            <span>View Support Center</span>
+                            <span className="group-hover:translate-x-0.5 transition-transform text-[10px]">→</span>
                           </Link>
                         </div>
                       </motion.div>
@@ -434,7 +464,6 @@ export default function AdminHeader() {
                 <AnimatePresence>
                   {profileDropdownOpen && (
                     <>
-                      {/* click-away backdrop */}
                       <div
                         className="fixed inset-0 z-40"
                         onClick={() => setProfileDropdownOpen(false)}
@@ -599,6 +628,19 @@ export default function AdminHeader() {
           .animate-ticker {
             animation: none;
           }
+        }
+        .scrollbar-thin::-webkit-scrollbar {
+          width: 2px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 10px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.15);
         }
       `}</style>
     </header>

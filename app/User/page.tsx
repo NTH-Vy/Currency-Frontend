@@ -50,7 +50,8 @@ import {
   Quote,
   Camera,
   Upload,
-  X
+  X,
+  Pencil
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -188,6 +189,9 @@ export default function UserDashboard() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [editingUsername, setEditingUsername] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [updatingUsername, setUpdatingUsername] = useState(false);
 
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToast({ message, type, visible: true });
@@ -488,6 +492,54 @@ export default function UserDashboard() {
     }
   };
 
+  const handleUpdateUsername = async () => {
+    if (!newUsername.trim()) {
+      showToast('Username cannot be empty', 'error');
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      showToast('Please login first', 'error');
+      return;
+    }
+
+    setUpdatingUsername(true);
+    try {
+      const res = await fetch(`${API_BASE}/user/profile`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ username: newUsername.trim() }),
+      });
+
+      const data = await res.json();
+      
+      if (res.ok && data.user) {
+        const updatedUser = {
+          ...user,
+          username: data.user.username,
+        } as AccountUser;
+        setUser(updatedUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        window.dispatchEvent(new Event("auth-changed"));
+        
+        showToast('Username updated successfully!', 'success');
+        setEditingUsername(false);
+      } else {
+        showToast(data.errors?.username?.[0] || data.message || 'Failed to update username', 'error');
+      }
+    } catch (error) {
+      console.error('Update username error:', error);
+      showToast('Failed to update username', 'error');
+    } finally {
+      setUpdatingUsername(false);
+    }
+  };
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
@@ -519,7 +571,6 @@ export default function UserDashboard() {
 
   const tabs = [
     { id: "profile", label: "Identity & Security", icon: <User size={14} /> },
-    { id: "history", label: "Trade Audit", icon: <History size={14} /> },
     { id: "comments", label: "Intelligence Activity", icon: <MessageSquare size={14} /> },
   ];
 
@@ -737,15 +788,71 @@ export default function UserDashboard() {
                             Identity Matrix
                           </h3>
                           <div className="flex flex-col gap-3">
-                            {/* Identity - Username (không editable) */}
+                            {/* Identity - Username (inline editing - clean version) */}
                             <div className="flex flex-col gap-1.5">
                               <label className="text-[7px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
                                 <User size={8} /> Identity
                               </label>
-                              <div className="flex items-center justify-between p-3 bg-black/40 rounded-xl border border-white/10">
-                                <span className="text-white font-mono text-sm font-bold">{user.username}</span>
-                                <BadgeCheck size={14} className="text-indigo-400" />
-                              </div>
+                              {editingUsername ? (
+                                <div className="flex items-center gap-2 px-3 py-2 bg-black/40 rounded-lg focus-within:ring-2 focus-within:ring-indigo-500/30 transition-all">
+                                  <input
+                                    type="text"
+                                    value={newUsername}
+                                    onChange={(e) => setNewUsername(e.target.value)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') {
+                                        handleUpdateUsername();
+                                      }
+                                      if (e.key === 'Escape') {
+                                        setEditingUsername(false);
+                                        setNewUsername(user.username);
+                                      }
+                                    }}
+                                    autoFocus
+                                    className="flex-1 bg-transparent text-white text-sm font-medium outline-none placeholder:text-slate-600"
+                                    placeholder="Enter username"
+                                    maxLength={30}
+                                  />
+                                  <div className="flex items-center gap-1">
+                                    <button
+                                      onClick={handleUpdateUsername}
+                                      disabled={updatingUsername || !newUsername.trim()}
+                                      className="p-1.5 hover:bg-white/10 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed text-indigo-400 hover:text-indigo-300"
+                                    >
+                                      {updatingUsername ? (
+                                        <Loader2 size={14} className="animate-spin" />
+                                      ) : (
+                                        <CheckCircle2 size={14} />
+                                      )}
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        setEditingUsername(false);
+                                        setNewUsername(user.username);
+                                      }}
+                                      className="p-1.5 hover:bg-white/10 rounded-lg transition-all text-slate-400 hover:text-white"
+                                    >
+                                      <X size={14} />
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div 
+                                  onClick={() => {
+                                    setEditingUsername(true);
+                                    setNewUsername(user.username);
+                                  }}
+                                  className="group flex items-center justify-between px-3 py-2 bg-black/40 rounded-lg transition-all cursor-pointer hover:bg-black/60"
+                                >
+                                  <span className="text-white text-sm font-medium">{user.username}</span>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-[6px] font-mono text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-wider">
+                                      Click to edit
+                                    </span>
+                                    <Pencil size={12} className="text-slate-500 group-hover:text-indigo-400 transition-colors" />
+                                  </div>
+                                </div>
+                              )}
                             </div>
                             
                             {/* Node Endpoint - Email hoặc Facebook ID (không editable) */}
@@ -753,7 +860,7 @@ export default function UserDashboard() {
                               <label className="text-[7px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
                                 <Mail size={8} /> Node Endpoint
                               </label>
-                              <div className="flex items-center justify-between p-3 bg-black/40 rounded-xl border border-white/10">
+                              <div className="flex items-center justify-between p-3 bg-black/40 rounded-xl">
                                 <span className="text-white font-mono text-xs truncate">
                                   {user.facebook_id ? `FB: ${user.facebook_id}` : user.email}
                                 </span>
@@ -769,7 +876,7 @@ export default function UserDashboard() {
                               <label className="text-[7px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
                                 <Mail size={8} /> Email Node
                               </label>
-                              <div className="flex items-center justify-between p-3 bg-black/40 rounded-xl border border-white/10">
+                              <div className="flex items-center justify-between p-3 bg-black/40 rounded-xl">
                                 <span className="text-white font-mono text-xs truncate">{user.email}</span>
                                 <div className="flex items-center gap-1">
                                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
@@ -795,7 +902,7 @@ export default function UserDashboard() {
                             Terminal Security
                           </h3>
                           <div className="flex flex-col gap-3">
-                            <div className="flex items-center gap-2 p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                            <div className="flex items-center gap-2 p-3 bg-emerald-500/10 rounded-xl">
                               <ShieldCheck size={14} className="text-emerald-400" />
                               <span className="text-[8px] text-slate-300 font-mono">AES-256 Encryption Active</span>
                             </div>
@@ -805,14 +912,14 @@ export default function UserDashboard() {
                             <motion.button 
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
-                              className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[8px] font-black font-mono text-slate-300 uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                              className="w-full py-3 bg-white/5 hover:bg-white/10 rounded-xl text-[8px] font-black font-mono text-slate-300 uppercase tracking-widest transition-all flex items-center justify-center gap-2"
                             >
                               <RefreshCw size={10} /> Rotate Access Key
                             </motion.button>
                             <motion.button 
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
-                              className="w-full py-3 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-xl text-[8px] font-black font-mono text-emerald-400 uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                              className="w-full py-3 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-xl text-[8px] font-black font-mono text-emerald-400 uppercase tracking-widest transition-all flex items-center justify-center gap-2"
                             >
                               <Fingerprint size={10} /> Enable MFA
                             </motion.button>
@@ -829,13 +936,13 @@ export default function UserDashboard() {
                       className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] p-6 rounded-2xl border border-white/10 shadow-xl"
                     >
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="flex flex-col gap-2 p-4 bg-black/30 rounded-xl border border-white/5">
+                        <div className="flex flex-col gap-2 p-4 bg-black/30 rounded-xl">
                           <span className="text-[7px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
                             <Award size={8} /> Role Tier
                           </span>
                           <span className="text-slate-200 font-mono font-bold text-xs uppercase tracking-wide">{user.role}</span>
                         </div>
-                        <div className="flex flex-col gap-2 p-4 bg-black/30 rounded-xl border border-white/5">
+                        <div className="flex flex-col gap-2 p-4 bg-black/30 rounded-xl">
                           <span className="text-[7px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
                             <ShieldCheck size={8} /> Account Status
                           </span>
@@ -844,7 +951,7 @@ export default function UserDashboard() {
                             {user.is_active ? "Active" : "Disabled"}
                           </span>
                         </div>
-                        <div className="flex flex-col gap-2 p-4 bg-black/30 rounded-xl border border-white/5">
+                        <div className="flex flex-col gap-2 p-4 bg-black/30 rounded-xl">
                           <span className="text-[7px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
                             <Wallet size={8} /> Preferred Currency
                           </span>
@@ -895,133 +1002,6 @@ export default function UserDashboard() {
                         </div>
                       </div>
                     </motion.div>
-                  </motion.div>
-                )}
-
-                {activeTab === "history" && (
-                  <motion.div
-                    key="history"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}
-                    className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] rounded-2xl overflow-hidden border border-white/10 shadow-xl"
-                  >
-                    <div className="px-6 py-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <History size={14} className="text-indigo-400" />
-                        <h3 className="text-[10px] font-mono font-bold text-slate-300 uppercase tracking-widest">System Transaction Log</h3>
-                        <span className="text-[8px] font-mono text-slate-500 bg-black/30 px-2 py-0.5 rounded-full">{systemTotal}</span>
-                      </div>
-                    </div>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left font-mono">
-                        <thead>
-                          <tr className="border-b border-white/10 bg-black/30">
-                            <th className="px-6 py-4 text-[8px] font-bold text-slate-500 uppercase tracking-wider">Time</th>
-                            <th className="px-6 py-4 text-[8px] font-bold text-slate-500 uppercase tracking-wider">Action</th>
-                            <th className="px-6 py-4 text-[8px] font-bold text-slate-500 uppercase tracking-wider">Target</th>
-                            <th className="px-6 py-4 text-[8px] font-bold text-slate-500 uppercase tracking-wider">Details</th>
-                            <th className="px-6 py-4 text-[8px] font-bold text-slate-500 uppercase tracking-wider text-right">Timestamp</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5">
-                          {systemLoading ? (
-                            <tr>
-                              <td colSpan={5} className="px-6 py-12 text-center">
-                                <div className="flex items-center justify-center gap-2">
-                                  <Loader2 className="animate-spin text-indigo-500" size={16} />
-                                  <span className="text-[9px] text-slate-500 font-mono">Loading transaction log...</span>
-                                </div>
-                              </td>
-                            </tr>
-                          ) : systemActivity.length === 0 ? (
-                            <tr>
-                              <td colSpan={5} className="px-6 py-12 text-center">
-                                <div className="flex flex-col items-center gap-2">
-                                  <MessageCircleMore size={24} className="text-slate-600" />
-                                  <span className="text-[9px] text-slate-500 font-mono">No activity found</span>
-                                </div>
-                              </td>
-                            </tr>
-                          ) : (
-                            systemActivity.slice((systemCurrentPage - 1) * itemsPerPage, systemCurrentPage * itemsPerPage).map((item, i) => {
-                              const formattedDate = formatDate(item.created_at);
-                              return (
-                                <motion.tr
-                                  key={`${item.type}-${item.id}`}
-                                  initial={{ opacity: 0, x: -20 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: i * 0.03 }}
-                                  className="hover:bg-white/5 transition-all"
-                                >
-                                  <td className="px-6 py-4">
-                                    <span className="text-[9px] text-slate-300 font-mono">{formattedDate}</span>
-                                  </td>
-                                  <td className="px-6 py-4">
-                                    <span className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-100">
-                                      {item.action}
-                                    </span>
-                                  </td>
-                                  <td className="px-6 py-4">
-                                    <span className="text-slate-200 text-[10px] font-bold">{item.title}</span>
-                                  </td>
-                                  <td className="px-6 py-4">
-                                    <span className="text-slate-400 text-[9px] font-mono line-clamp-2">{item.details}</span>
-                                  </td>
-                                  <td className="px-6 py-4 text-right">
-                                    <span className="text-[9px] text-slate-500 font-mono">{formattedDate}</span>
-                                  </td>
-                                </motion.tr>
-                              );
-                            })
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                    {systemActivity.length > 0 && (
-                      <div className="px-6 py-4 border-t border-white/10 bg-black/20 flex justify-between items-center">
-                        <span className="text-[7px] font-mono text-slate-500">
-                          Showing {((systemCurrentPage - 1) * itemsPerPage) + 1} to {Math.min(systemCurrentPage * itemsPerPage, systemTotal)} of {systemTotal} activities
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => setSystemCurrentPage(prev => Math.max(1, prev - 1))}
-                            disabled={systemCurrentPage === 1}
-                            className="text-[8px] font-mono px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-1"
-                          >
-                            <ChevronLeft size={10} />
-                            Prev
-                          </button>
-                          <div className="flex items-center gap-1">
-                            {Array.from({ length: Math.min(Math.max(1, Math.ceil(systemTotal / itemsPerPage)), 5) }, (_, i) => {
-                              const pageNum = Math.min(Math.max(1, systemCurrentPage - 2 + i), Math.ceil(systemTotal / itemsPerPage));
-                              return (
-                                <button
-                                  key={pageNum}
-                                  onClick={() => setSystemCurrentPage(pageNum)}
-                                  className={`w-6 h-6 text-[8px] font-mono rounded-lg transition-all ${
-                                    systemCurrentPage === pageNum
-                                      ? 'bg-indigo-500 text-white'
-                                      : 'border border-white/10 hover:bg-white/5 text-slate-400'
-                                  }`}
-                                >
-                                  {pageNum}
-                                </button>
-                              );
-                            })}
-                          </div>
-                          <button
-                            onClick={() => setSystemCurrentPage(prev => Math.min(Math.ceil(systemTotal / itemsPerPage), prev + 1))}
-                            disabled={systemCurrentPage === Math.ceil(systemTotal / itemsPerPage)}
-                            className="text-[8px] font-mono px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-1"
-                          >
-                            Next
-                            <ChevronRight size={10} />
-                          </button>
-                        </div>
-                      </div>
-                    )}
                   </motion.div>
                 )}
 
@@ -1089,10 +1069,10 @@ export default function UserDashboard() {
                                   className="hover:bg-white/5 transition-all group"
                                 >
                                   <td className="px-6 py-4">
-                                    <div className={`flex items-center gap-1.5 text-[7px] font-black uppercase tracking-widest px-2 py-1 rounded-lg border w-fit ${
+                                    <div className={`flex items-center gap-1.5 text-[7px] font-black uppercase tracking-widest px-2 py-1 rounded-lg w-fit ${
                                       item.type === 'comment' 
-                                        ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
-                                        : 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                                        ? 'bg-indigo-500/10 text-indigo-400'
+                                        : 'bg-purple-500/10 text-purple-400'
                                     }`}>
                                       {item.type === 'comment' ? (
                                         <MessageSquare size={8} />
@@ -1313,14 +1293,14 @@ export default function UserDashboard() {
                       setAvatarFile(null);
                       setAvatarPreview(null);
                     }}
-                    className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-bold text-slate-300 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    className="flex-1 py-3 bg-white/5 hover:bg-white/10 rounded-xl text-sm font-bold text-slate-300 transition-all hover:scale-[1.02] active:scale-[0.98]"
                   >
                     Cancel
                   </button>
                   {!user?.facebook_id && !user?.google_id && (
                     <button
                       onClick={handleDeleteAvatar}
-                      className="px-4 py-3 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-xl text-sm font-bold text-rose-400 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      className="px-4 py-3 bg-rose-500/10 hover:bg-rose-500/20 rounded-xl text-sm font-bold text-rose-400 transition-all hover:scale-[1.02] active:scale-[0.98]"
                     >
                       <Trash2 size={16} />
                     </button>

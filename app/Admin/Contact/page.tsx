@@ -118,10 +118,12 @@ const CustomSelect = ({
   value,
   options,
   onChange,
+  direction = "down",
 }: {
   value: string;
   options: SelectOption[];
   onChange: (v: string) => void;
+  direction?: "down" | "up";
 }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -135,32 +137,35 @@ const CustomSelect = ({
   }, []);
 
   const selected = options.find((o) => o.value === value);
+  const isUp = direction === "up";
 
   return (
     <div className="relative" ref={ref}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className={`w-full flex items-center justify-between bg-black/40 border rounded-xl pl-4 pr-3 py-2.5 text-[11px] font-mono text-white transition-all focus:outline-none ${
-          open ? "border-indigo-500/50 bg-black/60" : "border-white/10 hover:border-white/20"
+        className={`w-full flex items-center justify-between gap-3 bg-black/40 border rounded-xl pl-4 pr-3 py-2.5 text-[11px] font-mono text-white transition-all focus:outline-none shadow-inner ${
+          open ? "border-indigo-500/60 bg-black/60 ring-1 ring-indigo-500/20" : "border-white/10 hover:border-white/25 hover:bg-black/50"
         }`}
       >
         <span className="truncate">{selected?.label}</span>
-        <ChevronRight
+        <ChevronDown
           size={12}
-          className={`text-slate-500 transition-transform duration-200 flex-shrink-0 ml-2 ${
-            open ? "-rotate-90" : "rotate-90"
+          className={`text-slate-500 transition-transform duration-200 flex-shrink-0 ${
+            open ? "rotate-180 text-indigo-400" : ""
           }`}
         />
       </button>
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: -6, scale: 0.98 }}
+            initial={{ opacity: 0, y: isUp ? 6 : -6, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.98 }}
+            exit={{ opacity: 0, y: isUp ? 6 : -6, scale: 0.98 }}
             transition={{ duration: 0.15 }}
-            className="absolute z-50 mt-2 w-full bg-[#15151f] border border-white/10 rounded-xl shadow-2xl overflow-hidden py-1.5"
+            className={`absolute z-[60] w-full min-w-[160px] bg-[#15151f] border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden py-1.5 ${
+              isUp ? "bottom-full mb-2" : "top-full mt-2"
+            }`}
           >
             {options.map((opt) => (
               <button
@@ -629,8 +634,19 @@ export default function AdminContact() {
 
       const data = await res.json();
       if (data.success) {
+        // Laravel paginate returns object with 'data' field containing items
         setTickets(data.tickets.data || []);
-        setPagination(data.tickets.pagination || data.tickets);
+        setPagination({
+          current_page: data.tickets.current_page || 1,
+          last_page: data.tickets.last_page || 1,
+          per_page: data.tickets.per_page || 20,
+          total: data.tickets.total || 0
+        });
+        console.log('Pagination data:', {
+          current_page: data.tickets.current_page,
+          last_page: data.tickets.last_page,
+          total: data.tickets.total
+        });
       }
     } catch (error) {
       console.error("Error fetching tickets:", error);
@@ -671,40 +687,42 @@ export default function AdminContact() {
     return () => clearTimeout(timer);
   }, [filters.search]);
 
-  const handleRespond = async () => {
+    const handleRespond = async () => {
     if (!selectedTicket || !responseText.trim()) return;
 
     setIsSubmitting(true);
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${API_BASE}/admin/support-tickets/${selectedTicket.ticket_id}/respond`, {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API_BASE}/admin/support-tickets/${selectedTicket.ticket_id}/respond`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-          "Accept": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/json"
         },
         body: JSON.stringify({
-          response: responseText,
-          status: selectedTicket.status === 'open' ? 'in_progress' : selectedTicket.status
+            response: responseText,
+            status: selectedTicket.status === 'open' ? 'in_progress' : selectedTicket.status
         })
-      });
+        });
 
-      const data = await res.json();
-      if (data.success) {
+        const data = await res.json();
+        if (data.success) {
         setSelectedTicket(data.ticket);
         setResponseText("");
         fetchTickets();
         fetchStats();
-        showToast("Response sent successfully", "success");
-      }
+        showToast("Response sent successfully - User will receive notification", "success");
+        } else {
+        showToast("Failed to send response", "error");
+        }
     } catch (error) {
-      console.error("Error responding to ticket:", error);
-      showToast("Failed to send response", "error");
+        console.error("Error responding to ticket:", error);
+        showToast("Failed to send response", "error");
     } finally {
-      setIsSubmitting(false);
+        setIsSubmitting(false);
     }
-  };
+    };
 
   const handleUpdateStatus = async (ticketId: number, status: string) => {
     try {
@@ -945,39 +963,6 @@ export default function AdminContact() {
                     </motion.button>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-
-            {/* Stats */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05, duration: 0.4 }}
-              className="grid grid-cols-2 md:grid-cols-6 gap-4"
-            >
-              <div className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl p-4 shadow-xl">
-                <div className="text-2xl font-black text-white">{stats.total}</div>
-                <div className="text-[8px] text-slate-500 font-mono uppercase tracking-wider mt-1">Total</div>
-              </div>
-              <div className="bg-gradient-to-br from-amber-500/10 to-transparent border border-amber-500/20 rounded-2xl p-4 shadow-xl">
-                <div className="text-2xl font-black text-amber-400">{stats.open}</div>
-                <div className="text-[8px] text-slate-500 font-mono uppercase tracking-wider mt-1">Open</div>
-              </div>
-              <div className="bg-gradient-to-br from-blue-500/10 to-transparent border border-blue-500/20 rounded-2xl p-4 shadow-xl">
-                <div className="text-2xl font-black text-blue-400">{stats.in_progress}</div>
-                <div className="text-[8px] text-slate-500 font-mono uppercase tracking-wider mt-1">In Progress</div>
-              </div>
-              <div className="bg-gradient-to-br from-emerald-500/10 to-transparent border border-emerald-500/20 rounded-2xl p-4 shadow-xl">
-                <div className="text-2xl font-black text-emerald-400">{stats.resolved}</div>
-                <div className="text-[8px] text-slate-500 font-mono uppercase tracking-wider mt-1">Resolved</div>
-              </div>
-              <div className="bg-gradient-to-br from-slate-500/10 to-transparent border border-slate-500/20 rounded-2xl p-4 shadow-xl">
-                <div className="text-2xl font-black text-slate-400">{stats.closed}</div>
-                <div className="text-[8px] text-slate-500 font-mono uppercase tracking-wider mt-1">Closed</div>
-              </div>
-              <div className="bg-gradient-to-br from-rose-500/10 to-transparent border border-rose-500/20 rounded-2xl p-4 shadow-xl">
-                <div className="text-2xl font-black text-rose-400">{stats.high_priority}</div>
-                <div className="text-[8px] text-slate-500 font-mono uppercase tracking-wider mt-1">High Priority</div>
               </div>
             </motion.div>
 
@@ -1283,7 +1268,7 @@ export default function AdminContact() {
             </motion.div>
 
             {/* Pagination */}
-            {pagination && pagination.last_page > 1 && (
+            {pagination && pagination.total > 0 && (
               <motion.div 
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -1341,18 +1326,18 @@ export default function AdminContact() {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
                     onClick={(e) => e.stopPropagation()}
-                    className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-hidden flex flex-col"
+                    className="bg-gradient-to-br from-[#13131d] to-[#0a0a0f] border border-white/10 rounded-2xl w-full max-w-2xl shadow-2xl shadow-black/60 max-h-[90vh] overflow-visible flex flex-col ring-1 ring-white/5"
                   >
                     {/* Header */}
-                    <div className="p-6 border-b border-white/10">
+                    <div className="p-6 border-b border-white/10 rounded-t-2xl bg-gradient-to-b from-white/[0.03] to-transparent">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-3">
-                            <span className="text-indigo-400 font-black text-sm font-mono">#{selectedTicket.ticket_id}</span>
+                            <span className="text-indigo-400 font-black text-sm font-mono tracking-wide">#{selectedTicket.ticket_id}</span>
                             {getStatusBadge(selectedTicket)}
                             {getPriorityBadge(selectedTicket)}
                           </div>
-                          <h2 id="ticket-modal-title" className="text-lg font-black text-white font-mono uppercase mb-2">
+                          <h2 id="ticket-modal-title" className="text-lg font-black text-white font-mono uppercase mb-2 tracking-tight">
                             {selectedTicket.subject || 'Infrastructure Request'}
                           </h2>
                           <div className="flex items-center gap-2">
@@ -1401,9 +1386,9 @@ export default function AdminContact() {
 
                     {/* Content */}
                     <div className="flex-1 overflow-y-auto p-6">
-                      <div className="space-y-6">
+                      <div className="space-y-5">
                         {/* User Info */}
-                        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                        <div className="bg-white/[0.04] border border-white/10 rounded-xl p-4 hover:border-white/15 transition-colors">
                           <h3 className="text-[8px] font-mono text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
                             <User size={10} className="text-indigo-400" />
                             Contact Information
@@ -1411,17 +1396,17 @@ export default function AdminContact() {
                           <div className="grid grid-cols-2 gap-4">
                             <div>
                               <p className="text-[8px] text-slate-500 font-mono uppercase mb-1">Name</p>
-                              <p className="text-xs text-slate-300 font-bold">{selectedTicket.user ? selectedTicket.user.username : selectedTicket.name}</p>
+                              <p className="text-xs text-slate-200 font-bold">{selectedTicket.user ? selectedTicket.user.username : selectedTicket.name}</p>
                             </div>
                             <div>
                               <p className="text-[8px] text-slate-500 font-mono uppercase mb-1">Email</p>
-                              <p className="text-xs text-slate-300 font-bold">{selectedTicket.user ? selectedTicket.user.email : selectedTicket.email}</p>
+                              <p className="text-xs text-slate-200 font-bold truncate">{selectedTicket.user ? selectedTicket.user.email : selectedTicket.email}</p>
                             </div>
                           </div>
                         </div>
 
                         {/* Message */}
-                        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                        <div className="bg-white/[0.04] border border-white/10 rounded-xl p-4 hover:border-white/15 transition-colors">
                           <h3 className="text-[8px] font-mono text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
                             <MessageSquare size={10} className="text-indigo-400" />
                             User Message
@@ -1431,7 +1416,7 @@ export default function AdminContact() {
 
                         {/* Admin Response */}
                         {selectedTicket.admin_response ? (
-                          <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4">
+                          <div className="bg-emerald-500/[0.06] border border-emerald-500/20 rounded-xl p-4 shadow-[0_0_20px_-10px_rgba(16,185,129,0.4)]">
                             <h3 className="text-[8px] font-mono text-emerald-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
                               <Reply size={10} />
                               Admin Response
@@ -1444,7 +1429,7 @@ export default function AdminContact() {
                             )}
                           </div>
                         ) : (
-                          <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-4">
+                          <div className="bg-indigo-500/[0.06] border border-indigo-500/20 rounded-xl p-4">
                             <h3 className="text-[8px] font-mono text-indigo-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
                               <Reply size={10} />
                               Admin Response
@@ -1461,12 +1446,13 @@ export default function AdminContact() {
                     </div>
 
                     {/* Footer */}
-                    <div className="p-6 border-t border-white/10 flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[8px] text-slate-500 font-mono uppercase tracking-wider">Status:</span>
+                    <div className="relative z-10 p-6 border-t border-white/10 rounded-b-2xl bg-gradient-to-t from-white/[0.03] to-transparent flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3 min-w-[200px]">
+                        <span className="text-[8px] text-slate-500 font-mono uppercase tracking-wider whitespace-nowrap">Status:</span>
                         <CustomSelect
                           value={selectedTicket.status}
                           onChange={(v) => handleUpdateStatus(selectedTicket.ticket_id, v)}
+                          direction="up"
                           options={[
                             { value: "open", label: "Open" },
                             { value: "in_progress", label: "In Progress" },
@@ -1481,7 +1467,7 @@ export default function AdminContact() {
                           whileTap={{ scale: 0.98 }}
                           onClick={handleRespond}
                           disabled={!responseText.trim() || isSubmitting}
-                          className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white transition-all font-mono text-[9px] font-bold uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                          className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white transition-all font-mono text-[9px] font-bold uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 shadow-lg shadow-indigo-900/30 flex-shrink-0"
                         >
                           {isSubmitting ? (
                             <>
