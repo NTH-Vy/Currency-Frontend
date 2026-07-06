@@ -1,4 +1,5 @@
-﻿"use client";
+﻿// page.tsx
+"use client";
 
 import { useState, useEffect, useMemo, useCallback, useRef, memo } from "react";
 import Link from "next/link";
@@ -10,7 +11,7 @@ import {
   HelpCircle, Mail, MessageSquare, Send, CheckCircle2, Award, Sparkles,
   Activity, BarChart, Layers, Command, ExternalLink, Star,
   Wallet, RefreshCw, Database, Cloud, Fingerprint, Gauge, User,
-  AlertTriangle, Copy, RotateCcw, Eye, Trash2, ArrowUp
+  AlertTriangle, Copy, RotateCcw, Eye, Trash2, ArrowUp, X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -182,41 +183,41 @@ const SkeletonText = ({ className = "", width = "w-full" }: { className?: string
 );
 
 const SkeletonMarketCard = () => (
-  <div className="bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-2xl p-6 relative overflow-hidden animate-pulse">
-    <div className="flex justify-between items-start mb-6">
+  <div className="bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-2xl p-4 sm:p-6 relative overflow-hidden animate-pulse">
+    <div className="flex justify-between items-start mb-4 sm:mb-6">
       <div>
-        <div className="h-3 w-20 bg-white/10 rounded mb-2" />
-        <div className="h-8 w-24 bg-white/10 rounded" />
+        <div className="h-3 w-16 sm:w-20 bg-white/10 rounded mb-2" />
+        <div className="h-7 sm:h-8 w-20 sm:w-24 bg-white/10 rounded" />
       </div>
-      <div className="h-6 w-16 bg-white/10 rounded-xl" />
+      <div className="h-5 sm:h-6 w-14 sm:w-16 bg-white/10 rounded-xl" />
     </div>
-    <div className="h-20 w-full bg-white/5 rounded" />
-    <div className="mt-4 pt-3 border-t border-white/5 flex justify-between">
-      <div className="h-3 w-16 bg-white/10 rounded" />
-      <div className="h-3 w-20 bg-white/10 rounded" />
+    <div className="h-16 sm:h-20 w-full bg-white/5 rounded" />
+    <div className="mt-3 sm:mt-4 pt-3 border-t border-white/5 flex justify-between">
+      <div className="h-3 w-12 sm:w-16 bg-white/10 rounded" />
+      <div className="h-3 w-16 sm:w-20 bg-white/10 rounded" />
     </div>
   </div>
 );
 
 const SkeletonHistoryRow = () => (
   <tr className="animate-pulse">
-    <td className="px-6 py-5">
-      <div className="flex items-center gap-3">
-        <div className="h-6 w-20 bg-white/10 rounded" />
-        <div className="h-5 w-12 bg-white/10 rounded" />
+    <td className="px-3 sm:px-4 lg:px-6 py-4 sm:py-5">
+      <div className="flex items-center gap-2 sm:gap-3">
+        <div className="h-5 sm:h-6 w-16 sm:w-20 bg-white/10 rounded" />
+        <div className="h-4 sm:h-5 w-10 sm:w-12 bg-white/10 rounded" />
       </div>
     </td>
-    <td className="px-6 py-5">
+    <td className="px-3 sm:px-4 lg:px-6 py-4 sm:py-5">
       <div className="flex items-center gap-2">
-        <div className="h-4 w-8 bg-white/10 rounded" />
-        <div className="h-6 w-6 bg-white/10 rounded" />
-        <div className="h-4 w-8 bg-white/10 rounded" />
+        <div className="h-4 w-6 sm:w-8 bg-white/10 rounded" />
+        <div className="h-5 sm:h-6 w-5 sm:w-6 bg-white/10 rounded" />
+        <div className="h-4 w-6 sm:w-8 bg-white/10 rounded" />
       </div>
     </td>
-    <td className="px-6 py-5 text-right">
+    <td className="px-3 sm:px-4 lg:px-6 py-4 sm:py-5 text-right">
       <div className="flex flex-col items-end gap-1">
-        <div className="h-6 w-24 bg-white/10 rounded" />
-        <div className="h-3 w-12 bg-white/10 rounded" />
+        <div className="h-5 sm:h-6 w-20 sm:w-24 bg-white/10 rounded" />
+        <div className="h-3 w-10 sm:w-12 bg-white/10 rounded" />
       </div>
     </td>
   </tr>
@@ -229,16 +230,16 @@ const SkeletonNewsCard = () => (
     </div>
     <div className="h-4 w-3/4 bg-white/10 rounded mb-2" />
     <div className="flex items-center gap-2">
-      <div className="h-3 w-16 bg-white/10 rounded" />
+      <div className="h-3 w-12 sm:w-16 bg-white/10 rounded" />
       <div className="w-1 h-1 rounded-full bg-white/10" />
-      <div className="h-3 w-12 bg-white/10 rounded" />
+      <div className="h-3 w-10 sm:w-12 bg-white/10 rounded" />
     </div>
   </div>
 );
 
 const SkeletonToolCard = () => (
-  <div className="group p-6 bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5 rounded-xl animate-pulse">
-    <div className="w-12 h-12 bg-white/10 rounded-xl mb-5" />
+  <div className="group p-4 sm:p-6 bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5 rounded-xl animate-pulse">
+    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 rounded-xl mb-4 sm:mb-5" />
     <div className="h-4 w-3/4 bg-white/10 rounded mb-2" />
     <div className="h-3 w-full bg-white/10 rounded" />
     <div className="h-3 w-2/3 bg-white/10 rounded mt-1" />
@@ -246,15 +247,15 @@ const SkeletonToolCard = () => (
 );
 
 const SkeletonSecurityCard = () => (
-  <div className="bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-2xl p-6 animate-pulse">
-    <div className="w-12 h-12 bg-white/10 rounded-xl mb-4" />
+  <div className="bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-2xl p-5 sm:p-6 animate-pulse">
+    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 rounded-xl mb-3 sm:mb-4" />
     <div className="h-4 w-3/4 bg-white/10 rounded mb-2" />
     <div className="h-3 w-full bg-white/10 rounded" />
   </div>
 );
 
 const SkeletonFaqItem = () => (
-  <div className="bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-xl p-5 animate-pulse">
+  <div className="bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-xl p-4 sm:p-5 animate-pulse">
     <div className="flex items-center justify-between">
       <div className="h-4 w-3/4 bg-white/10 rounded" />
       <div className="h-4 w-4 bg-white/10 rounded" />
@@ -317,12 +318,12 @@ const CustomSelect = memo(({ value, onChange, options }: { value: string; onChan
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label={`Select currency, currently ${value}`}
-        className="group relative bg-gradient-to-br from-white/[0.05] to-white/[0.02] hover:from-indigo-500/20 hover:to-indigo-600/10 px-4 py-2.5 rounded-xl border border-white/10 hover:border-indigo-500/50 transition-all duration-300 flex items-center gap-2 outline-none shadow-md cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#02020a]"
+        className="group relative bg-gradient-to-br from-white/[0.05] to-white/[0.02] hover:from-indigo-500/20 hover:to-indigo-600/10 px-2.5 sm:px-3 lg:px-4 py-2 sm:py-2.5 rounded-xl border border-white/10 hover:border-indigo-500/50 transition-all duration-300 flex items-center gap-1.5 sm:gap-2 outline-none shadow-md cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#02020a]"
       >
-        <span className="font-mono font-bold text-sm bg-gradient-to-r from-indigo-200 to-white bg-clip-text text-transparent">
+        <span className="font-mono font-bold text-xs sm:text-sm bg-gradient-to-r from-indigo-200 to-white bg-clip-text text-transparent">
           {value}
         </span>
-        <ChevronDown size={14} className={`transition-all duration-300 text-indigo-400 ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown size={12} className={`transition-all duration-300 text-indigo-400 ${isOpen ? "rotate-180" : ""}`} />
       </button>
       <AnimatePresence>
         {isOpen && (
@@ -346,7 +347,7 @@ const CustomSelect = memo(({ value, onChange, options }: { value: string; onChan
               transition={{ duration: 0.15 }}
               role="listbox"
               aria-activedescendant={focusedIndex >= 0 ? `option-${focusedIndex}` : undefined}
-              className="absolute right-0 mt-2 w-32 max-h-56 bg-[#0a0a12]/95 border border-indigo-500/30 rounded-xl shadow-2xl overflow-y-auto z-50 divide-y divide-white/[0.04] backdrop-blur-xl"
+              className="absolute right-0 mt-2 w-28 sm:w-32 max-h-56 bg-[#0a0a12]/95 border border-indigo-500/30 rounded-xl shadow-2xl overflow-y-auto z-50 divide-y divide-white/[0.04] backdrop-blur-xl"
             >
               {options.map((opt, idx) => (
                 <button
@@ -360,7 +361,7 @@ const CustomSelect = memo(({ value, onChange, options }: { value: string; onChan
                     setIsOpen(false);
                     setFocusedIndex(-1);
                   }}
-                  className={`w-full text-left px-4 py-2.5 text-xs font-mono font-bold transition-all duration-200 block cursor-pointer outline-none
+                  className={`w-full text-left px-3 sm:px-4 py-2 sm:py-2.5 text-[10px] sm:text-xs font-mono font-bold transition-all duration-200 block cursor-pointer outline-none
                     ${opt === value ? "text-indigo-400 bg-indigo-500/15" : "text-slate-300 hover:bg-white/5 hover:text-white"}
                     ${focusedIndex === idx ? "bg-indigo-500/20" : ""}`}
                 >
@@ -395,7 +396,7 @@ const NumberInput = memo(({ value, onChange, disabled }: { value: string; onChan
         onChange={handleChange}
         disabled={disabled}
         aria-label="Enter amount to send"
-        className={`bg-transparent text-5xl font-mono font-bold text-white outline-none w-full placeholder:text-slate-700 focus:placeholder:text-slate-600 transition-all rounded-lg ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className={`bg-transparent text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-mono font-bold text-white outline-none w-full placeholder:text-slate-700 focus:placeholder:text-slate-600 transition-all rounded-lg ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         placeholder="0.00"
       />
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent" />
@@ -462,6 +463,14 @@ export default function Home() {
   
   // Scroll to top state
   const [showScrollTop, setShowScrollTop] = useState(false);
+  
+  // Chat box state
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState<Array<{ id: number; text: string; isUser: boolean; timestamp: string }>>([
+    { id: 1, text: "Welcome! How can I help you with currency conversion today?", isUser: false, timestamp: new Date().toISOString() }
+  ]);
+  const [chatInput, setChatInput] = useState("");
+  const [isSendingChat, setIsSendingChat] = useState(false);
 
   // ─── SCROLL TO TOP ───
   useEffect(() => {
@@ -476,6 +485,34 @@ export default function Home() {
   const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
+
+  // ─── CHAT HANDLER ───
+  const handleSendMessage = useCallback(async () => {
+    if (!chatInput.trim() || isSendingChat) return;
+
+    const userMessage = {
+      id: Date.now(),
+      text: chatInput.trim(),
+      isUser: true,
+      timestamp: new Date().toISOString()
+    };
+
+    setChatMessages(prev => [...prev, userMessage]);
+    setChatInput("");
+    setIsSendingChat(true);
+
+    // Simulate bot response
+    setTimeout(() => {
+      const botResponse = {
+        id: Date.now() + 1,
+        text: "Thanks for your message! Our support team will get back to you shortly. For immediate assistance, please use the contact form below.",
+        isUser: false,
+        timestamp: new Date().toISOString()
+      };
+      setChatMessages(prev => [...prev, botResponse]);
+      setIsSendingChat(false);
+    }, 1500);
+  }, [chatInput, isSendingChat]);
 
   const initialChartData = [
     { timestamp: new Date().toISOString(), value: 25410 },
@@ -851,7 +888,7 @@ export default function Home() {
       if (data.success) {
         setFormSubmitted(true);
         showToast("Support ticket submitted successfully!", "success");
-        setContactForm({ name: '', email: '', subject: '', message: '' });
+        setContactForm(prev => ({ ...prev, subject: '', message: '' }));
       } else {
         showToast(data.message || "Failed to submit support ticket", "error");
       }
@@ -1129,61 +1166,61 @@ export default function Home() {
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 100, scale: 0.9 }}
             transition={{ duration: 0.3, type: "spring", stiffness: 400 }}
-            className={`fixed top-6 right-6 z-50 px-5 py-3.5 rounded-xl border backdrop-blur-xl flex items-center gap-3 max-w-md shadow-2xl ${
+            className={`fixed top-4 sm:top-6 right-4 sm:right-6 z-50 px-4 sm:px-5 py-3 sm:py-3.5 rounded-xl border backdrop-blur-xl flex items-center gap-2 sm:gap-3 max-w-xs sm:max-w-md shadow-2xl text-sm sm:text-base ${
               toast.type === 'success' ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-200' :
               toast.type === 'error' ? 'bg-red-500/15 border-red-500/40 text-red-200' :
               'bg-indigo-500/15 border-indigo-500/40 text-indigo-200'
             }`}
           >
-            {toast.type === 'success' && <CheckCircle2 size={18} />}
-            {toast.type === 'error' && <AlertTriangle size={18} />}
-            {toast.type === 'info' && <Info size={18} />}
-            <p className="text-sm font-medium">{toast.message}</p>
+            {toast.type === 'success' && <CheckCircle2 size={16} className="sm:w-[18px] sm:h-[18px]" />}
+            {toast.type === 'error' && <AlertTriangle size={16} className="sm:w-[18px] sm:h-[18px]" />}
+            {toast.type === 'info' && <Info size={16} className="sm:w-[18px] sm:h-[18px]" />}
+            <p className="text-xs sm:text-sm font-medium">{toast.message}</p>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <main className="max-w-7xl mx-auto px-6 lg:px-8 w-full flex flex-col gap-28 lg:gap-40 py-12 pt-44">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col gap-20 sm:gap-28 lg:gap-40 py-8 sm:py-12 pt-24 sm:pt-36 lg:pt-44">
 
         {/* ─── 1. HERO & CONVERTER ─── */}
         <ErrorBoundary>
-          <section className="grid lg:grid-cols-2 gap-16 items-center">
+          <section className="grid lg:grid-cols-2 gap-12 md:gap-16 items-center">
           <motion.div 
             initial={{ opacity: 0, x: -40 }} 
             animate={{ opacity: 1, x: 0 }} 
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <div className="inline-flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-full mb-8 backdrop-blur-sm">
+            <div className="inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-full mb-6 sm:mb-8 backdrop-blur-sm">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
               </span>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+              <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
                 v4.0 Quantum Core Active
               </span>
               {isWebSocketConnected && (
-                <span className="flex items-center gap-1 text-emerald-400 text-[8px] font-mono">
+                <span className="flex items-center gap-1 text-emerald-400 text-[7px] sm:text-[8px] font-mono">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   LIVE
                 </span>
               )}
             </div>
 
-            <h1 className="text-[clamp(3rem,8vw,6rem)] font-black leading-[0.9] uppercase italic tracking-tighter mb-6">
+            <h1 className="text-[clamp(2.5rem,7vw,6rem)] font-black leading-[0.9] uppercase italic tracking-tighter mb-4 sm:mb-6">
               <span className="text-white block">Next-Gen</span>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400 animate-gradient-x">Liquidity</span>
               <span className="text-white block relative">
                 Protocol
                 <span className="text-indigo-500">.</span>
-                <span className="absolute -top-2 -right-8 text-[8px] font-mono bg-indigo-500/20 px-2 py-0.5 rounded-full text-indigo-300">BETA</span>
+                <span className="absolute -top-2 -right-4 sm:-right-8 text-[6px] sm:text-[8px] font-mono bg-indigo-500/20 px-1.5 sm:px-2 py-0.5 rounded-full text-indigo-300">BETA</span>
               </span>
             </h1>
 
-            <p className="text-slate-400 text-lg max-w-md leading-relaxed mb-10 font-medium border-l-2 border-indigo-500/40 pl-6">
+            <p className="text-slate-400 text-sm sm:text-base lg:text-lg max-w-md leading-relaxed mb-6 sm:mb-10 font-medium border-l-2 border-indigo-500/40 pl-4 sm:pl-6">
               Near-zero latency conversion with institutional-grade risk parameters. Built for the modern global economy.
             </p>
 
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-3 sm:gap-4">
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
@@ -1194,9 +1231,9 @@ export default function Home() {
                     router.push('/converter');
                   }
                 }}
-                className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-2xl font-bold text-sm uppercase tracking-widest transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2 cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#02020a]"
+                className="px-5 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-2xl font-bold text-[10px] sm:text-sm uppercase tracking-widest transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2 cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#02020a]"
               >
-                Launch Terminal <Sparkles size={16} />
+                Launch Terminal <Sparkles size={14} className="sm:w-[16px] sm:h-[16px]" />
               </motion.button>
               <motion.button 
                 whileHover={{ scale: 1.05 }}
@@ -1216,25 +1253,25 @@ export default function Home() {
                     }
                   }
                 }}
-                className="px-8 py-4 bg-white/5 border border-white/10 hover:bg-white/10 rounded-2xl font-bold text-sm uppercase tracking-widest transition-all backdrop-blur-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#02020a]"
+                className="px-5 sm:px-8 py-3 sm:py-4 bg-white/5 border border-white/10 hover:bg-white/10 rounded-2xl font-bold text-[10px] sm:text-sm uppercase tracking-widest transition-all backdrop-blur-sm cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#02020a]"
               >
                 Explore Nodes
               </motion.button>
             </div>
 
             {/* Trust Badges */}
-            <div className="flex items-center gap-6 mt-12 pt-6 border-t border-white/5">
-              <div className="flex items-center gap-2">
-                <ShieldCheck size={14} className="text-emerald-500" />
-                <span className="text-[10px] font-mono text-slate-500">SECURE</span>
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-8 sm:mt-12 pt-4 sm:pt-6 border-t border-white/5">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <ShieldCheck size={12} className="sm:w-[14px] sm:h-[14px] text-emerald-500" />
+                <span className="text-[8px] sm:text-[10px] font-mono text-slate-500">SECURE</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Zap size={14} className="text-yellow-500" />
-                <span className="text-[10px] font-mono text-slate-500">{healthData.latency} LATENCY</span>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Zap size={12} className="sm:w-[14px] sm:h-[14px] text-yellow-500" />
+                <span className="text-[8px] sm:text-[10px] font-mono text-slate-500">{healthData.latency} LATENCY</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Globe2 size={14} className="text-cyan-500" />
-                <span className="text-[10px] font-mono text-slate-500">190+ COUNTRIES</span>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Globe2 size={12} className="sm:w-[14px] sm:h-[14px] text-cyan-500" />
+                <span className="text-[8px] sm:text-[10px] font-mono text-slate-500">190+ COUNTRIES</span>
               </div>
             </div>
           </motion.div>
@@ -1246,14 +1283,14 @@ export default function Home() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="relative group"
           >
-            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 rounded-[2.5rem] blur-2xl opacity-30 group-hover:opacity-60 transition duration-1000" />
-            <div className="relative bg-gradient-to-br from-[#0f0f18] to-[#08080e] backdrop-blur-3xl border border-white/10 rounded-[2.2rem] p-8 lg:p-10 shadow-2xl">
+            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 rounded-[2rem] sm:rounded-[2.5rem] blur-2xl opacity-30 group-hover:opacity-60 transition duration-1000" />
+            <div className="relative bg-gradient-to-br from-[#0f0f18] to-[#08080e] backdrop-blur-3xl border border-white/10 rounded-[1.8rem] sm:rounded-[2.2rem] p-5 sm:p-8 lg:p-10 shadow-2xl">
               
-              <div className="flex justify-between items-center mb-8">
+              <div className="flex justify-between items-center mb-5 sm:mb-8">
                 <div>
-                  <h2 className="text-2xl font-black text-white uppercase italic flex items-center gap-2">
+                  <h2 className="text-lg sm:text-2xl font-black text-white uppercase italic flex flex-wrap items-center gap-2">
                     Instant Swap
-                    <span className={`text-[8px] px-2 py-1 rounded-full font-mono normal-case not-italic ${
+                    <span className={`text-[7px] sm:text-[8px] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-mono normal-case not-italic ${
                       isWebSocketConnected 
                         ? 'bg-emerald-500/20 text-emerald-400' 
                         : 'bg-amber-500/20 text-amber-400'
@@ -1261,30 +1298,30 @@ export default function Home() {
                       {isWebSocketConnected ? 'LIVE' : 'UPDATING'}
                     </span>
                     {isGuest && (
-                      <span className="text-[8px] bg-indigo-500/20 text-indigo-400 px-2 py-1 rounded-full font-mono normal-case not-italic">
+                      <span className="text-[7px] sm:text-[8px] bg-indigo-500/20 text-indigo-400 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-mono normal-case not-italic">
                         GUEST
                       </span>
                     )}
                   </h2>
-                  <div className="flex items-center gap-2 mt-2">
+                  <div className="flex items-center gap-2 mt-1 sm:mt-2">
                     <div className={`w-1.5 h-1.5 rounded-full ${isWebSocketConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-                    <span className="text-[9px] font-mono font-bold text-slate-500 uppercase tracking-widest">
+                    <span className="text-[8px] sm:text-[9px] font-mono font-bold text-slate-500 uppercase tracking-widest">
                       {isWebSocketConnected ? 'Verified Mid-Market Rate' : 'Syncing...'}
                     </span>
                   </div>
                 </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                  <Globe size={20} className="text-indigo-400" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                  <Globe size={16} className="sm:w-[20px] sm:h-[20px] text-indigo-400" />
                 </div>
               </div>
 
               <div className="space-y-4">
                 {/* Send Amount */}
-                <div className="group/input p-6 bg-gradient-to-br from-black/40 to-black/20 rounded-[1.5rem] border border-white/5 focus-within:border-indigo-500/40 transition-all duration-300">
-                  <label className="text-[10px] font-mono font-black text-slate-500 uppercase tracking-widest block mb-3 flex items-center gap-2">
-                    <ArrowRight size={10} /> Amount to Send
+                <div className="group/input p-4 sm:p-6 bg-gradient-to-br from-black/40 to-black/20 rounded-[1.5rem] border border-white/5 focus-within:border-indigo-500/40 transition-all duration-300">
+                  <label className="text-[8px] sm:text-[10px] font-mono font-black text-slate-500 uppercase tracking-widest block mb-2 sm:mb-3 flex items-center gap-1.5 sm:gap-2">
+                    <ArrowRight size={8} className="sm:w-[10px] sm:h-[10px]" /> Amount to Send
                   </label>
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
                     <NumberInput 
                       value={amount} 
                       onChange={handleSendAmountChange}
@@ -1302,7 +1339,7 @@ export default function Home() {
                 </div>
 
                 {/* Swap Button */}
-                <div className="flex justify-center -my-7 relative z-10">
+                <div className="flex justify-center -my-6 sm:-my-7 relative z-10">
                   <motion.button 
                     animate={{ rotate: swapAnimating ? 360 : 0 }}
                     transition={{ rotate: { duration: 0.6, ease: [0.34, 1.56, 0.64, 1] } }}
@@ -1316,16 +1353,16 @@ export default function Home() {
                     aria-label={`Swap currencies from ${from} to ${to}`}
                     className="relative group outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#1a1a2e] rounded-full"
                   >
-                    <div className="relative w-14 h-14 bg-gradient-to-br from-[#1a1a2e] to-[#0d0d1a] rounded-full border border-indigo-500/40 hover:border-indigo-400 transition-all duration-300 shadow-lg flex items-center justify-center group-hover:shadow-indigo-500/20">
+                    <div className="relative w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-[#1a1a2e] to-[#0d0d1a] rounded-full border border-indigo-500/40 hover:border-indigo-400 transition-all duration-300 shadow-lg flex items-center justify-center group-hover:shadow-indigo-500/20">
                       <div className="absolute inset-1 rounded-full bg-gradient-to-br from-indigo-500/5 to-purple-500/5" />
                       <motion.div
                         animate={{ rotate: swapAnimating ? 180 : 0 }}
                         transition={{ duration: ANIMATION_DURATION, delay: SWAP_ANIMATION_DELAY_MS / 1000 }}
                       >
-                        <ArrowRightLeft size={20} className="text-indigo-400 group-hover:text-white transition-colors duration-300 relative z-10" />
+                        <ArrowRightLeft size={16} className="sm:w-[20px] sm:h-[20px] text-indigo-400 group-hover:text-white transition-colors duration-300 relative z-10" />
                       </motion.div>
                     </div>
-                    <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none translate-y-2 group-hover:translate-y-0">
+                    <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none translate-y-2 group-hover:translate-y-0 hidden sm:block">
                       <div className="relative">
                         <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-indigo-600 rotate-45" />
                         <span className="text-[8px] font-mono font-bold text-white bg-indigo-600 px-2 py-1 rounded-md whitespace-nowrap">
@@ -1337,12 +1374,12 @@ export default function Home() {
                 </div>
 
                 {/* Receive Amount */}
-                <div className="p-6 bg-gradient-to-br from-black/40 to-black/20 rounded-[1.5rem] border border-white/5">
-                  <label className="text-[10px] font-mono font-black text-slate-500 uppercase tracking-widest block mb-3 flex items-center gap-2">
-                    <CheckCircle2 size={10} /> Recipient Receives
+                <div className="p-4 sm:p-6 bg-gradient-to-br from-black/40 to-black/20 rounded-[1.5rem] border border-white/5">
+                  <label className="text-[8px] sm:text-[10px] font-mono font-black text-slate-500 uppercase tracking-widest block mb-2 sm:mb-3 flex items-center gap-1.5 sm:gap-2">
+                    <CheckCircle2 size={8} className="sm:w-[10px] sm:h-[10px]" /> Recipient Receives
                   </label>
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex-1">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+                    <div className="flex-1 w-full">
                       <input 
                         type="text"
                         inputMode="decimal"
@@ -1350,13 +1387,13 @@ export default function Home() {
                         onChange={(e) => handleReceiveAmountChange(e.target.value)}
                         disabled={isCalculating}
                         aria-label={`Receive amount in ${to}`}
-                        className={`bg-transparent text-5xl font-mono font-bold outline-none w-full placeholder:text-slate-700 focus:placeholder:text-slate-600 transition-all focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f18] rounded-lg ${
+                        className={`bg-transparent text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-mono font-bold outline-none w-full placeholder:text-slate-700 focus:placeholder:text-slate-600 transition-all focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f18] rounded-lg ${
                           isCalculating ? 'text-slate-600 animate-pulse cursor-not-allowed' : 'bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent'
                         }`}
                         placeholder="0.00"
                       />
                       {activeInput === 'receive' && (
-                        <div className="text-[8px] text-indigo-400 font-mono mt-1">
+                        <div className="text-[7px] sm:text-[8px] text-indigo-400 font-mono mt-1">
                           ⚡ Calculating send amount...
                         </div>
                       )}
@@ -1374,10 +1411,10 @@ export default function Home() {
               </div>
 
               <div className="mt-4 pt-4 border-t border-white/10 space-y-4">
-                <div className="flex justify-between items-center text-[11px] font-mono font-bold px-2">
+                <div className="flex flex-wrap justify-between items-center text-[10px] sm:text-[11px] font-mono font-bold px-1 sm:px-2 gap-2">
                   <span className="text-slate-500">Exchange Rate:</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-indigo-400 bg-indigo-500/10 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <span className="text-indigo-400 bg-indigo-500/10 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg flex items-center gap-1.5 text-[10px] sm:text-[11px]">
                       {isWebSocketConnected && (
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                       )}
@@ -1395,9 +1432,9 @@ export default function Home() {
                       aria-label="Refresh exchange rates"
                       className="text-slate-600 hover:text-indigo-400 transition-colors relative cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f18] rounded-lg p-1"
                     >
-                      <RefreshCw size={12} className={isRefreshing ? 'animate-spin' : ''} />
+                      <RefreshCw size={10} className="sm:w-[12px] sm:h-[12px] ${isRefreshing ? 'animate-spin' : ''}" />
                       {isRefreshing && (
-                        <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[7px] text-indigo-400 whitespace-nowrap">
+                        <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[6px] sm:text-[7px] text-indigo-400 whitespace-nowrap">
                           Updating...
                         </span>
                       )}
@@ -1417,14 +1454,14 @@ export default function Home() {
                   }}
                   disabled={loading}
                   aria-label={`Convert ${amount} ${from} to ${to}`}
-                  className="w-full py-5 bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-lg shadow-indigo-600/30 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f18]"
+                  className="w-full py-4 sm:py-5 bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-[0.15em] sm:tracking-[0.2em] transition-all flex items-center justify-center gap-2 sm:gap-3 shadow-lg shadow-indigo-600/30 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f18]"
                 >
-                  {loading ? <Loader2 className="animate-spin" size={16} /> : <><Sparkles size={16} /> Execute Protocol</>}
+                  {loading ? <Loader2 className="animate-spin sm:w-[16px] sm:h-[16px]" size={14} /> : <><Sparkles size={14} className="sm:w-[16px] sm:h-[16px]" /> Execute Protocol</>}
                 </motion.button>
 
                 {isGuest && (
-                  <div className="text-center text-[9px] text-amber-400/70 font-mono flex items-center justify-center gap-2">
-                    <AlertTriangle size={10} />
+                  <div className="text-center text-[8px] sm:text-[9px] text-amber-400/70 font-mono flex flex-wrap items-center justify-center gap-1 sm:gap-2">
+                    <AlertTriangle size={8} className="sm:w-[10px] sm:h-[10px]" />
                     Guest: Limited to USD, EUR, GBP, JPY, VND
                     <Link href="/login" className="text-indigo-400 hover:text-indigo-300 underline">
                       Sign in for full access
@@ -1433,7 +1470,7 @@ export default function Home() {
                 )}
               </div>
 
-              <div className="mt-4 text-center text-[9px] text-slate-600 font-mono">
+              <div className="mt-4 text-center text-[8px] sm:text-[9px] text-slate-600 font-mono">
                 No hidden fees • Best execution guarantee
               </div>
             </div>
@@ -1443,54 +1480,54 @@ export default function Home() {
 
         {/* ─── 2. MARKET OVERVIEW ─── */}
         <ErrorBoundary>
-          <section className="flex flex-col gap-10">
-          <div className="flex items-center justify-between border-b border-white/10 pb-6">
+          <section className="flex flex-col gap-8 sm:gap-10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 sm:pb-6 gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-1 h-10 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full" />
+              <div className="w-1 h-8 sm:h-10 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full" />
               <div>
-                <h2 className="text-2xl font-black uppercase italic tracking-tight text-white">Market Intelligence</h2>
-                <p className="text-[12px] text-slate-500 font-mono mt-1">Real-time market data streaming</p>
+                <h2 className="text-xl sm:text-2xl font-black uppercase italic tracking-tight text-white">Market Intelligence</h2>
+                <p className="text-[10px] sm:text-[12px] text-slate-500 font-mono mt-1">Real-time market data streaming</p>
               </div>
             </div>
-            <div className="hidden sm:flex items-center gap-2 text-[9px] font-mono text-emerald-500 font-bold uppercase tracking-widest bg-emerald-500/10 px-4 py-2 rounded-xl border border-emerald-500/20">
+            <div className="flex items-center gap-2 text-[8px] sm:text-[9px] font-mono text-emerald-500 font-bold uppercase tracking-widest bg-emerald-500/10 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl border border-emerald-500/20">
               <div className={`w-1.5 h-1.5 rounded-full ${isWebSocketConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
               {isWebSocketConnected ? 'Real-time Global Feed' : 'Updating...'}
             </div>
           </div>
 
           {isMarketLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
               <SkeletonMarketCard />
               <SkeletonMarketCard />
               <SkeletonMarketCard />
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
               {overviewMarkets.map((market, i) => (
                 <motion.div 
                   key={i} 
-                  whileHover={{ y: -8 }} 
+                  whileHover={{ y: -6 }} 
                   transition={{ type: "spring", stiffness: SPRING_STIFFNESS }}
-                  className="bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-2xl p-6 relative overflow-hidden group"
+                  className="bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-2xl p-4 sm:p-6 relative overflow-hidden group"
                 >
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-500/5 to-transparent rounded-full blur-2xl" />
+                  <div className="absolute top-0 right-0 w-24 sm:w-32 h-24 sm:h-32 bg-gradient-to-br from-indigo-500/5 to-transparent rounded-full blur-2xl" />
                   
-                  <div className="flex justify-between items-start mb-6 relative z-10">
+                  <div className="flex justify-between items-start mb-4 sm:mb-6 relative z-10">
                     <div>
-                      <h3 className="text-slate-500 font-mono text-[10px] font-black uppercase tracking-widest mb-1">{market.pair}</h3>
-                      <div className="text-3xl font-mono font-bold text-white tracking-tighter">{market.price}</div>
+                      <h3 className="text-slate-500 font-mono text-[8px] sm:text-[10px] font-black uppercase tracking-widest mb-1">{market.pair}</h3>
+                      <div className="text-2xl sm:text-3xl font-mono font-bold text-white tracking-tighter">{market.price}</div>
                     </div>
-                    <div className={`px-3 py-1.5 rounded-xl text-[10px] font-black font-mono border flex items-center gap-1 ${
+                    <div className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl text-[8px] sm:text-[10px] font-black font-mono border flex items-center gap-1 ${
                       market.trend === 'up' 
                         ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
                         : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
                     }`}>
-                      {market.trend === 'up' ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
+                      {market.trend === 'up' ? <TrendingUp size={8} className="sm:w-[10px] sm:h-[10px]" /> : <TrendingDown size={8} className="sm:w-[10px] sm:h-[10px]" />}
                       {market.change}
                     </div>
                   </div>
 
-                  <div className="h-20 w-full opacity-60 group-hover:opacity-100 transition-opacity">
+                  <div className="h-16 sm:h-20 w-full opacity-60 group-hover:opacity-100 transition-opacity">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={market.data}>
                         <defs>
@@ -1511,7 +1548,7 @@ export default function Home() {
                     </ResponsiveContainer>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-white/5 flex justify-between text-[9px] font-mono text-slate-600">
+                  <div className="mt-3 sm:mt-4 pt-3 border-t border-white/5 flex justify-between text-[8px] sm:text-[9px] font-mono text-slate-600">
                     <span>24h Vol: {market.vol}</span>
                     <span>Liquidity: High</span>
                   </div>
@@ -1524,16 +1561,16 @@ export default function Home() {
 
         {/* ─── 3. SETTLEMENT LEDGER ─── */}
         <ErrorBoundary>
-          <section className="flex flex-col gap-10">
-          <div className="flex items-center justify-between border-b border-white/10 pb-6">
+          <section className="flex flex-col gap-8 sm:gap-10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 sm:pb-6 gap-4">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 rounded-xl">
-                <History size={20} className="text-indigo-400" />
+              <div className="p-2 sm:p-3 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 rounded-xl">
+                <History size={16} className="sm:w-[20px] sm:h-[20px] text-indigo-400" />
               </div>
               <div>
-                <h2 className="text-xl font-black text-white uppercase italic tracking-tight">Settlement Ledger</h2>
-                <p className="text-[10px] text-slate-500 font-mono uppercase font-bold tracking-[0.2em] mt-1 flex items-center gap-2">
-                  <Database size={10} />
+                <h2 className="text-lg sm:text-xl font-black text-white uppercase italic tracking-tight">Settlement Ledger</h2>
+                <p className="text-[8px] sm:text-[10px] text-slate-500 font-mono uppercase font-bold tracking-[0.15em] sm:tracking-[0.2em] mt-1 flex items-center gap-2">
+                  <Database size={8} className="sm:w-[10px] sm:h-[10px]" />
                   {isGuest ? "Recent Local Matching Engine Records" : "System Index Records"}
                 </p>
               </div>
@@ -1545,9 +1582,9 @@ export default function Home() {
               <table className="w-full text-left font-mono">
                 <thead>
                   <tr className="border-b border-white/5 bg-gradient-to-r from-white/[0.03] to-transparent">
-                    <th className="px-6 py-4 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Source Asset</th>
-                    <th className="px-6 py-4 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Swap Protocol</th>
-                    <th className="px-6 py-4 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">Settlement Result</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-[8px] sm:text-[9px] font-black text-slate-500 uppercase tracking-[0.15em] sm:tracking-[0.2em]">Source Asset</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-[8px] sm:text-[9px] font-black text-slate-500 uppercase tracking-[0.15em] sm:tracking-[0.2em]">Swap Protocol</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-[8px] sm:text-[9px] font-black text-slate-500 uppercase tracking-[0.15em] sm:tracking-[0.2em] text-right">Settlement Result</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
@@ -1567,36 +1604,36 @@ export default function Home() {
                       transition={{ delay: i * 0.05 }}
                       className="hover:bg-white/[0.03] transition-colors group"
                     >
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-3">
-                          <span className="font-bold text-white text-base">{h.amount_input?.toLocaleString()}</span>
-                          <span className="text-[8px] bg-white/5 border border-white/10 px-2 py-1 rounded-md text-slate-400 font-black">{h.from_currency}</span>
+                      <td className="px-3 sm:px-6 py-4 sm:py-5">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                          <span className="font-bold text-white text-sm sm:text-base">{h.amount_input?.toLocaleString()}</span>
+                          <span className="text-[7px] sm:text-[8px] bg-white/5 border border-white/10 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-slate-400 font-black">{h.from_currency}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-2 text-slate-500 text-xs font-bold">
-                          <span className="w-6 h-px bg-white/10" />
-                          <div className="p-1.5 bg-indigo-500/10 rounded-lg text-indigo-400"><ArrowRight size={10} /></div>
+                      <td className="px-3 sm:px-6 py-4 sm:py-5">
+                        <div className="flex items-center gap-1.5 sm:gap-2 text-slate-500 text-[10px] sm:text-xs font-bold">
+                          <span className="w-4 sm:w-6 h-px bg-white/10" />
+                          <div className="p-1 sm:p-1.5 bg-indigo-500/10 rounded-lg text-indigo-400"><ArrowRight size={8} className="sm:w-[10px] sm:h-[10px]" /></div>
                           <span className="font-bold text-slate-400">{h.to_currency}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-5 text-right">
+                      <td className="px-3 sm:px-6 py-4 sm:py-5 text-right">
                         <div className="flex flex-col items-end">
-                          <span className="font-mono font-black text-emerald-400 text-base">
+                          <span className="font-mono font-black text-emerald-400 text-sm sm:text-base">
                             +{formatWithPrecision(h.amount_output, h.to_currency)}
                           </span>
-                          <span className="text-emerald-500/50 text-[8px] font-bold uppercase tracking-widest">{h.to_currency}</span>
+                          <span className="text-emerald-500/50 text-[7px] sm:text-[8px] font-bold uppercase tracking-widest">{h.to_currency}</span>
                         </div>
                       </td>
                     </motion.tr>
                   )) : (
                     <tr>
-                      <td colSpan={3} className="px-6 py-16 text-center">
+                      <td colSpan={3} className="px-3 sm:px-6 py-12 sm:py-16 text-center">
                         <div className="flex flex-col items-center gap-3">
-                          <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center">
-                            <Database size={20} className="text-slate-600" />
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/5 flex items-center justify-center">
+                            <Database size={16} className="sm:w-[20px] sm:h-[20px] text-slate-600" />
                           </div>
-                          <div className="text-[10px] text-slate-500 font-mono italic uppercase tracking-widest">
+                          <div className="text-[8px] sm:text-[10px] text-slate-500 font-mono italic uppercase tracking-widest">
                             Waiting for new telemetry data...
                           </div>
                         </div>
@@ -1612,24 +1649,24 @@ export default function Home() {
 
         {/* ─── 4. NEWS FEED ─── */}
         <ErrorBoundary>
-          <section className="flex flex-col gap-10">
-          <div className="flex items-center justify-between border-b border-white/10 pb-6">
+          <section className="flex flex-col gap-8 sm:gap-10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 sm:pb-6 gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-1 h-10 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full" />
+              <div className="w-1 h-8 sm:h-10 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full" />
               <div>
-                <h2 className="text-2xl font-black uppercase italic tracking-tight text-white">Institutional Briefs </h2>
-                <p className="text-[12px] text-slate-500 font-mono mt-1">Latest market insights</p>
+                <h2 className="text-xl sm:text-2xl font-black uppercase italic tracking-tight text-white">Institutional Briefs</h2>
+                <p className="text-[10px] sm:text-[12px] text-slate-500 font-mono mt-1">Latest market insights</p>
               </div>
             </div>
             <Link href="/news">
-              <button className="text-[10px] font-mono font-black text-indigo-400 hover:text-indigo-300 uppercase tracking-widest border border-indigo-500/30 px-4 py-2.5 rounded-xl transition-all hover:bg-indigo-500/10 flex items-center gap-2 group cursor-pointer">
-                View More <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+              <button className="text-[8px] sm:text-[10px] font-mono font-black text-indigo-400 hover:text-indigo-300 uppercase tracking-widest border border-indigo-500/30 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-all hover:bg-indigo-500/10 flex items-center gap-2 group cursor-pointer">
+                View More <ArrowRight size={10} className="sm:w-[12px] sm:h-[12px] group-hover:translate-x-1 transition-transform" />
               </button>
             </Link>
           </div>
 
           {newsLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
               <SkeletonNewsCard />
               <SkeletonNewsCard />
               <SkeletonNewsCard />
@@ -1640,7 +1677,7 @@ export default function Home() {
               <SkeletonNewsCard />
             </div>
           ) : popularNews.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
               {popularNews.slice(0, 8).map((news, idx) => (
                 <motion.div
                   key={news.news_id}
@@ -1658,16 +1695,17 @@ export default function Home() {
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1611974717483-3600171ea7f7?w=600";
                           }}
+                          loading="lazy"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#050508] via-transparent to-transparent opacity-60" />
-                        <span className="absolute top-3 left-3 text-[7px] font-mono font-black uppercase tracking-widest px-2 py-1 rounded-lg bg-black/70 backdrop-blur-md border border-white/10 text-indigo-400">
+                        <span className="absolute top-2 sm:top-3 left-2 sm:left-3 text-[6px] sm:text-[7px] font-mono font-black uppercase tracking-widest px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg bg-black/70 backdrop-blur-md border border-white/10 text-indigo-400">
                           {news.category}
                         </span>
                       </div>
-                      <h3 className="text-sm font-bold text-slate-200 group-hover:text-indigo-400 transition-colors mb-2 leading-snug line-clamp-2">
+                      <h3 className="text-xs sm:text-sm font-bold text-slate-200 group-hover:text-indigo-400 transition-colors mb-2 leading-snug line-clamp-2">
                         {news.title}
                       </h3>
-                      <div className="flex items-center gap-2 text-[9px] text-slate-500 font-mono font-bold uppercase">
+                      <div className="flex items-center gap-2 text-[8px] sm:text-[9px] text-slate-500 font-mono font-bold uppercase">
                         <span>{new Date(news.published_at).toLocaleDateString()}</span>
                         <div className="w-1 h-1 rounded-full bg-slate-700" />
                         <span>📊 {news.views} views</span>
@@ -1678,7 +1716,7 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <div className="col-span-full py-16 text-center">
+            <div className="col-span-full py-12 sm:py-16 text-center">
               <div className="text-slate-500 font-mono text-xs">No news available</div>
             </div>
           )}
@@ -1687,72 +1725,72 @@ export default function Home() {
 
         {/* ─── 5. ADVANCED TOOLS (id="advanced-tools") ─── */}
         <ErrorBoundary>
-          <section id="advanced-tools" className="grid lg:grid-cols-2 gap-16 items-center">
+          <section id="advanced-tools" className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {isToolsLoading ? (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
               <SkeletonToolCard />
               <SkeletonToolCard />
               <SkeletonToolCard />
               <SkeletonToolCard />
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {[
-                { icon: <Lock size={22} />, title: "Quantum Cipher", desc: "Military-grade encryption with zero-knowledge proofs." },
-                { icon: <Cpu size={22} />, title: "Titan Reactor", desc: "Sub-millisecond latency processing on dedicated nodes." },
-                { icon: <ShieldCheck size={22} />, title: "Verified Ledger", desc: "Immutable record of all transactions on-chain." },
-                { icon: <Globe2 size={22} />, title: "Global Anycast", desc: "Optimized routing fabric across 190+ countries." },
+                { icon: <Lock size={18} className="sm:w-[22px] sm:h-[22px]" />, title: "Quantum Cipher", desc: "Military-grade encryption with zero-knowledge proofs." },
+                { icon: <Cpu size={18} className="sm:w-[22px] sm:h-[22px]" />, title: "Titan Reactor", desc: "Sub-millisecond latency processing on dedicated nodes." },
+                { icon: <ShieldCheck size={18} className="sm:w-[22px] sm:h-[22px]" />, title: "Verified Ledger", desc: "Immutable record of all transactions on-chain." },
+                { icon: <Globe2 size={18} className="sm:w-[22px] sm:h-[22px]" />, title: "Global Anycast", desc: "Optimized routing fabric across 190+ countries." },
               ].map((f, i) => (
                 <motion.div 
                   key={i} 
                   whileHover={{ scale: 1.02 }}
-                  className="group p-6 bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5 rounded-xl hover:border-indigo-500/30 transition-all duration-300"
+                  className="group p-4 sm:p-6 bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5 rounded-xl hover:border-indigo-500/30 transition-all duration-300"
                 >
-                  <div className="w-12 h-12 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl flex items-center justify-center mb-3 sm:mb-5 group-hover:scale-110 transition-transform duration-300">
                     <div className="text-indigo-400">{f.icon}</div>
                   </div>
-                  <h4 className="text-sm font-black text-white uppercase mb-2 tracking-wide">{f.title}</h4>
-                  <p className="text-xs text-slate-500 leading-relaxed">{f.desc}</p>
+                  <h4 className="text-xs sm:text-sm font-black text-white uppercase mb-1.5 sm:mb-2 tracking-wide">{f.title}</h4>
+                  <p className="text-[10px] sm:text-xs text-slate-500 leading-relaxed">{f.desc}</p>
                 </motion.div>
               ))}
             </div>
           )}
 
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             <div className="relative">
-              <div className="absolute -left-4 top-0 w-1 h-20 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full" />
-              <h2 className="text-5xl font-black text-white uppercase italic leading-[0.95] tracking-tighter pl-6">
+              <div className="absolute -left-3 sm:-left-4 top-0 w-1 h-16 sm:h-20 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full" />
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white uppercase italic leading-[0.95] tracking-tighter pl-4 sm:pl-6">
                 Advanced Tools<br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400">For The Modern</span><br />
                 Edge.
               </h2>
             </div>
-            <p className="text-slate-400 text-lg leading-relaxed font-medium pl-6">
+            <p className="text-slate-400 text-sm sm:text-base lg:text-lg leading-relaxed font-medium pl-4 sm:pl-6">
               We provide the most sophisticated software infrastructure to process foreign exchange transactions with absolute precision.
             </p>
-            <div className="pl-6">
+            <div className="pl-4 sm:pl-6">
               <motion.button 
                 whileHover={{ x: 5 }}
-                className="flex items-center gap-3 text-indigo-400 font-black uppercase text-xs tracking-widest group cursor-pointer"
+                className="flex items-center gap-2 sm:gap-3 text-indigo-400 font-black uppercase text-[10px] sm:text-xs tracking-widest group cursor-pointer"
               >
                 Review Infrastructure Documentation 
-                <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
+                <ArrowRight size={12} className="sm:w-[14px] sm:h-[14px] group-hover:translate-x-2 transition-transform" />
               </motion.button>
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-3 gap-4 pt-6 pl-6">
+            <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-4 sm:pt-6 pl-4 sm:pl-6">
               <motion.div 
                 whileHover={{ y: -4, scale: 1.02 }}
                 className="relative group"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="relative bg-gradient-to-br from-white/[0.05] to-white/[0.02] border border-white/10 rounded-xl p-4 text-center backdrop-blur-sm group-hover:border-indigo-500/40 transition-all duration-300">
-                  <div className="text-2xl font-black bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                <div className="relative bg-gradient-to-br from-white/[0.05] to-white/[0.02] border border-white/10 rounded-xl p-3 sm:p-4 text-center backdrop-blur-sm group-hover:border-indigo-500/40 transition-all duration-300">
+                  <div className="text-lg sm:text-2xl font-black bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
                     $2.4B
                   </div>
-                  <div className="text-[9px] text-slate-500 font-mono mt-1 flex items-center justify-center gap-1">
-                    <Activity size={10} className="text-emerald-500" />
+                  <div className="text-[7px] sm:text-[9px] text-slate-500 font-mono mt-0.5 sm:mt-1 flex items-center justify-center gap-1">
+                    <Activity size={8} className="sm:w-[10px] sm:h-[10px] text-emerald-500" />
                     Volume (24h)
                   </div>
                 </div>
@@ -1763,12 +1801,12 @@ export default function Home() {
                 className="relative group"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="relative bg-gradient-to-br from-white/[0.05] to-white/[0.02] border border-white/10 rounded-xl p-4 text-center backdrop-blur-sm group-hover:border-cyan-500/40 transition-all duration-300">
-                  <div className="text-2xl font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                <div className="relative bg-gradient-to-br from-white/[0.05] to-white/[0.02] border border-white/10 rounded-xl p-3 sm:p-4 text-center backdrop-blur-sm group-hover:border-cyan-500/40 transition-all duration-300">
+                  <div className="text-lg sm:text-2xl font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
                     190+
                   </div>
-                  <div className="text-[9px] text-slate-500 font-mono mt-1 flex items-center justify-center gap-1">
-                    <Globe2 size={10} className="text-cyan-500" />
+                  <div className="text-[7px] sm:text-[9px] text-slate-500 font-mono mt-0.5 sm:mt-1 flex items-center justify-center gap-1">
+                    <Globe2 size={8} className="sm:w-[10px] sm:h-[10px] text-cyan-500" />
                     Countries
                   </div>
                 </div>
@@ -1779,12 +1817,12 @@ export default function Home() {
                 className="relative group"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-green-500/20 rounded-xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="relative bg-gradient-to-br from-white/[0.05] to-white/[0.02] border border-white/10 rounded-xl p-4 text-center backdrop-blur-sm group-hover:border-emerald-500/40 transition-all duration-300">
-                  <div className="text-2xl font-black bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent">
+                <div className="relative bg-gradient-to-br from-white/[0.05] to-white/[0.02] border border-white/10 rounded-xl p-3 sm:p-4 text-center backdrop-blur-sm group-hover:border-emerald-500/40 transition-all duration-300">
+                  <div className="text-lg sm:text-2xl font-black bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent">
                     {healthData.uptime}
                   </div>
-                  <div className="text-[9px] text-slate-500 font-mono mt-1 flex items-center justify-center gap-1">
-                    <Zap size={10} className="text-emerald-500" />
+                  <div className="text-[7px] sm:text-[9px] text-slate-500 font-mono mt-0.5 sm:mt-1 flex items-center justify-center gap-1">
+                    <Zap size={8} className="sm:w-[10px] sm:h-[10px] text-emerald-500" />
                     Uptime
                   </div>
                 </div>
@@ -1796,40 +1834,40 @@ export default function Home() {
 
         {/* ─── 6. NEURAL SETTLEMENT ENGINE ─── */}
         <ErrorBoundary>
-          <section className="flex flex-col gap-10">
+          <section className="flex flex-col gap-8 sm:gap-10">
           <div className="flex items-center gap-4">
-            <div className="w-1 h-10 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full" />
+            <div className="w-1 h-8 sm:h-10 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full" />
             <div>
-              <h2 className="text-2xl font-black uppercase italic tracking-tight text-white">Neural Settlement Engine</h2>
-              <p className="text-[12px] text-slate-500 font-mono mt-1">Sub-millisecond transaction processing core</p>
+              <h2 className="text-xl sm:text-2xl font-black uppercase italic tracking-tight text-white">Neural Settlement Engine</h2>
+              <p className="text-[10px] sm:text-[12px] text-slate-500 font-mono mt-1">Sub-millisecond transaction processing core</p>
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
             <motion.div 
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
-              className="bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-2xl p-8 relative overflow-hidden"
+              className="bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-2xl p-6 sm:p-8 relative overflow-hidden"
             >
-              <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl" />
+              <div className="absolute top-0 right-0 w-32 sm:w-40 h-32 sm:h-40 bg-indigo-500/10 rounded-full blur-3xl" />
               <div className="relative z-10">
-                <div className="w-14 h-14 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 rounded-xl flex items-center justify-center mb-6">
-                  <Zap size={28} className="text-indigo-400" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+                  <Zap size={22} className="sm:w-[28px] sm:h-[28px] text-indigo-400" />
                 </div>
-                <h3 className="text-xl font-black text-white uppercase mb-4">Quantum-Speed Processing</h3>
-                <p className="text-slate-400 leading-relaxed">
+                <h3 className="text-lg sm:text-xl font-black text-white uppercase mb-3 sm:mb-4">Quantum-Speed Processing</h3>
+                <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
                   Our proprietary neural engine processes transactions in under 1 millisecond using distributed computing nodes across global data centers. Zero latency, maximum throughput.
                 </p>
-                <div className="mt-6 flex items-center gap-4">
+                <div className="mt-5 sm:mt-6 flex items-center gap-4">
                   <div className="text-center">
-                    <div className="text-2xl font-black text-indigo-400">{healthData.latency}</div>
-                    <div className="text-[9px] text-slate-500 font-mono uppercase">Latency</div>
+                    <div className="text-xl sm:text-2xl font-black text-indigo-400">{healthData.latency}</div>
+                    <div className="text-[8px] sm:text-[9px] text-slate-500 font-mono uppercase">Latency</div>
                   </div>
-                  <div className="w-px h-10 bg-white/10" />
+                  <div className="w-px h-8 sm:h-10 bg-white/10" />
                   <div className="text-center">
-                    <div className="text-2xl font-black text-purple-400">{healthData.uptime}</div>
-                    <div className="text-[9px] text-slate-500 font-mono uppercase">Uptime</div>
+                    <div className="text-xl sm:text-2xl font-black text-purple-400">{healthData.uptime}</div>
+                    <div className="text-[8px] sm:text-[9px] text-slate-500 font-mono uppercase">Uptime</div>
                   </div>
                 </div>
               </div>
@@ -1839,20 +1877,20 @@ export default function Home() {
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-2xl p-8 relative overflow-hidden"
+              className="bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-2xl p-6 sm:p-8 relative overflow-hidden"
             >
-              <div className="absolute top-0 right-0 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl" />
+              <div className="absolute top-0 right-0 w-32 sm:w-40 h-32 sm:h-40 bg-cyan-500/10 rounded-full blur-3xl" />
               <div className="relative z-10">
-                <div className="w-14 h-14 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/30 rounded-xl flex items-center justify-center mb-6">
-                  <Cpu size={28} className="text-cyan-400" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/30 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+                  <Cpu size={22} className="sm:w-[28px] sm:h-[28px] text-cyan-400" />
                 </div>
-                <h3 className="text-xl font-black text-white uppercase mb-4">Distributed Architecture</h3>
-                <p className="text-slate-400 leading-relaxed">
+                <h3 className="text-lg sm:text-xl font-black text-white uppercase mb-3 sm:mb-4">Distributed Architecture</h3>
+                <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
                   Multi-region deployment ensures redundancy and failover capabilities. Your transactions are processed at the nearest node for optimal performance.
                 </p>
-                <div className="mt-6 flex flex-wrap gap-2">
-                  <span className="text-[9px] font-mono font-bold text-cyan-400 bg-cyan-500/10 px-3 py-1.5 rounded-lg border border-cyan-500/20">190+ LOCATIONS</span>
-                  <span className="text-[9px] font-mono font-bold text-indigo-400 bg-indigo-500/10 px-3 py-1.5 rounded-lg border border-indigo-500/20">AUTO-SCALING</span>
+                <div className="mt-5 sm:mt-6 flex flex-wrap gap-2">
+                  <span className="text-[8px] sm:text-[9px] font-mono font-bold text-cyan-400 bg-cyan-500/10 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-cyan-500/20">190+ LOCATIONS</span>
+                  <span className="text-[8px] sm:text-[9px] font-mono font-bold text-indigo-400 bg-indigo-500/10 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-indigo-500/20">AUTO-SCALING</span>
                 </div>
               </div>
             </motion.div>
@@ -1862,40 +1900,40 @@ export default function Home() {
 
         {/* ─── 7. PROTOCOL SECURITY ─── */}
         <ErrorBoundary>
-          <section className="flex flex-col gap-10">
+          <section className="flex flex-col gap-8 sm:gap-10">
           <div className="flex items-center gap-4">
-            <div className="w-1 h-10 bg-emerald-500 rounded-full" />
+            <div className="w-1 h-8 sm:h-10 bg-emerald-500 rounded-full" />
             <div>
-              <h2 className="text-2xl font-black uppercase italic tracking-tight text-white">Protocol Security</h2>
-              <p className="text-[12px] text-slate-500 font-mono mt-1">Military-grade encryption and protection layers</p>
+              <h2 className="text-xl sm:text-2xl font-black uppercase italic tracking-tight text-white">Protocol Security</h2>
+              <p className="text-[10px] sm:text-[12px] text-slate-500 font-mono mt-1">Military-grade encryption and protection layers</p>
             </div>
           </div>
 
           {isSecurityLoading ? (
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
               <SkeletonSecurityCard />
               <SkeletonSecurityCard />
               <SkeletonSecurityCard />
             </div>
           ) : (
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
               {[
-                { icon: <Lock size={24} />, title: "SSL/TLS Encryption", desc: "256-bit SSL encryption for all data in transit", color: "emerald" },
-                { icon: <ShieldCheck size={24} />, title: "AES-256 Encryption", desc: "Advanced encryption standard for data at rest", color: "cyan" },
-                { icon: <Globe2 size={24} />, title: "DDoS Protection", desc: "Enterprise-grade mitigation against attacks", color: "indigo" }
+                { icon: <Lock size={20} className="sm:w-[24px] sm:h-[24px]" />, title: "SSL/TLS Encryption", desc: "256-bit SSL encryption for all data in transit", color: "emerald" },
+                { icon: <ShieldCheck size={20} className="sm:w-[24px] sm:h-[24px]" />, title: "AES-256 Encryption", desc: "Advanced encryption standard for data at rest", color: "cyan" },
+                { icon: <Globe2 size={20} className="sm:w-[24px] sm:h-[24px]" />, title: "DDoS Protection", desc: "Enterprise-grade mitigation against attacks", color: "indigo" }
               ].map((item, i) => (
                 <motion.div 
                   key={i}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 }}
-                  className="bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-2xl p-6 hover:border-white/20 transition-all group"
+                  className="bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-2xl p-5 sm:p-6 hover:border-white/20 transition-all group"
                 >
-                  <div className={`w-12 h-12 bg-gradient-to-br from-${item.color}-500/20 to-${item.color}-500/10 border border-${item.color}-500/30 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-${item.color}-500/20 to-${item.color}-500/10 border border-${item.color}-500/30 rounded-xl flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}>
                     <div className={`text-${item.color}-400`}>{item.icon}</div>
                   </div>
-                  <h3 className="text-sm font-black text-white uppercase mb-2">{item.title}</h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">{item.desc}</p>
+                  <h3 className="text-xs sm:text-sm font-black text-white uppercase mb-1.5 sm:mb-2">{item.title}</h3>
+                  <p className="text-[10px] sm:text-xs text-slate-500 leading-relaxed">{item.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -1903,23 +1941,23 @@ export default function Home() {
         </section>
 
         {/* ─── 8. COMPLIANCE & TRANSPARENCY ─── */}
-        <section className="flex flex-col gap-10">
+        <section className="flex flex-col gap-8 sm:gap-10">
           <div className="flex items-center gap-4">
-            <div className="w-1 h-10 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full" />
+            <div className="w-1 h-8 sm:h-10 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full" />
             <div>
-              <h2 className="text-2xl font-black uppercase italic tracking-tight text-white">Compliance & Transparency</h2>
-              <p className="text-[12px] text-slate-500 font-mono mt-1">Regulatory compliance and operational transparency</p>
+              <h2 className="text-xl sm:text-2xl font-black uppercase italic tracking-tight text-white">Compliance & Transparency</h2>
+              <p className="text-[10px] sm:text-[12px] text-slate-500 font-mono mt-1">Regulatory compliance and operational transparency</p>
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-2xl p-8 lg:p-12">
-            <div className="grid lg:grid-cols-2 gap-10">
+          <div className="bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-2xl p-6 sm:p-8 lg:p-12">
+            <div className="grid md:grid-cols-2 gap-8 sm:gap-10">
               <div>
-                <h3 className="text-lg font-black text-white uppercase mb-6 flex items-center gap-3">
-                  <Award size={20} className="text-purple-400" />
+                <h3 className="text-base sm:text-lg font-black text-white uppercase mb-4 sm:mb-6 flex items-center gap-3">
+                  <Award size={16} className="sm:w-[20px] sm:h-[20px] text-purple-400" />
                   Regulatory Compliance
                 </h3>
-                <ul className="space-y-4">
+                <ul className="space-y-3 sm:space-y-4">
                   {[
                     "KYC/AML verification for all users",
                     "FATCA and CRS reporting compliance",
@@ -1927,18 +1965,18 @@ export default function Home() {
                     "Regular third-party security audits"
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-3">
-                      <div className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-2 shrink-0" />
-                      <span className="text-sm text-slate-400">{item}</span>
+                      <div className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-1.5 sm:mt-2 shrink-0" />
+                      <span className="text-xs sm:text-sm text-slate-400">{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
               <div>
-                <h3 className="text-lg font-black text-white uppercase mb-6 flex items-center gap-3">
-                  <Layers size={20} className="text-pink-400" />
+                <h3 className="text-base sm:text-lg font-black text-white uppercase mb-4 sm:mb-6 flex items-center gap-3">
+                  <Layers size={16} className="sm:w-[20px] sm:h-[20px] text-pink-400" />
                   Operational Transparency
                 </h3>
-                <ul className="space-y-4">
+                <ul className="space-y-3 sm:space-y-4">
                   {[
                     "Real-time transaction monitoring",
                     "Public audit reports available",
@@ -1946,24 +1984,24 @@ export default function Home() {
                     "24/7 customer support access"
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-3">
-                      <div className="w-1.5 h-1.5 rounded-full bg-pink-500 mt-2 shrink-0" />
-                      <span className="text-sm text-slate-400">{item}</span>
+                      <div className="w-1.5 h-1.5 rounded-full bg-pink-500 mt-1.5 sm:mt-2 shrink-0" />
+                      <span className="text-xs sm:text-sm text-slate-400">{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             </div>
-            <div className="mt-8 pt-8 border-t border-white/10 flex flex-wrap gap-4">
-              <div className="flex items-center gap-2 text-[9px] font-mono text-slate-500">
-                <CheckCircle2 size={12} className="text-emerald-500" />
+            <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-white/10 flex flex-wrap gap-3 sm:gap-4">
+              <div className="flex items-center gap-2 text-[8px] sm:text-[9px] font-mono text-slate-500">
+                <CheckCircle2 size={10} className="sm:w-[12px] sm:h-[12px] text-emerald-500" />
                 ISO 27001 Certified
               </div>
-              <div className="flex items-center gap-2 text-[9px] font-mono text-slate-500">
-                <CheckCircle2 size={12} className="text-emerald-500" />
+              <div className="flex items-center gap-2 text-[8px] sm:text-[9px] font-mono text-slate-500">
+                <CheckCircle2 size={10} className="sm:w-[12px] sm:h-[12px] text-emerald-500" />
                 SOC 2 Type II Compliant
               </div>
-              <div className="flex items-center gap-2 text-[9px] font-mono text-slate-500">
-                <CheckCircle2 size={12} className="text-emerald-500" />
+              <div className="flex items-center gap-2 text-[8px] sm:text-[9px] font-mono text-slate-500">
+                <CheckCircle2 size={10} className="sm:w-[12px] sm:h-[12px] text-emerald-500" />
                 PCI DSS Level 1
               </div>
             </div>
@@ -1974,12 +2012,12 @@ export default function Home() {
         {/* ─── 9. FAQ ─── */}
         <ErrorBoundary>
           <section className="max-w-3xl mx-auto w-full">
-          <div className="text-center mb-12 space-y-4">
-            <div className="inline-flex items-center justify-center p-3 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-2xl border border-white/10 mb-4">
-              <HelpCircle size={24} className="text-indigo-400" />
+          <div className="text-center mb-8 sm:mb-12 space-y-3 sm:space-y-4">
+            <div className="inline-flex items-center justify-center p-2 sm:p-3 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-2xl border border-white/10 mb-3 sm:mb-4">
+              <HelpCircle size={20} className="sm:w-[24px] sm:h-[24px] text-indigo-400" />
             </div>
-            <h2 className="text-4xl font-black text-white uppercase italic tracking-tight">Knowledge Base</h2>
-            <p className="text-slate-500 font-medium">Learn more about how the Swap protocol works.</p>
+            <h2 className="text-3xl sm:text-4xl font-black text-white uppercase italic tracking-tight">Knowledge Base</h2>
+            <p className="text-slate-500 text-sm sm:text-base font-medium">Learn more about how the Swap protocol works.</p>
           </div>
 
           {isFaqLoading ? (
@@ -2011,12 +2049,12 @@ export default function Home() {
                     }}
                     aria-expanded={openFaq === index}
                     aria-controls={`faq-answer-${index}`}
-                    className="w-full flex items-center justify-between p-5 text-left outline-none group cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14] rounded-lg"
+                    className="w-full flex items-center justify-between p-4 sm:p-5 text-left outline-none group cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14] rounded-lg"
                   >
-                    <span className={`text-sm font-bold transition-colors ${openFaq === index ? "text-indigo-400" : "text-slate-200 group-hover:text-white"}`}>
+                    <span className={`text-xs sm:text-sm font-bold transition-colors ${openFaq === index ? "text-indigo-400" : "text-slate-200 group-hover:text-white"}`}>
                       {faq.question}
                     </span>
-                    <ChevronDown size={16} className={`transition-all duration-300 ${openFaq === index ? "rotate-180 text-indigo-400" : "text-slate-600"}`} />
+                    <ChevronDown size={14} className={`transition-all duration-300 ${openFaq === index ? "rotate-180 text-indigo-400" : "text-slate-600"}`} />
                   </button>
                   <AnimatePresence>
                     {openFaq === index && (
@@ -2029,7 +2067,7 @@ export default function Home() {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <div className="px-5 pb-5 text-sm text-slate-400 leading-relaxed font-medium border-t border-white/10 pt-4">
+                        <div className="px-4 sm:px-5 pb-4 sm:pb-5 text-xs sm:text-sm text-slate-400 leading-relaxed font-medium border-t border-white/10 pt-3 sm:pt-4">
                           {faq.answer}
                         </div>
                       </motion.div>
@@ -2044,66 +2082,66 @@ export default function Home() {
 
         {/* ─── 10. CONTACT ─── */}
         <ErrorBoundary>
-          <section className="grid lg:grid-cols-12 gap-12 items-start border-t border-white/10 pt-24 pb-16">
-            <div className="lg:col-span-5 space-y-6">
+          <section className="grid lg:grid-cols-12 gap-10 sm:gap-12 items-start border-t border-white/10 pt-16 sm:pt-24 pb-12 sm:pb-16">
+            <div className="lg:col-span-5 space-y-5 sm:space-y-6">
               <div className="relative">
-                <div className="absolute -left-4 top-0 w-1 h-16 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full" />
-                <h2 className="text-4xl font-black text-white uppercase italic tracking-tight leading-none pl-6">
+                <div className="absolute -left-3 sm:-left-4 top-0 w-1 h-12 sm:h-16 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full" />
+                <h2 className="text-3xl sm:text-4xl font-black text-white uppercase italic tracking-tight leading-none pl-4 sm:pl-6">
                   Connect With<br />Our Engineers.
                 </h2>
               </div>
-              <p className="text-slate-500 text-sm leading-relaxed font-medium max-w-sm pl-6">
+              <p className="text-slate-500 text-sm sm:text-base leading-relaxed font-medium max-w-sm pl-4 sm:pl-6">
                 Facing technical issues or need enterprise solutions? Our rapid response team is always ready.
               </p>
-              <div className="flex flex-col gap-3 pt-4 pl-6">
-                <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-white/5 to-transparent rounded-xl border border-white/10 w-fit group hover:border-indigo-500/30 transition-all">
-                  <Mail className="text-indigo-400" size={16} />
-                  <span className="text-xs font-mono font-bold text-slate-300 group-hover:text-indigo-400 transition-colors">viee1525@gmail.com</span>
+              <div className="flex flex-col gap-2 sm:gap-3 pt-2 sm:pt-4 pl-4 sm:pl-6">
+                <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-gradient-to-r from-white/5 to-transparent rounded-xl border border-white/10 w-fit group hover:border-indigo-500/30 transition-all">
+                  <Mail className="text-indigo-400 sm:w-[16px] sm:h-[16px]" size={14} />
+                  <span className="text-[10px] sm:text-xs font-mono font-bold text-slate-300 group-hover:text-indigo-400 transition-colors">viee1525@gmail.com</span>
                 </div>
-                <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-white/5 to-transparent rounded-xl border border-white/10 w-fit group hover:border-indigo-500/30 transition-all">
-                  <MessageSquare className="text-indigo-400" size={16} />
-                  <span className="text-xs font-mono font-bold text-slate-300">( +84 ) 0765687090</span>
+                <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-gradient-to-r from-white/5 to-transparent rounded-xl border border-white/10 w-fit group hover:border-indigo-500/30 transition-all">
+                  <MessageSquare className="text-indigo-400 sm:w-[16px] sm:h-[16px]" size={14} />
+                  <span className="text-[10px] sm:text-xs font-mono font-bold text-slate-300">( +84 ) 0765687090</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 pl-6 pt-4">
-                <div className={`w-2 h-2 rounded-full ${isWebSocketConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-                <span className="text-[9px] font-mono text-emerald-500">{isWebSocketConnected ? 'All systems operational' : 'Syncing...'}</span>
+              <div className="flex items-center gap-2 pl-4 sm:pl-6 pt-3 sm:pt-4">
+                <div className={`w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full ${isWebSocketConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+                <span className="text-[8px] sm:text-[9px] font-mono text-emerald-500">{isWebSocketConnected ? 'All systems operational' : 'Syncing...'}</span>
               </div>
             </div>
 
             <div className="lg:col-span-7 relative">
               <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 blur-3xl rounded-full" />
-              <div className="relative bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-xl p-8 lg:p-10">
+              <div className="relative bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-xl p-6 sm:p-8 lg:p-10">
                 {!formSubmitted ? (
-                  <form onSubmit={handleContactSubmit} className="space-y-5">
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-[9px] font-mono font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-1">
-                          <User size={10} /> Identity
+                  <form onSubmit={handleContactSubmit} className="space-y-4 sm:space-y-5">
+                    <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
+                      <div className="space-y-1.5 sm:space-y-2">
+                        <label className="text-[8px] sm:text-[9px] font-mono font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-1">
+                          <User size={8} className="sm:w-[10px] sm:h-[10px]" /> Identity
                         </label>
                         <input
                           type="text"
                           value={contactForm.name}
                           disabled
-                          className="w-full bg-black/40 border border-white/10 rounded-lg p-3.5 text-sm font-mono text-white/70 outline-none cursor-not-allowed"
+                          className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 sm:p-3.5 text-xs sm:text-sm font-mono text-white/70 outline-none cursor-not-allowed"
                         />
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-[9px] font-mono font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-1">
-                          <Mail size={10} /> Node Endpoint
+                      <div className="space-y-1.5 sm:space-y-2">
+                        <label className="text-[8px] sm:text-[9px] font-mono font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-1">
+                          <Mail size={8} className="sm:w-[10px] sm:h-[10px]" /> Node Endpoint
                         </label>
                         <input
                           type="email"
                           value={contactForm.email}
                           disabled
-                          className="w-full bg-black/40 border border-white/10 rounded-lg p-3.5 text-sm font-mono text-white/70 outline-none cursor-not-allowed"
+                          className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 sm:p-3.5 text-xs sm:text-sm font-mono text-white/70 outline-none cursor-not-allowed"
                         />
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[9px] font-mono font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-1">
-                        <Send size={10} /> Transmission Data
+                    <div className="space-y-1.5 sm:space-y-2">
+                      <label className="text-[8px] sm:text-[9px] font-mono font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-1">
+                        <Send size={8} className="sm:w-[10px] sm:h-[10px]" /> Transmission Data
                       </label>
                       <textarea
                         rows={4}
@@ -2112,7 +2150,7 @@ export default function Home() {
                         value={contactForm.message}
                         onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
                         aria-label="Your message"
-                        className="w-full bg-black/40 border border-white/10 focus:border-indigo-500/50 rounded-lg p-3.5 text-sm font-mono text-white outline-none resize-none transition-all focus:bg-black/60 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14]"
+                        className="w-full bg-black/40 border border-white/10 focus:border-indigo-500/50 rounded-lg p-2.5 sm:p-3.5 text-xs sm:text-sm font-mono text-white outline-none resize-none transition-all focus:bg-black/60 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14]"
                       />
                     </div>
                     <motion.button
@@ -2120,16 +2158,16 @@ export default function Home() {
                       whileTap={{ scale: 0.98 }}
                       type="submit"
                       disabled={isSubmittingContact}
-                      className="w-full bg-gradient-to-r from-white to-slate-200 text-indigo-950 font-black text-xs uppercase tracking-[0.2em] py-4 rounded-lg flex items-center justify-center gap-3 hover:from-indigo-50 hover:to-white transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-gradient-to-r from-white to-slate-200 text-indigo-950 font-black text-[10px] sm:text-xs uppercase tracking-[0.15em] sm:tracking-[0.2em] py-3 sm:py-4 rounded-lg flex items-center justify-center gap-2 sm:gap-3 hover:from-indigo-50 hover:to-white transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isSubmittingContact ? (
                         <>
-                          <Loader2 size={12} className="animate-spin" />
+                          <Loader2 size={10} className="sm:w-[12px] sm:h-[12px] animate-spin" />
                           Transmitting...
                         </>
                       ) : (
                         <>
-                          Transmit Message <Send size={12} />
+                          Transmit Message <Send size={10} className="sm:w-[12px] sm:h-[12px]" />
                         </>
                       )}
                     </motion.button>
@@ -2138,14 +2176,14 @@ export default function Home() {
                   <motion.div 
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="py-16 text-center flex flex-col items-center justify-center gap-5"
+                    className="py-12 sm:py-16 text-center flex flex-col items-center justify-center gap-4 sm:gap-5"
                   >
-                    <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-400 border border-emerald-500/20">
-                      <CheckCircle2 size={32} />
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-400 border border-emerald-500/20">
+                      <CheckCircle2 size={28} className="sm:w-[32px] sm:h-[32px]" />
                     </div>
                     <div>
-                      <h4 className="text-xl font-black text-white uppercase italic tracking-tight">Transmission Successful</h4>
-                      <p className="text-slate-500 text-sm mt-2">Your data has been recorded in the response log.</p>
+                      <h4 className="text-lg sm:text-xl font-black text-white uppercase italic tracking-tight">Transmission Successful</h4>
+                      <p className="text-slate-500 text-xs sm:text-sm mt-2">Your data has been recorded in the response log.</p>
                     </div>
                     <button 
                       onClick={() => setFormSubmitted(false)} 
@@ -2156,9 +2194,9 @@ export default function Home() {
                         }
                       }}
                       aria-label="Send another message"
-                      className="text-indigo-400 text-[10px] font-black uppercase tracking-widest hover:underline mt-2 flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14] rounded px-2 py-1"
+                      className="text-indigo-400 text-[8px] sm:text-[10px] font-black uppercase tracking-widest hover:underline mt-2 flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14] rounded px-2 py-1"
                     >
-                      <RefreshCw size={10} /> Send another query
+                      <RefreshCw size={8} className="sm:w-[10px] sm:h-[10px]" /> Send another query
                     </button>
                   </motion.div>
                 )}
@@ -2187,14 +2225,166 @@ export default function Home() {
               }
             }}
             aria-label="Scroll to top"
-            className="fixed bottom-8 right-8 z-50 w-14 h-14 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full border border-indigo-500/50 shadow-lg shadow-indigo-500/30 flex items-center justify-center text-white hover:scale-110 transition-all duration-300 cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#02020a] group"
+            className="fixed bottom-4 sm:bottom-8 right-20 sm:right-24 z-50 w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full border border-indigo-500/50 shadow-lg shadow-indigo-500/30 flex items-center justify-center text-white hover:scale-110 transition-all duration-300 cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#02020a] group"
           >
-            <ArrowUp size={22} className="group-hover:-translate-y-0.5 transition-transform" />
-            <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full animate-ping" />
-            <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full" />
+            <ArrowUp size={16} className="sm:w-[18px] sm:h-[18px] group-hover:-translate-y-0.5 transition-transform" />
           </motion.button>
         )}
       </AnimatePresence>
+
+      {/* ─── CHAT BOX ─── */}
+      <div className="fixed bottom-4 sm:bottom-8 right-4 sm:right-8 z-50">
+        <div className="flex flex-col items-end">
+          <AnimatePresence>
+            {isChatOpen && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                transition={{ duration: 0.2 }}
+                className="mb-4 w-[320px] sm:w-[380px] h-[450px] sm:h-[500px] bg-gradient-to-br from-[#0d0d14] to-[#08080c] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+              >
+                {/* Chat Header */}
+                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                      <MessageSquare size={20} className="text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-black text-sm uppercase tracking-wider">Support Chat</h3>
+                      <p className="text-indigo-200 text-[10px] font-mono">Online • Response time: &lt;2min</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Chat Messages */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                  {chatMessages.map((msg) => (
+                    <motion.div
+                      key={msg.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`max-w-[80%] p-3 rounded-xl ${
+                          msg.isUser
+                            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'
+                            : 'bg-white/10 text-slate-200'
+                        }`}
+                      >
+                        <p className="text-xs sm:text-sm leading-relaxed">{msg.text}</p>
+                        <p className={`text-[8px] mt-1 font-mono ${msg.isUser ? 'text-indigo-200' : 'text-slate-500'}`}>
+                          {new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ))}
+                  {isSendingChat && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex justify-start"
+                    >
+                      <div className="bg-white/10 p-3 rounded-xl">
+                        <div className="flex gap-1">
+                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
+
+                {/* Chat Input */}
+                <div className="p-4 border-t border-white/10">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={chatInput}
+                      onChange={(e) => setChatInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
+                      placeholder="Type your message..."
+                      disabled={isSendingChat}
+                      aria-label="Chat message input"
+                      className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-indigo-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    />
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleSendMessage}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
+                      disabled={isSendingChat || !chatInput.trim()}
+                      aria-label="Send message"
+                      className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl px-4 py-3 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d14]"
+                    >
+                      {isSendingChat ? (
+                        <Loader2 size={18} className="animate-spin" />
+                      ) : (
+                        <Send size={18} />
+                      )}
+                    </motion.button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          <motion.button
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setIsChatOpen(!isChatOpen)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setIsChatOpen(!isChatOpen);
+              }
+            }}
+            aria-label={isChatOpen ? "Close chat" : "Open chat"}
+            aria-expanded={isChatOpen}
+            className="w-12 h-12 sm:w-12 sm:h-12 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full border border-indigo-500/50 shadow-lg shadow-indigo-500/30 flex items-center justify-center text-white hover:scale-110 transition-all duration-300 cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#02020a] group ml-auto"
+          >
+            <AnimatePresence mode="wait">
+              {isChatOpen ? (
+                <motion.div
+                  key="close"
+                  initial={{ opacity: 0, rotate: -90 }}
+                  animate={{ opacity: 1, rotate: 0 }}
+                  exit={{ opacity: 0, rotate: 90 }}
+                  transition={{ duration: 0.15 }}
+                  className="flex items-center justify-center"
+                >
+                  <X size={22} className="sm:w-[24px] sm:h-[24px]" strokeWidth={2.5} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="open"
+                  initial={{ opacity: 0, rotate: 90 }}
+                  animate={{ opacity: 1, rotate: 0 }}
+                  exit={{ opacity: 0, rotate: -90 }}
+                  transition={{ duration: 0.15 }}
+                  className="flex items-center justify-center"
+                >
+                  <MessageSquare size={22} className="sm:w-[22px] sm:h-[22px]" strokeWidth={2} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
+        </div>
+      </div>
 
       <style jsx global>{`
 

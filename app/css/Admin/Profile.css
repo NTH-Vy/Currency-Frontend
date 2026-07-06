@@ -1,10 +1,6 @@
-        @keyframes gradient-x {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
         ::-webkit-scrollbar {
-          width: 6px;
-          height: 6px;
+          width: 5px;
+          height: 5px;
         }
         ::-webkit-scrollbar-track {
           background: #050508;
@@ -20,7 +16,8 @@
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
-        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-          filter: invert(1);
-          cursor: pointer;
+        .truncate {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }

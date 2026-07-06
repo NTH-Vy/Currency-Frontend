@@ -47,7 +47,8 @@ import {
   Check,
   Ban,
   AlertTriangle,
-  Tag
+  Tag,
+  ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BACK_END } from "@/lib/echo";
@@ -304,66 +305,6 @@ const CustomDatePicker = ({
 };
 
 // ---------- Skeleton Components ----------
-const HeaderSkeleton = () => (
-  <div className="relative group">
-    <div className="relative bg-gradient-to-br from-[#11111a] to-[#0c0c12] rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-      <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="flex flex-col gap-3 w-full md:w-2/3">
-          <div className="h-6 w-48 bg-white/5 rounded-full animate-pulse" />
-          <div className="h-12 w-3/4 bg-white/5 rounded-xl animate-pulse" />
-          <div className="h-4 w-full max-w-2xl bg-white/5 rounded-lg animate-pulse" />
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="h-12 w-28 bg-white/5 rounded-xl animate-pulse" />
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-const StatsSkeleton = () => (
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-    {[...Array(4)].map((_, idx) => (
-      <div key={idx} className="bg-[#11111a] border border-white/10 rounded-2xl p-4 shadow-xl">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/5 animate-pulse" />
-          <div className="flex-1">
-            <div className="h-3 w-20 bg-white/5 rounded animate-pulse mb-1" />
-            <div className="h-7 w-12 bg-white/5 rounded animate-pulse" />
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
-);
-
-const SearchSkeleton = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
-  return (
-    <div 
-      className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-end"
-      style={{
-        opacity: isVisible ? 1 : 0,
-        transform: isVisible ? 'translateX(0)' : 'translateX(50px)',
-        transition: 'all 0.4s ease-out'
-      }}
-    >
-      <div className="relative w-full sm:w-80">
-        <div className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-10 pr-4 h-12 animate-pulse" />
-      </div>
-      <div className="flex items-center gap-2">
-        <div className="h-12 w-28 bg-white/5 rounded-xl animate-pulse" />
-      </div>
-    </div>
-  );
-};
-
 const TableHeaderSkeleton = () => (
   <tr className="border-b border-white/10 bg-white/5">
     <th className="px-4 py-4 w-24"><div className="h-3 w-10 bg-white/5 rounded animate-pulse" /></th>
@@ -396,8 +337,8 @@ const TableSkeleton = () => {
           <thead>
             <TableHeaderSkeleton />
           </thead>
-          <tbody className="divide-y divide-white/5">
-            {[...Array(5)].map((_, idx) => {
+          <tbody>
+            {[...Array(10)].map((_, idx) => {
               const delay = idx * 80;
               return (
                 <tr 
@@ -473,11 +414,42 @@ const PaginationSkeleton = () => {
   );
 };
 
+// Skeleton tổng thể cho trang
 const PageSkeleton = () => (
   <div className="flex flex-col gap-8">
-    <HeaderSkeleton />
-    <StatsSkeleton />
-    <SearchSkeleton />
+    <div className="relative group">
+      <div className="relative bg-gradient-to-br from-[#11111a] to-[#0c0c12] rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+        <div className="relative z-10 flex flex-col gap-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex flex-col gap-3 w-full md:w-2/3">
+              <div className="h-6 w-32 bg-white/5 rounded-full animate-pulse" />
+              <div className="h-12 w-3/4 bg-white/5 rounded-xl animate-pulse" />
+              <div className="h-4 w-full max-w-2xl bg-white/5 rounded-lg animate-pulse" />
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-white/10">
+            <div className="flex items-center gap-6">
+              <div className="h-3 w-20 bg-white/5 rounded animate-pulse" />
+              <div className="h-3 w-20 bg-white/5 rounded animate-pulse" />
+              <div className="h-3 w-20 bg-white/5 rounded animate-pulse" />
+              <div className="h-3 w-20 bg-white/5 rounded animate-pulse" />
+            </div>
+            <div className="h-10 w-28 bg-white/5 rounded-xl animate-pulse" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-end">
+      <div className="relative w-full sm:w-80">
+        <div className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-10 pr-4 h-12 animate-pulse" />
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="h-12 w-24 bg-white/5 rounded-xl animate-pulse" />
+      </div>
+    </div>
+
     <TableSkeleton />
     <PaginationSkeleton />
   </div>
@@ -617,6 +589,7 @@ export default function AdminReportsPage() {
         setReports(data.data);
         setTotalPages(data.last_page || 1);
         setTotalItems(data.total || 0);
+        if (data.stats) setStats(data.stats);
       }
     } catch (error) {
       console.error('Error fetching reports:', error);
@@ -840,7 +813,24 @@ export default function AdminReportsPage() {
   };
 
   const renderPaginationPages = () => {
-    if (!totalPages || totalPages <= 1) return null;
+    // Luôn hiển thị ít nhất 1 trang
+    if (!totalPages || totalPages <= 1) {
+      return (
+        <motion.button
+          key={1}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setCurrentPage(1)}
+          className={`px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-wider transition-all ${
+            currentPage === 1
+              ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow-md'
+              : 'bg-white/5 hover:bg-white/10 text-slate-400'
+          }`}
+        >
+          1
+        </motion.button>
+      );
+    }
     
     const total = totalPages;
     const current = currentPage;
@@ -882,6 +872,126 @@ export default function AdminReportsPage() {
     });
   };
 
+  // Render rows - luôn hiển thị đúng 10 dòng
+  const renderRows = () => {
+    const rows = [];
+    const totalRows = 10;
+    
+    if (reports.length === 0) {
+      for (let i = 0; i < totalRows; i++) {
+        rows.push(
+          <tr key={`empty-${i}`} className="pointer-events-none">
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] text-center border-none">&nbsp;</td>
+          </tr>
+        );
+      }
+    } else {
+      for (let i = 0; i < reports.length; i++) {
+        const report = reports[i];
+        const statusStyle = getStatusBadge(report.status);
+        rows.push(
+          <motion.tr 
+            key={report.report_id} 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: Math.min(i * 0.03, 0.3) }}
+            onMouseEnter={() => setHoveredRow(report.report_id)}
+            onMouseLeave={() => setHoveredRow(null)}
+            className="hover:bg-white/5 transition-all group border-b border-white/5"
+          >
+            <td className="px-4 py-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/30 flex items-center justify-center flex-shrink-0">
+                  <Flag size={12} className="text-red-400" />
+                </div>
+                <span className="text-red-400 font-black text-[11px]">R-{report.report_id}</span>
+              </div>
+            </td>
+            <td className="px-4 py-4">
+              <div className="flex flex-col">
+                <span className="text-white font-black text-sm font-sans tracking-tight">
+                  @{report.reporter?.username || 'Unknown'}
+                </span>
+                <span className="text-[8px] text-slate-500 font-mono truncate max-w-[120px]">
+                  {report.reporter?.email || ''}
+                </span>
+              </div>
+            </td>
+            <td className="px-4 py-4">
+              <div className="flex flex-col">
+                <span className="text-white font-black text-sm font-sans tracking-tight">
+                  @{report.comment?.user?.username || 'Unknown'}
+                </span>
+                <span className="text-[8px] text-slate-500 font-mono truncate max-w-[150px]">
+                  "{report.comment?.content?.substring(0, 30) || 'N/A'}..."
+                </span>
+              </div>
+            </td>
+            <td className="px-4 py-4">
+              <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg border ${getReasonColor(report.reason)}`}>
+                <AlertCircle size={8} />
+                <span className="text-[7px] font-black uppercase">{getReasonLabel(report.reason)}</span>
+              </div>
+            </td>
+            <td className="px-4 py-4">
+              <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg border ${statusStyle.bg}`}>
+                {statusStyle.icon}
+                <span className="text-[7px] font-black uppercase">{statusStyle.label}</span>
+              </div>
+            </td>
+            <td className="px-4 py-4 text-center">
+              <div className="flex items-center justify-center gap-1.5">
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setViewModal({ show: true, data: report })} 
+                  className="p-2 bg-white/5 hover:bg-sky-500/20 rounded-lg text-slate-400 hover:text-sky-400 transition-all border border-transparent hover:border-sky-500/30"
+                  title="View report details"
+                >
+                  <Eye size={12} />
+                </motion.button>
+                {report.status === 'pending' && (
+                  <motion.button 
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setViewModal({ show: true, data: report });
+                      setSelectedReportId(report.report_id);
+                    }} 
+                    className="p-2 bg-white/5 hover:bg-indigo-500/20 rounded-lg text-slate-400 hover:text-indigo-400 transition-all border border-transparent hover:border-indigo-500/30"
+                    title="Process report"
+                  >
+                    <ShieldCheck size={12} />
+                  </motion.button>
+                )}
+              </div>
+            </td>
+          </motion.tr>
+        );
+      }
+      
+      for (let i = reports.length; i < totalRows; i++) {
+        rows.push(
+          <tr key={`empty-${i}`} className="pointer-events-none">
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] text-center border-none">&nbsp;</td>
+          </tr>
+        );
+      }
+    }
+
+    return rows;
+  };
+
   return (
     <div className="min-h-screen bg-[#05050a] text-slate-100 flex flex-col font-sans pt-28 pb-20 selection:bg-red-500/30 overflow-x-hidden">
       
@@ -917,7 +1027,6 @@ export default function AdminReportsPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative w-full flex flex-col gap-8">
         
-        {/* Hiển thị Skeleton khi đang loading */}
         {isLoading ? (
           <PageSkeleton />
         ) : (
@@ -932,20 +1041,43 @@ export default function AdminReportsPage() {
               <div className="absolute -inset-1 bg-gradient-to-r from-red-500/30 via-orange-500/30 to-red-500/30 rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-100 transition duration-700" />
               <div className="relative bg-gradient-to-br from-[#11111a] to-[#0c0c12] rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl overflow-hidden">
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-                <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                  <div className="flex flex-col gap-3">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-500/10 border border-red-500/20 rounded-full w-fit">
-                      <Flag size={12} className="text-red-400" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-red-400 font-mono">Moderation Control Panel</span>
+                <div className="relative z-10 flex flex-col gap-6">
+                  {/* Row 1: Title + Badge */}
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div className="flex flex-col gap-3">
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-500/10 border border-red-500/20 rounded-full w-fit">
+                        <Flag size={12} className="text-red-400" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-red-400 font-mono">Moderation Control Panel</span>
+                      </div>
+                      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tighter uppercase text-white leading-none">
+                        Report <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-red-400">Oversight</span>
+                      </h1>
+                      <p className="text-xs text-slate-500 max-w-2xl">
+                        Review and manage user reports, enforce community guidelines, and maintain platform safety.
+                      </p>
                     </div>
-                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tighter uppercase text-white leading-none">
-                      Report <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-red-400">Oversight</span>
-                    </h1>
-                    <p className="text-xs text-slate-500 max-w-2xl">
-                      Review and manage user reports, enforce community guidelines, and maintain platform safety.
-                    </p>
                   </div>
-                  <div className="flex items-center gap-3 flex-wrap">
+                  
+                  {/* Row 2: Stats + Refresh Button */}
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-white/10">
+                    <div className="flex items-center gap-6 text-[11px] font-mono text-slate-500 uppercase tracking-wider">
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-400">Total:</span>
+                        <span className="text-white font-bold text-sm">{stats?.total_reports || totalItems || 0}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-yellow-400 text-xs">●</span>
+                        <span>Pending: <span className="text-white font-bold text-sm">{stats?.pending_reports || 0}</span></span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-red-400 text-xs">●</span>
+                        <span>Approved: <span className="text-white font-bold text-sm">{stats?.approved_reports || 0}</span></span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-400 text-xs">●</span>
+                        <span>Rejected: <span className="text-white font-bold text-sm">{stats?.rejected_reports || 0}</span></span>
+                      </div>
+                    </div>
                     <motion.button 
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -953,7 +1085,7 @@ export default function AdminReportsPage() {
                         fetchReports();
                         fetchStats();
                       }}
-                      className="bg-white/5 hover:bg-white/10 text-slate-300 font-mono text-[9px] font-black uppercase tracking-widest px-4 py-3 rounded-xl transition-all flex items-center gap-2 border border-white/10"
+                      className="bg-white/5 hover:bg-white/10 text-slate-300 font-mono text-[9px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 border border-white/10 hover:border-white/20"
                     >
                       <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} /> 
                       {isLoading ? "Loading..." : "Refresh"}
@@ -962,61 +1094,6 @@ export default function AdminReportsPage() {
                 </div>
               </div>
             </motion.div>
-
-            {/* Stats */}
-            {stats && (
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.05 }}
-                className="grid grid-cols-2 md:grid-cols-4 gap-4"
-              >
-                <div className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl p-4 shadow-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-                      <Flag size={16} className="text-slate-400" />
-                    </div>
-                    <div>
-                      <p className="text-[8px] font-mono text-slate-500 uppercase tracking-wider">Total Reports</p>
-                      <p className="text-2xl font-black text-white">{stats.total_reports}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-yellow-500/20 rounded-2xl p-4 shadow-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center">
-                      <Clock size={16} className="text-yellow-400" />
-                    </div>
-                    <div>
-                      <p className="text-[8px] font-mono text-slate-500 uppercase tracking-wider">Pending</p>
-                      <p className="text-2xl font-black text-yellow-400">{stats.pending_reports}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-red-500/20 rounded-2xl p-4 shadow-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                      <Check size={16} className="text-red-400" />
-                    </div>
-                    <div>
-                      <p className="text-[8px] font-mono text-slate-500 uppercase tracking-wider">Approved</p>
-                      <p className="text-2xl font-black text-red-400">{stats.approved_reports}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-slate-500/20 rounded-2xl p-4 shadow-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-500/10 border border-slate-500/20 flex items-center justify-center">
-                      <X size={16} className="text-slate-400" />
-                    </div>
-                    <div>
-                      <p className="text-[8px] font-mono text-slate-500 uppercase tracking-wider">Rejected</p>
-                      <p className="text-2xl font-black text-slate-400">{stats.rejected_reports}</p>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
 
             {/* Search & Filters */}
             <motion.div 
@@ -1047,7 +1124,7 @@ export default function AdminReportsPage() {
                 >
                   <Filter size={12} />
                   Filters
-                  {Object.values(filters).some(v => v !== '' && v !== 'All' && v !== 'pending') && (
+                  {(filters.status !== 'pending' || filters.reason !== 'All' || filters.dateFrom || filters.dateTo) && (
                     <span className="flex h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />
                   )}
                 </motion.button>
@@ -1076,7 +1153,6 @@ export default function AdminReportsPage() {
                   <div className="relative bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl p-6 shadow-xl">
                     <div className="absolute inset-0 rounded-2xl overflow-hidden bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
                     <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {/* Status */}
                       <div>
                         <label className="text-[8px] font-mono text-slate-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
                           <Activity size={10} className="text-red-400" />
@@ -1094,7 +1170,6 @@ export default function AdminReportsPage() {
                         />
                       </div>
 
-                      {/* Reason */}
                       <div>
                         <label className="text-[8px] font-mono text-slate-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
                           <AlertCircle size={10} className="text-red-400" />
@@ -1116,7 +1191,6 @@ export default function AdminReportsPage() {
                         />
                       </div>
 
-                      {/* From Date */}
                       <div>
                         <label className="text-[8px] font-mono text-slate-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
                           <Calendar size={10} className="text-red-400" />
@@ -1128,7 +1202,6 @@ export default function AdminReportsPage() {
                         />
                       </div>
 
-                      {/* To Date */}
                       <div>
                         <label className="text-[8px] font-mono text-slate-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
                           <Calendar size={10} className="text-red-400" />
@@ -1164,157 +1237,51 @@ export default function AdminReportsPage() {
                       <th className="px-4 py-4 w-32 text-center">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {reports.length === 0 ? (
-                      <tr>
-                        <td colSpan={6} className="py-20 text-center">
-                          <div className="flex flex-col items-center gap-4">
-                            <div className="p-4 bg-red-500/10 rounded-2xl border border-red-500/20">
-                              <ShieldCheck size={32} className="text-red-400" />
-                            </div>
-                            <p className="text-slate-400 font-mono text-sm font-bold">No reports found</p>
-                            <p className="text-slate-500 text-[9px] font-mono">Try adjusting your search or filters</p>
-                          </div>
-                        </td>
-                      </tr>
-                    ) : (
-                      reports.map((report, idx) => {
-                        const statusStyle = getStatusBadge(report.status);
-                        const formattedDate = formatDate(report.created_at);
-                        return (
-                          <motion.tr 
-                            key={report.report_id} 
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: Math.min(idx * 0.03, 0.3) }}
-                            onMouseEnter={() => setHoveredRow(report.report_id)}
-                            onMouseLeave={() => setHoveredRow(null)}
-                            className="hover:bg-white/5 transition-all group"
-                          >
-                            {/* ID */}
-                            <td className="px-4 py-4">
-                              <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/30 flex items-center justify-center flex-shrink-0">
-                                  <Flag size={12} className="text-red-400" />
-                                </div>
-                                <span className="text-red-400 font-black text-[11px]">R-{report.report_id}</span>
-                              </div>
-                            </td>
-                            
-                            {/* Reporter */}
-                            <td className="px-4 py-4">
-                              <div className="flex flex-col">
-                                <span className="text-white font-black text-sm font-sans tracking-tight">
-                                  @{report.reporter?.username || 'Unknown'}
-                                </span>
-                                <span className="text-[8px] text-slate-500 font-mono truncate max-w-[120px]">
-                                  {report.reporter?.email || ''}
-                                </span>
-                              </div>
-                            </td>
-                            
-                            {/* Target */}
-                            <td className="px-4 py-4">
-                              <div className="flex flex-col">
-                                <span className="text-white font-black text-sm font-sans tracking-tight">
-                                  @{report.comment?.user?.username || 'Unknown'}
-                                </span>
-                                <span className="text-[8px] text-slate-500 font-mono truncate max-w-[150px]">
-                                  "{report.comment?.content?.substring(0, 30) || 'N/A'}..."
-                                </span>
-                              </div>
-                            </td>
-                            
-                            {/* Reason */}
-                            <td className="px-4 py-4">
-                              <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg border ${getReasonColor(report.reason)}`}>
-                                <AlertCircle size={8} />
-                                <span className="text-[7px] font-black uppercase">{getReasonLabel(report.reason)}</span>
-                              </div>
-                            </td>
-                            
-                            {/* Status */}
-                            <td className="px-4 py-4">
-                              <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg border ${statusStyle.bg}`}>
-                                {statusStyle.icon}
-                                <span className="text-[7px] font-black uppercase">{statusStyle.label}</span>
-                              </div>
-                            </td>
-                            
-                            {/* Actions */}
-                            <td className="px-4 py-4 text-center">
-                              <div className="flex items-center justify-center gap-1.5">
-                                <motion.button 
-                                  whileHover={{ scale: 1.05 }}
-                                  whileTap={{ scale: 0.95 }}
-                                  onClick={() => setViewModal({ show: true, data: report })} 
-                                  className="p-2 bg-white/5 hover:bg-sky-500/20 rounded-lg text-slate-400 hover:text-sky-400 transition-all border border-transparent hover:border-sky-500/30"
-                                  title="View report details"
-                                >
-                                  <Eye size={12} />
-                                </motion.button>
-                                {report.status === 'pending' && (
-                                  <motion.button 
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => {
-                                      setViewModal({ show: true, data: report });
-                                      setSelectedReportId(report.report_id);
-                                    }} 
-                                    className="p-2 bg-white/5 hover:bg-indigo-500/20 rounded-lg text-slate-400 hover:text-indigo-400 transition-all border border-transparent hover:border-indigo-500/30"
-                                    title="Process report"
-                                  >
-                                    <ShieldCheck size={12} />
-                                  </motion.button>
-                                )}
-                              </div>
-                            </td>
-                          </motion.tr>
-                        );
-                      })
-                    )}
+                  <tbody>
+                    {renderRows()}
                   </tbody>
                 </table>
               </div>
             </motion.div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <motion.div 
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2, duration: 0.4 }}
-                className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-xl p-4"
-              >
-                <div className="text-[8px] font-mono text-slate-500">
-                  Showing {((currentPage - 1) * 10) + 1} to{' '}
-                  {Math.min(currentPage * 10, totalItems)} of {totalItems} entries
-                </div>
-                <div className="flex items-center gap-1.5 flex-wrap justify-center">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
-                  >
-                    <ChevronLeft size={10} /> Prev
-                  </motion.button>
-                  
-                  {renderPaginationPages()}
-                  
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
-                  >
-                    Next <ChevronRight size={10} />
-                  </motion.button>
-                </div>
-              </motion.div>
-            )}
+            {/* Pagination - Luôn hiển thị */}
+            <motion.div 
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+              className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-xl p-4"
+            >
+              <div className="text-[8px] font-mono text-slate-500">
+                {totalItems > 0 ? (
+                  `Showing ${((currentPage - 1) * 10) + 1} to ${Math.min(currentPage * 10, totalItems)} of ${totalItems} entries`
+                ) : (
+                  `Showing 0 of 0 entries`
+                )}
+              </div>
+              <div className="flex items-center gap-1.5 flex-wrap justify-center">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
+                >
+                  <ChevronLeft size={10} /> Prev
+                </motion.button>
+                
+                {renderPaginationPages()}
+                
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setCurrentPage(p => Math.min(totalPages || 1, p + 1))}
+                  disabled={currentPage === totalPages || totalPages === 0}
+                  className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
+                >
+                  Next <ChevronRight size={10} />
+                </motion.button>
+              </div>
+            </motion.div>
           </>
         )}
 
@@ -1358,11 +1325,10 @@ export default function AdminReportsPage() {
                 
                 <div className="p-6 flex-1 overflow-y-auto">
                   <div className="space-y-4">
-                    {/* Reporter & Target */}
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                          <UserCheck size={10} /> Reporter
+                          Reporter
                         </label>
                         <div className="bg-black/40 border border-white/10 rounded-xl p-3">
                           <p className="text-sm font-bold text-white">@{viewModal.data.reporter?.username || 'Unknown'}</p>
@@ -1371,7 +1337,7 @@ export default function AdminReportsPage() {
                       </div>
                       <div className="space-y-2">
                         <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                          <Users size={10} /> Target User
+                          Target User
                         </label>
                         <div className="bg-black/40 border border-white/10 rounded-xl p-3">
                           <p className="text-sm font-bold text-white">@{viewModal.data.comment?.user?.username || 'Unknown'}</p>
@@ -1380,10 +1346,9 @@ export default function AdminReportsPage() {
                       </div>
                     </div>
 
-                    {/* Reason */}
                     <div className="space-y-2">
                       <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                        <AlertCircle size={10} /> Reason
+                        Reason
                       </label>
                       <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border ${getReasonColor(viewModal.data.reason)}`}>
                         <AlertCircle size={10} />
@@ -1394,7 +1359,7 @@ export default function AdminReportsPage() {
                     {viewModal.data.description && (
                       <div className="space-y-2">
                         <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                          <MessageSquare size={10} /> Additional Details
+                          Additional Details
                         </label>
                         <div className="bg-black/40 border border-white/10 rounded-xl p-3">
                           <p className="text-sm text-slate-300">{viewModal.data.description}</p>
@@ -1402,27 +1367,24 @@ export default function AdminReportsPage() {
                       </div>
                     )}
 
-                    {/* Comment Content */}
                     <div className="space-y-2">
                       <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                        <MessageSquare size={10} /> Reported Comment
+                        Reported Comment
                       </label>
                       <div className="bg-black/40 border border-white/10 rounded-xl p-3">
                         <p className="text-sm text-slate-300 italic">"{viewModal.data.comment?.content || 'Comment deleted'}"</p>
                       </div>
                     </div>
 
-                    {/* Timestamp */}
                     <div className="space-y-2">
                       <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                        <Calendar size={10} /> Reported At
+                        Reported At
                       </label>
                       <div className="bg-black/40 border border-white/10 rounded-xl p-3">
                         <p className="text-sm font-mono text-slate-300">{new Date(viewModal.data.created_at).toLocaleString()}</p>
                       </div>
                     </div>
 
-                    {/* Review Info */}
                     {viewModal.data.status !== 'pending' && viewModal.data.reviewer && (
                       <div className="bg-white/5 border border-white/10 rounded-xl p-4">
                         <div className="flex items-center gap-3">
@@ -1463,26 +1425,32 @@ export default function AdminReportsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest block mb-1">
-                          <ShieldCheck size={10} className="inline mr-1" /> Action *
+                          Action *
                         </label>
-                        <CustomSelect
-                          value={action}
-                          onChange={(v) => setAction(v)}
-                          options={[
-                            { value: "", label: "Select action..." },
-                            { value: "warning", label: "⚠️ Warning" },
-                            { value: "delete_comment", label: "🗑️ Delete Comment" },
-                            { value: "temporary_ban", label: "🔒 Temporary Ban" },
-                            { value: "permanent_ban", label: "🚫 Permanent Ban" },
-                            { value: "none", label: "⏭️ No Action" },
-                          ]}
-                        />
+                        <div className="relative">
+                          <select
+                            value={action}
+                            onChange={(e) => setAction(e.target.value)}
+                            className="w-full bg-black/40 border border-white/10 hover:border-red-500/40 focus:border-red-500/50 rounded-xl px-4 py-3 text-[11px] font-mono text-white outline-none transition-all appearance-none cursor-pointer pr-10"
+                          >
+                            <option value="" className="bg-[#15151f] text-slate-400">Select action...</option>
+                            <option value="warning" className="bg-[#15151f] text-yellow-400">Warning</option>
+                            <option value="delete_comment" className="bg-[#15151f] text-orange-400">Delete Comment</option>
+                            <option value="temporary_ban" className="bg-[#15151f] text-blue-400">Temporary Ban</option>
+                            <option value="permanent_ban" className="bg-[#15151f] text-red-400">Permanent Ban</option>
+                            <option value="none" className="bg-[#15151f] text-slate-400">No Action</option>
+                          </select>
+                          <ChevronDown 
+                            size={14} 
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
+                          />
+                        </div>
                       </div>
 
                       {action === 'temporary_ban' && (
                         <div>
                           <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest block mb-1">
-                            <Clock size={10} className="inline mr-1" /> Ban Duration (days)
+                            Ban Duration (days)
                           </label>
                           <input
                             type="number"
@@ -1490,20 +1458,20 @@ export default function AdminReportsPage() {
                             max="365"
                             value={banDays}
                             onChange={(e) => setBanDays(Number(e.target.value))}
-                            className="w-full bg-black/40 border border-white/10 focus:border-red-500/50 rounded-xl px-3 py-2.5 text-sm font-mono text-white outline-none transition-all"
+                            className="w-full bg-black/40 border border-white/10 focus:border-red-500/50 rounded-xl px-4 py-3 text-[11px] font-mono text-white outline-none transition-all"
                           />
                         </div>
                       )}
 
                       <div className="md:col-span-2">
                         <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest block mb-1">
-                          <Edit size={10} className="inline mr-1" /> Admin Note
+                          Admin Note
                         </label>
                         <textarea
                           value={adminNote}
                           onChange={(e) => setAdminNote(e.target.value)}
                           placeholder="Add notes about this report..."
-                          className="w-full bg-black/40 border border-white/10 focus:border-red-500/50 rounded-xl px-3 py-2.5 text-sm font-mono text-white outline-none transition-all resize-none min-h-[60px]"
+                          className="w-full bg-black/40 border border-white/10 focus:border-red-500/50 rounded-xl px-4 py-3 text-[11px] font-mono text-white outline-none transition-all resize-none min-h-[60px] placeholder:text-slate-600"
                         />
                       </div>
                     </div>
@@ -1512,7 +1480,7 @@ export default function AdminReportsPage() {
                       <button
                         onClick={() => handleReview(viewModal.data!.report_id)}
                         disabled={processing || !action}
-                        className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white text-[9px] font-black uppercase tracking-wider transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-red-600/30"
+                        className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white text-[9px] font-black uppercase tracking-wider transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-red-600/30"
                       >
                         {processing ? <Loader2 className="animate-spin" size={14} /> : <Check size={14} />}
                         Process Report
@@ -1520,7 +1488,7 @@ export default function AdminReportsPage() {
                       <button
                         onClick={() => handleReject(viewModal.data!.report_id)}
                         disabled={processing}
-                        className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white transition-all text-[9px] font-black uppercase tracking-wider disabled:opacity-50 flex items-center gap-2"
+                        className="flex-1 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white transition-all text-[9px] font-black uppercase tracking-wider disabled:opacity-50 flex items-center justify-center gap-2"
                       >
                         <X size={14} /> Reject
                       </button>
@@ -1528,7 +1496,6 @@ export default function AdminReportsPage() {
                   </div>
                 )}
 
-                {/* Close button for processed reports */}
                 {viewModal.data.status !== 'pending' && (
                   <div className="p-4 border-t border-white/10 bg-gradient-to-t from-[#11111a] to-[#0d0d14] flex-shrink-0 flex justify-end">
                     <button

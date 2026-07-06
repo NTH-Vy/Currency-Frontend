@@ -43,7 +43,10 @@ import {
   MessageSquare,
   ThumbsUp,
   Reply,
-  Tag
+  Tag,
+  Upload,
+  Camera,
+  XCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -51,6 +54,8 @@ import { motion, AnimatePresence } from "framer-motion";
 interface SelectOption {
   value: string;
   label: string;
+  icon?: React.ReactNode;
+  dotColor?: string;
 }
 
 const CustomSelect = ({
@@ -80,15 +85,23 @@ const CustomSelect = ({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className={`w-full flex items-center justify-between bg-black/40 border rounded-xl pl-4 pr-3 py-2.5 text-[11px] font-mono text-white transition-all focus:outline-none ${
-          open ? "border-indigo-500/50 bg-black/60" : "border-white/10 hover:border-white/20"
+        className={`w-full flex items-center justify-between bg-black/40 border rounded-xl pl-3.5 pr-3 py-3 text-[12px] font-mono text-white transition-all focus:outline-none ${
+          open
+            ? "border-indigo-500/60 bg-black/60 shadow-[0_0_0_3px_rgba(99,102,241,0.12)]"
+            : "border-white/10 hover:border-white/20"
         }`}
       >
-        <span className="truncate">{selected?.label}</span>
+        <span className="flex items-center gap-2 truncate">
+          {selected?.dotColor && (
+            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${selected.dotColor}`} />
+          )}
+          {selected?.icon}
+          <span className="truncate">{selected?.label}</span>
+        </span>
         <ChevronRight
           size={12}
           className={`text-slate-500 transition-transform duration-200 flex-shrink-0 ml-2 ${
-            open ? "-rotate-90" : "rotate-90"
+            open ? "rotate-90" : "-rotate-90"
           }`}
         />
       </button>
@@ -99,7 +112,7 @@ const CustomSelect = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.98 }}
             transition={{ duration: 0.15 }}
-            className="absolute z-50 mt-2 w-full bg-[#15151f] border border-white/10 rounded-xl shadow-2xl overflow-hidden py-1.5"
+            className="absolute z-50 mt-2 w-full bg-[#13131c] border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden py-1.5"
           >
             {options.map((opt) => (
               <button
@@ -109,14 +122,18 @@ const CustomSelect = ({
                   onChange(opt.value);
                   setOpen(false);
                 }}
-                className={`w-full text-left px-4 py-2.5 text-[11px] font-mono transition-colors flex items-center justify-between ${
+                className={`w-full text-left px-3.5 py-2.5 text-[12px] font-mono transition-colors flex items-center justify-between gap-2 ${
                   opt.value === value
                     ? "bg-indigo-500/15 text-indigo-300"
-                    : "text-slate-300 hover:bg-white/5 hover:text-white"
+                    : "text-slate-300 hover:bg-white/[0.06] hover:text-white"
                 }`}
               >
-                <span>{opt.label}</span>
-                {opt.value === value && <CheckCircle2 size={12} className="text-indigo-400" />}
+                <span className="flex items-center gap-2 truncate">
+                  {opt.dotColor && <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${opt.dotColor}`} />}
+                  {opt.icon}
+                  <span className="truncate">{opt.label}</span>
+                </span>
+                {opt.value === value && <CheckCircle2 size={13} className="text-indigo-400 flex-shrink-0" />}
               </button>
             ))}
           </motion.div>
@@ -299,54 +316,10 @@ const CustomDatePicker = ({
 };
 
 // ---------- Skeleton Components ----------
-const HeaderSkeleton = () => (
-  <div className="relative group">
-    <div className="relative bg-gradient-to-br from-[#11111a] to-[#0c0c12] rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-      <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="flex flex-col gap-3 w-full md:w-2/3">
-          <div className="h-6 w-48 bg-white/5 rounded-full animate-pulse" />
-          <div className="h-12 w-3/4 bg-white/5 rounded-xl animate-pulse" />
-          <div className="h-4 w-full max-w-2xl bg-white/5 rounded-lg animate-pulse" />
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="h-12 w-28 bg-white/5 rounded-xl animate-pulse" />
-          <div className="h-12 w-28 bg-white/5 rounded-xl animate-pulse" />
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-const SearchSkeleton = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
-  return (
-    <div 
-      className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-end"
-      style={{
-        opacity: isVisible ? 1 : 0,
-        transform: isVisible ? 'translateX(0)' : 'translateX(50px)',
-        transition: 'all 0.4s ease-out'
-      }}
-    >
-      <div className="relative w-full sm:w-80">
-        <div className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-10 pr-4 h-12 animate-pulse" />
-      </div>
-      <div className="flex items-center gap-2">
-        <div className="h-12 w-28 bg-white/5 rounded-xl animate-pulse" />
-      </div>
-    </div>
-  );
-};
-
+// Table Header Skeleton
 const TableHeaderSkeleton = () => (
   <tr className="border-b border-white/10 bg-white/5">
-    <th className="px-4 py-4 w-16"><div className="h-3 w-8 bg-white/5 rounded animate-pulse" /></th>
+    <th className="px-4 py-4 w-[72px]"><div className="h-3 w-8 bg-white/5 rounded animate-pulse" /></th>
     <th className="px-4 py-4 w-20"><div className="h-3 w-10 bg-white/5 rounded animate-pulse" /></th>
     <th className="px-4 py-4"><div className="h-3 w-16 bg-white/5 rounded animate-pulse" /></th>
     <th className="px-4 py-4 w-20"><div className="h-3 w-12 bg-white/5 rounded animate-pulse" /></th>
@@ -392,7 +365,7 @@ const TableSkeleton = () => {
                   }}
                 >
                   <td className="px-4 py-4">
-                    <div className="w-8 h-8 rounded-full bg-white/5 animate-pulse" />
+                    <div className="w-10 h-10 rounded-full bg-white/5 animate-pulse" />
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-1.5">
@@ -456,11 +429,52 @@ const PaginationSkeleton = () => {
   );
 };
 
+// Skeleton tổng thể cho trang - khớp với giao diện mới
 const PageSkeleton = () => (
   <div className="flex flex-col gap-8">
-    <HeaderSkeleton />
-    <SearchSkeleton />
+    {/* Header Skeleton */}
+    <div className="relative group">
+      <div className="relative bg-gradient-to-br from-[#11111a] to-[#0c0c12] rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+        <div className="relative z-10 flex flex-col gap-6">
+          {/* Row 1 */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex flex-col gap-3 w-full md:w-2/3">
+              <div className="h-6 w-32 bg-white/5 rounded-full animate-pulse" />
+              <div className="h-12 w-3/4 bg-white/5 rounded-xl animate-pulse" />
+              <div className="h-4 w-full max-w-2xl bg-white/5 rounded-lg animate-pulse" />
+            </div>
+          </div>
+          {/* Row 2 */}
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-white/10">
+            <div className="flex items-center gap-6">
+              <div className="h-3 w-20 bg-white/5 rounded animate-pulse" />
+              <div className="h-3 w-20 bg-white/5 rounded animate-pulse" />
+              <div className="h-3 w-20 bg-white/5 rounded animate-pulse" />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-10 w-28 bg-white/5 rounded-xl animate-pulse" />
+              <div className="h-10 w-36 bg-white/5 rounded-xl animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Search & Filters Skeleton */}
+    <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-end">
+      <div className="relative w-full sm:w-80">
+        <div className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-10 pr-4 h-12 animate-pulse" />
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="h-12 w-24 bg-white/5 rounded-xl animate-pulse" />
+      </div>
+    </div>
+
+    {/* Table Skeleton */}
     <TableSkeleton />
+
+    {/* Pagination Skeleton */}
     <PaginationSkeleton />
   </div>
 );
@@ -572,6 +586,7 @@ export default function UserPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [userStats, setUserStats] = useState<{ total: number; admins: number; editors: number; active: number }>({ total: 0, admins: 0, editors: 0, active: 0 });
 
   // Modal states
   const [userModal, setUserModal] = useState<{ show: boolean; mode: "create" | "edit"; data: UserRegistryItem | null }>({
@@ -583,6 +598,11 @@ export default function UserPage() {
   const [userForm, setUserForm] = useState<UserRegistryItem>({
     user_id: 0, username: "", email: "", role: "user", is_active: 1, created_at: ""
   });
+
+  // Avatar states
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   // Activity modal states
   const [systemActivities, setSystemActivities] = useState<SystemActivityItem[]>([]);
@@ -598,6 +618,100 @@ export default function UserPage() {
   const showToast = (message: string, type: ToastState['type'] = 'info') => {
     setToast({ message, type, visible: true });
     setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 3000);
+  };
+
+  // Avatar functions
+  const uploadUserAvatar = async (userId: number, file: File) => {
+    setIsUploadingAvatar(true);
+    try {
+      const token = localStorage.getItem("token");
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const response = await fetch(`${BACK_END}/api/admin/users/${userId}/avatar`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        showToast("Avatar updated successfully!", "success");
+        fetchUsers();
+        setUserForm(prev => ({ ...prev, avatar_url: data.data.avatar_url }));
+        return data.data.avatar_url;
+      } else {
+        showToast(data.message || "Failed to upload avatar", "error");
+        return null;
+      }
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      showToast("Error uploading avatar", "error");
+      return null;
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const removeUserAvatar = async (userId: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${BACK_END}/api/admin/users/${userId}/avatar`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        showToast("Avatar removed successfully!", "success");
+        fetchUsers();
+        setUserForm(prev => ({ ...prev, avatar_url: null }));
+        setAvatarPreview(null);
+      } else {
+        showToast(data.message || "Failed to remove avatar", "error");
+      }
+    } catch (error) {
+      console.error('Error removing avatar:', error);
+      showToast("Error removing avatar", "error");
+    }
+  };
+
+  const handleAvatarFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg'];
+    if (!validTypes.includes(file.type)) {
+      showToast("Please select a valid image file (JPEG, PNG, GIF, WEBP)", "error");
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      showToast("Image size must be less than 2MB", "error");
+      return;
+    }
+
+    setAvatarFile(file);
+    
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload immediately if in edit mode
+    if (userModal.mode === "edit" && userForm.user_id) {
+      await uploadUserAvatar(userForm.user_id, file);
+    }
   };
 
   const fetchUsers = useCallback(async () => {
@@ -640,6 +754,12 @@ export default function UserPage() {
         setUsers(data.data);
         setTotalPages(data.pagination?.last_page || 1);
         setTotalItems(data.pagination?.total || 0);
+        setUserStats({
+          total: data.stats?.total || data.pagination?.total || 0,
+          admins: data.stats?.admins || 0,
+          editors: data.stats?.editors || 0,
+          active: data.stats?.active || 0,
+        });
       }
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -763,8 +883,14 @@ export default function UserPage() {
   };
 
   const openUserModal = (mode: "create" | "edit", item?: UserRegistryItem) => {
+    setAvatarFile(null);
+    setAvatarPreview(null);
+    
     if (mode === "edit" && item) {
       setUserForm({ ...item });
+      if (item.avatar_url) {
+        setAvatarPreview(item.avatar_url);
+      }
       setUserModal({ show: true, mode: "edit", data: item });
     } else {
       setUserForm({
@@ -773,7 +899,8 @@ export default function UserPage() {
         email: "",
         role: "user",
         is_active: 1,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        avatar_url: null,
       });
       setUserModal({ show: true, mode: "create", data: null });
     }
@@ -921,8 +1048,25 @@ export default function UserPage() {
     showToast("Activities exported successfully", "success");
   };
 
+  // Updated: Luôn hiển thị ít nhất 1 trang
   const renderPaginationPages = () => {
-    if (!totalPages || totalPages <= 1) return null;
+    if (!totalPages || totalPages <= 1) {
+      return (
+        <motion.button
+          key={1}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setCurrentPage(1)}
+          className={`px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-wider transition-all ${
+            currentPage === 1
+              ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md'
+              : 'bg-white/5 hover:bg-white/10 text-slate-400'
+          }`}
+        >
+          1
+        </motion.button>
+      );
+    }
     
     const total = totalPages;
     const current = currentPage;
@@ -999,7 +1143,6 @@ export default function UserPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative w-full flex flex-col gap-8">
         
-        {/* Hiển thị Skeleton khi đang loading */}
         {isLoading ? (
           <PageSkeleton />
         ) : (
@@ -1014,37 +1157,62 @@ export default function UserPage() {
               <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/30 via-purple-500/30 to-indigo-500/30 rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-100 transition duration-700" />
               <div className="relative bg-gradient-to-br from-[#11111a] to-[#0c0c12] rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl overflow-hidden">
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-                <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                  <div className="flex flex-col gap-3">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full w-fit">
-                      <ShieldCheck size={12} className="text-indigo-400" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 font-mono">User Security Roster</span>
+                <div className="relative z-10 flex flex-col gap-6">
+                  {/* Row 1: Title + Badge */}
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div className="flex flex-col gap-3">
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full w-fit">
+                        <ShieldCheck size={12} className="text-indigo-400" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 font-mono">User Security Roster</span>
+                      </div>
+                      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tighter uppercase text-white leading-none">
+                        Node <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-400 to-cyan-400">Operators</span>
+                      </h1>
+                      <p className="text-xs text-slate-500 max-w-2xl">
+                        Manage user access, roles, and security permissions for the network.
+                      </p>
                     </div>
-                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tighter uppercase text-white leading-none">
-                      Node <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-400 to-cyan-400">Operators</span>
-                    </h1>
-                    <p className="text-xs text-slate-500 max-w-2xl">
-                      Manage user access, roles, and security permissions for the network.
-                    </p>
                   </div>
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <motion.button 
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => fetchUsers()}
-                      className="bg-white/5 hover:bg-white/10 text-slate-300 font-mono text-[9px] font-black uppercase tracking-widest px-4 py-3 rounded-xl transition-all flex items-center gap-2 border border-white/10"
-                    >
-                      <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} /> 
-                      {isLoading ? "Loading..." : "Refresh"}
-                    </motion.button>
-                    <motion.button 
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => openUserModal("create")} 
-                      className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-mono text-[9px] font-black uppercase tracking-widest px-6 py-3 rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-indigo-600/30"
-                    >
-                      <Plus size={14} /> Install New Node
-                    </motion.button>
+                  
+                  {/* Row 2: Stats + Buttons */}
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-white/10">
+                    <div className="flex items-center gap-6 text-[11px] font-mono text-slate-500 uppercase tracking-wider">
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-400">Total:</span>
+                        <span className="text-white font-bold">{totalItems}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-red-400">●</span>
+                        <span>Admins: {userStats.admins}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-amber-400">●</span>
+                        <span>Editors: {userStats.editors}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-emerald-400">●</span>
+                        <span>Active: {userStats.active}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <motion.button 
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => fetchUsers()}
+                        className="bg-white/5 hover:bg-white/10 text-slate-300 font-mono text-[9px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 border border-white/10 hover:border-white/20"
+                      >
+                        <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} /> 
+                        {isLoading ? "Loading..." : "Refresh"}
+                      </motion.button>
+                      <motion.button 
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => openUserModal("create")} 
+                        className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-mono text-[9px] font-black uppercase tracking-widest px-5 py-2.5 rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-indigo-600/30"
+                      >
+                        <Plus size={14} /> Install New Node
+                      </motion.button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1172,7 +1340,7 @@ export default function UserPage() {
               )}
             </AnimatePresence>
 
-            {/* Users Table with Avatar and Method Columns */}
+            {/* Users Table */}
             <motion.div 
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -1183,7 +1351,7 @@ export default function UserPage() {
                 <table className="w-full text-left font-mono">
                   <thead>
                     <tr className="border-b border-white/10 bg-white/5 text-[8px] text-slate-400 uppercase tracking-[0.2em] font-black">
-                      <th className="px-4 py-4 w-16">Avatar</th>
+                      <th className="px-4 py-4 w-[72px]">Avatar</th>
                       <th className="px-4 py-4 w-20">Node</th>
                       <th className="px-4 py-4">Operator</th>
                       <th className="px-4 py-4 w-20">Method</th>
@@ -1226,33 +1394,32 @@ export default function UserPage() {
                               onMouseLeave={() => setHoveredRow(null)}
                               className="hover:bg-white/5 transition-all group border-b border-white/5"
                             >
-                              {/* Avatar */}
                               <td className="px-4 py-4">
-                                {avatarUrl ? (
-                                  <img 
-                                    src={avatarUrl} 
-                                    alt={user.username}
-                                    className="w-8 h-8 rounded-full object-cover border border-indigo-500/30"
-                                    onError={(e) => {
-                                      e.currentTarget.style.display = 'none';
-                                      const parent = e.currentTarget.parentElement;
-                                      if (parent) {
-                                        const fallback = document.createElement('div');
-                                        fallback.className = 'w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold flex items-center justify-center text-xl uppercase border border-indigo-500/30';
-                                        // Fix: Use optional chaining and a fallback string
-                                        fallback.textContent = getInitials(viewModal.data?.username ?? ''); 
-                                        parent.appendChild(fallback);
-                                      }
-                                    }}
-                                  />
-                                ) : (
-                                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold flex items-center justify-center text-xs uppercase border border-indigo-500/30">
-                                    {initials}
-                                  </div>
-                                )}
+                                <div className="w-10 h-10 flex-shrink-0">
+                                  {avatarUrl ? (
+                                    <img 
+                                      src={avatarUrl} 
+                                      alt={user.username}
+                                      className="w-10 h-10 rounded-full object-cover border border-indigo-500/30"
+                                      onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                        const parent = e.currentTarget.parentElement;
+                                        if (parent) {
+                                          const fallback = document.createElement('div');
+                                          fallback.className = 'w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold flex items-center justify-center text-sm uppercase border border-indigo-500/30 flex-shrink-0';
+                                          fallback.textContent = getInitials(user.username);
+                                          parent.appendChild(fallback);
+                                        }
+                                      }}
+                                    />
+                                  ) : (
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold flex items-center justify-center text-sm uppercase border border-indigo-500/30 flex-shrink-0">
+                                      {initials}
+                                    </div>
+                                  )}
+                                </div>
                               </td>
                               
-                              {/* Node */}
                               <td className="px-4 py-4">
                                 <div className="flex items-center gap-1.5">
                                   <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
@@ -1262,7 +1429,6 @@ export default function UserPage() {
                                 </div>
                               </td>
                               
-                              {/* Operator */}
                               <td className="px-4 py-4">
                                 <div className="flex flex-col">
                                   <div className="flex items-center gap-2">
@@ -1277,7 +1443,6 @@ export default function UserPage() {
                                 </div>
                               </td>
                               
-                              {/* Method */}
                               <td className="px-4 py-4">
                                 <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg border ${methodInfo.color}`}>
                                   {methodInfo.icon}
@@ -1285,7 +1450,6 @@ export default function UserPage() {
                                 </div>
                               </td>
                               
-                              {/* Rank */}
                               <td className="px-4 py-4">
                                 <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-br ${roleColor.bg} border ${roleColor.border}`}>
                                   {roleColor.icon}
@@ -1293,7 +1457,6 @@ export default function UserPage() {
                                 </div>
                               </td>
                               
-                              {/* Status */}
                               <td className="px-4 py-4">
                                 <motion.button
                                   whileHover={{ scale: 1.02 }}
@@ -1310,7 +1473,6 @@ export default function UserPage() {
                                 </motion.button>
                               </td>
                               
-                              {/* Joined */}
                               <td className="px-4 py-4">
                                 <div className="flex flex-col whitespace-nowrap">
                                   <span className="text-[9px] text-slate-400 font-mono">{formattedDate.date}</span>
@@ -1318,7 +1480,6 @@ export default function UserPage() {
                                 </div>
                               </td>
                               
-                              {/* Actions */}
                               <td className="px-4 py-4 text-center">
                                 <div className="flex items-center justify-center gap-1">
                                   <motion.button 
@@ -1383,43 +1544,44 @@ export default function UserPage() {
               </div>
             </motion.div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <motion.div 
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2, duration: 0.4 }}
-                className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-xl p-4"
-              >
-                <div className="text-[8px] font-mono text-slate-500">
-                  Showing {((currentPage - 1) * 10) + 1} to{' '}
-                  {Math.min(currentPage * 10, totalItems)} of {totalItems} entries
-                </div>
-                <div className="flex items-center gap-1.5 flex-wrap justify-center">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
-                  >
-                    <ChevronLeft size={10} /> Prev
-                  </motion.button>
-                  
-                  {renderPaginationPages()}
-                  
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
-                  >
-                    Next <ChevronRight size={10} />
-                  </motion.button>
-                </div>
-              </motion.div>
-            )}
+            {/* Pagination - Luôn hiển thị */}
+            <motion.div 
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+              className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-xl p-4"
+            >
+              <div className="text-[8px] font-mono text-slate-500">
+                {totalItems > 0 ? (
+                  `Showing ${((currentPage - 1) * 10) + 1} to ${Math.min(currentPage * 10, totalItems)} of ${totalItems} entries`
+                ) : (
+                  `Showing 0 of 0 entries`
+                )}
+              </div>
+              <div className="flex items-center gap-1.5 flex-wrap justify-center">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
+                >
+                  <ChevronLeft size={10} /> Prev
+                </motion.button>
+                
+                {renderPaginationPages()}
+                
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setCurrentPage(p => Math.min(totalPages || 1, p + 1))}
+                  disabled={currentPage === totalPages || totalPages === 0}
+                  className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
+                >
+                  Next <ChevronRight size={10} />
+                </motion.button>
+              </div>
+            </motion.div>
           </>
         )}
 
@@ -1469,7 +1631,7 @@ export default function UserPage() {
           )}
         </AnimatePresence>
 
-        {/* User Modal */}
+        {/* User Modal with Avatar Upload */}
         <AnimatePresence>
           {userModal.show && (
             <motion.div
@@ -1485,88 +1647,175 @@ export default function UserPage() {
                 exit={{ scale: 0.95, opacity: 0, y: 20 }}
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+                className="relative bg-gradient-to-b from-[#131320] to-[#0a0a10] border border-white/10 w-full max-w-[560px] rounded-3xl shadow-2xl shadow-black/60 flex flex-col"
               >
-                <div className="p-6 border-b border-white/10 flex justify-between items-center bg-gradient-to-r from-white/5 to-transparent sticky top-0 bg-[#11111a]/95 backdrop-blur-sm z-10">
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 bg-indigo-500/10 rounded-lg">
-                      {userModal.mode === "edit" ? <Edit size={14} className="text-indigo-400" /> : <Plus size={14} className="text-indigo-400" />}
+                {/* Ambient glow */}
+                <div className="pointer-events-none absolute -top-24 -left-16 w-56 h-56 bg-indigo-600/20 blur-[90px] rounded-full overflow-hidden" />
+                <div className="pointer-events-none absolute -bottom-20 -right-10 w-48 h-48 bg-purple-600/10 blur-[90px] rounded-full overflow-hidden" />
+
+                {/* Header */}
+                <div className="relative px-6 py-5 flex justify-between items-center border-b border-white/[0.06] rounded-t-3xl bg-gradient-to-b from-[#131320] to-[#131320]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/25 to-indigo-500/5 border border-indigo-500/20 flex items-center justify-center flex-shrink-0">
+                      {userModal.mode === "edit" ? <Edit size={16} className="text-indigo-400" /> : <Plus size={16} className="text-indigo-400" />}
                     </div>
                     <div>
-                      <h3 className="text-base font-black uppercase text-white">
+                      <h3 className="text-[15px] font-black uppercase text-white tracking-wide leading-tight">
                         {userModal.mode === "edit" ? "Adjust Node Keys" : "Install New Node"}
                       </h3>
-                      <p className="text-[7px] text-slate-500 font-mono">User Parameters Configuration</p>
+                      <p className="text-[10px] text-slate-500 font-mono mt-0.5">User Parameters Configuration</p>
                     </div>
                   </div>
                   <button 
                     onClick={() => setUserModal({ show: false, mode: "create", data: null })} 
-                    className="text-slate-500 hover:text-white p-1.5 rounded-lg bg-white/5 transition-all"
+                    className="text-slate-500 hover:text-white p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all flex-shrink-0"
                   >
                     <X size={16} />
                   </button>
                 </div>
 
-                <form onSubmit={handleUserSubmit} className="p-6 flex flex-col gap-5">
-                  <div className="space-y-3">
-                    <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                      <UserCheck size={10} /> Username
-                    </label>
-                    <input 
-                      required 
-                      value={userForm.username} 
-                      onChange={(e) => setUserForm({ ...userForm, username: e.target.value })} 
-                      placeholder="Enter username" 
-                      className="w-full bg-black/40 border border-white/10 focus:border-indigo-500/50 rounded-xl p-3 text-sm font-mono text-white outline-none transition-all"
-                    />
-                  </div>
-                  <div className="space-y-3">
-                    <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                      <Mail size={10} /> Email Address
-                    </label>
-                    <input 
-                      required 
-                      type="email" 
-                      value={userForm.email} 
-                      onChange={(e) => setUserForm({ ...userForm, email: e.target.value })} 
-                      placeholder="user@example.com" 
-                      className="w-full bg-black/40 border border-white/10 focus:border-indigo-500/50 rounded-xl p-3 text-sm font-mono text-white outline-none transition-all"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-3">
-                      <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                        <Shield size={10} /> Role
-                      </label>
-                      <CustomSelect
-                        value={userForm.role}
-                        onChange={(v) => setUserForm({ ...userForm, role: v })}
-                        options={[
-                          { value: "admin", label: "Administrator" },
-                          { value: "editor", label: "Editor" },
-                          { value: "user", label: "User" },
-                        ]}
-                      />
+                <form onSubmit={handleUserSubmit} className="relative flex flex-col flex-1">
+                  <div className="p-7 flex flex-col gap-5">
+                    {/* Avatar Upload Section - Compact Layout */}
+                    <div className="flex items-center gap-5 pb-3 border-b border-white/5">
+                      <div className="relative group">
+                        <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-indigo-500/30 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center flex-shrink-0">
+                          {avatarPreview ? (
+                            <img 
+                              src={avatarPreview} 
+                              alt="Avatar preview"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <Camera size={28} className="text-slate-500" />
+                          )}
+                        </div>
+                        {userModal.mode === "edit" && (
+                          <>
+                            <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                              <div className="flex flex-col items-center">
+                                <Upload size={14} className="text-white" />
+                                <span className="text-[6px] text-white font-mono uppercase mt-0.5">Upload</span>
+                              </div>
+                            </div>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleAvatarFileChange}
+                              className="absolute inset-0 opacity-0 cursor-pointer"
+                              disabled={isUploadingAvatar}
+                            />
+                            {isUploadingAvatar && (
+                              <div className="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center">
+                                <Loader2 size={20} className="animate-spin text-white" />
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-[10px] font-mono text-slate-400">
+                          {userModal.mode === "edit" 
+                            ? "Click avatar to upload new image (max 2MB)"
+                            : "Avatar can be set after creating the user"}
+                        </p>
+                        <p className="text-[8px] font-mono text-slate-500 mt-0.5">
+                          Supported: JPG, PNG, GIF, WEBP
+                        </p>
+                        {userModal.mode === "edit" && (
+                          <div className="flex items-center gap-3 mt-1.5">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+                                if (input) input.click();
+                              }}
+                              className="text-[9px] font-mono text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1"
+                            >
+                              <Camera size={10} />
+                              Change Avatar
+                            </button>
+                            {avatarPreview && (
+                              <button
+                                type="button"
+                                onClick={() => removeUserAvatar(userForm.user_id)}
+                                className="text-[9px] font-mono text-rose-400 hover:text-rose-300 transition-colors flex items-center gap-1"
+                              >
+                                <Trash2 size={10} />
+                                Remove
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="space-y-3">
-                      <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                        <Activity size={10} /> Status
-                      </label>
-                      <CustomSelect
-                        value={userForm.is_active ? "active" : "inactive"}
-                        onChange={(v) => setUserForm({ ...userForm, is_active: v === "active" ? 1 : 0 })}
-                        options={[
-                          { value: "active", label: "Active" },
-                          { value: "inactive", label: "Inactive" },
-                        ]}
-                      />
+
+                    {/* Form Fields - Compact Grid */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                          <UserCheck size={10} className="text-indigo-400" /> Username
+                        </label>
+                        <input 
+                          required 
+                          value={userForm.username} 
+                          onChange={(e) => setUserForm({ ...userForm, username: e.target.value })} 
+                          placeholder="Enter username" 
+                          className="w-full bg-black/40 border border-white/10 focus:border-indigo-500/60 focus:shadow-[0_0_0_3px_rgba(99,102,241,0.12)] rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-all placeholder:text-slate-600"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                          <Mail size={10} className="text-indigo-400" /> Email
+                        </label>
+                        <input 
+                          required 
+                          type="email" 
+                          value={userForm.email} 
+                          onChange={(e) => setUserForm({ ...userForm, email: e.target.value })} 
+                          placeholder="user@example.com" 
+                          className="w-full bg-black/40 border border-white/10 focus:border-indigo-500/60 focus:shadow-[0_0_0_3px_rgba(99,102,241,0.12)] rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-all placeholder:text-slate-600 font-mono"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                          <Shield size={10} className="text-indigo-400" /> Role
+                        </label>
+                        <CustomSelect
+                          value={userForm.role}
+                          onChange={(v) => setUserForm({ ...userForm, role: v })}
+                          options={[
+                            { value: "admin", label: "Administrator", icon: <Crown size={11} className="text-amber-400 flex-shrink-0" /> },
+                            { value: "editor", label: "Editor", icon: <Star size={11} className="text-sky-400 flex-shrink-0" /> },
+                            { value: "user", label: "User", icon: <UserCheck size={11} className="text-slate-400 flex-shrink-0" /> },
+                          ]}
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                          <Activity size={10} className="text-indigo-400" /> Status
+                        </label>
+                        <CustomSelect
+                          value={userForm.is_active ? "active" : "inactive"}
+                          onChange={(v) => setUserForm({ ...userForm, is_active: v === "active" ? 1 : 0 })}
+                          options={[
+                            { value: "active", label: "Active", dotColor: "bg-emerald-400" },
+                            { value: "inactive", label: "Inactive", dotColor: "bg-slate-500" },
+                          ]}
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div className="flex justify-end gap-3 mt-2">
+
+                  {/* Footer */}
+                  <div className="relative px-7 py-4 border-t border-white/[0.06] bg-black/20 rounded-b-3xl flex justify-end gap-3 flex-shrink-0">
                     <button
                       type="button"
                       onClick={() => setUserModal({ show: false, mode: "create", data: null })}
-                      className="px-5 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all"
+                      className="px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all"
                     >
                       Cancel
                     </button>
@@ -1574,9 +1823,9 @@ export default function UserPage() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       type="submit" 
-                      className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[9px] font-black uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-indigo-600/30"
+                      className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-indigo-600/30"
                     >
-                      <Save size={12} /> Commit Keys
+                      <Save size={13} /> Commit Keys
                     </motion.button>
                   </div>
                 </form>
@@ -1585,7 +1834,7 @@ export default function UserPage() {
           )}
         </AnimatePresence>
 
-        {/* View Modal - với Avatar */}
+        {/* View Modal */}
         <AnimatePresence>
           {viewModal.show && viewModal.data && (
             <motion.div
@@ -1601,106 +1850,117 @@ export default function UserPage() {
                 exit={{ scale: 0.95, opacity: 0, y: 20 }}
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden"
+                className="relative bg-gradient-to-b from-[#131320] to-[#0a0a10] border border-white/10 w-full max-w-[560px] rounded-3xl shadow-2xl shadow-black/60 flex flex-col"
               >
-                <div className="p-6 border-b border-white/10 flex items-center gap-4 bg-gradient-to-r from-white/5 to-transparent">
-                  {getUserAvatar(viewModal.data) ? (
-                    <img 
-                      src={getUserAvatar(viewModal.data) || ''} 
-                      alt={viewModal.data.username}
-                      className="w-12 h-12 rounded-full object-cover border border-indigo-500/30"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        const parent = e.currentTarget.parentElement;
-                        if (parent) {
-                          const fallback = document.createElement('div');
-                          fallback.className = 'w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold flex items-center justify-center text-xl uppercase border border-indigo-500/30';
-                          fallback.textContent = getInitials(viewModal.data?.username ?? '');
-                          parent.appendChild(fallback);
-                        }
-                      }}
-                    />
-                  ) : (
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold flex items-center justify-center text-xl uppercase border border-indigo-500/30">
-                      {getInitials(viewModal.data.username)}
-                    </div>
-                  )}
-                  <div className="flex-1">
-                    <h3 className="text-base font-black uppercase text-white">@{viewModal.data.username}</h3>
-                    <p className="text-[7px] text-slate-500 font-mono">Node Details</p>
+                {/* Ambient glow */}
+                <div className="pointer-events-none absolute -top-24 -left-16 w-56 h-56 bg-indigo-600/20 blur-[90px] rounded-full" />
+                <div className="pointer-events-none absolute -bottom-20 -right-10 w-48 h-48 bg-purple-600/10 blur-[90px] rounded-full" />
+
+                {/* Header */}
+                <div className="relative px-7 py-6 flex items-center gap-4 border-b border-white/[0.06] rounded-t-3xl">
+                  <div className="relative w-16 h-16 flex-shrink-0">
+                    <div className="absolute -inset-0.5 bg-gradient-to-tr from-indigo-500/50 to-purple-500/50 rounded-full blur-[2px]" />
+                    {getUserAvatar(viewModal.data) ? (
+                      <img 
+                        src={getUserAvatar(viewModal.data) || ''} 
+                        alt={viewModal.data.username}
+                        className="relative w-16 h-16 rounded-full object-cover border-2 border-[#131320]"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const parent = e.currentTarget.parentElement;
+                          if (parent) {
+                            const fallback = document.createElement('div');
+                            fallback.className = 'relative w-16 h-16 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold flex items-center justify-center text-2xl uppercase border-2 border-[#131320] flex-shrink-0';
+                            fallback.textContent = getInitials(viewModal.data?.username ?? '');
+                            parent.appendChild(fallback);
+                          }
+                        }}
+                      />
+                    ) : (
+                      <div className="relative w-16 h-16 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold flex items-center justify-center text-2xl uppercase border-2 border-[#131320] flex-shrink-0">
+                        {getInitials(viewModal.data.username)}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-[17px] font-black uppercase text-white truncate tracking-wide">@{viewModal.data.username}</h3>
+                    <p className="text-[10px] text-slate-500 font-mono mt-0.5">Node Details</p>
                   </div>
                   <button 
                     onClick={() => setViewModal({ show: false, data: null })} 
-                    className="text-slate-500 hover:text-white p-1.5 rounded-lg bg-white/5 transition-all"
+                    className="text-slate-500 hover:text-white p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all flex-shrink-0"
                   >
                     <X size={16} />
                   </button>
                 </div>
-                <div className="p-6 flex flex-col gap-5">
-                  <div className="space-y-3">
-                    <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                      <Hash size={10} /> Node ID
+
+                <div className="relative p-7 flex flex-col gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <Hash size={11} className="text-indigo-400" /> Node ID
                     </label>
-                    <div className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm font-mono text-slate-300">
+                    <div className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-3 text-sm font-mono text-slate-300">
                       U-{viewModal.data.user_id}
                     </div>
                   </div>
-                  <div className="space-y-3">
-                    <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                      <UserCheck size={10} /> Username
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <UserCheck size={11} className="text-indigo-400" /> Username
                     </label>
-                    <div className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm font-mono text-white">
+                    <div className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-3 text-sm font-mono text-white">
                       @{viewModal.data.username}
                     </div>
                   </div>
-                  <div className="space-y-3">
-                    <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                      <Mail size={10} /> Email Address
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <Mail size={11} className="text-indigo-400" /> Email Address
                     </label>
-                    <div className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm font-mono text-white">
+                    <div className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-3 text-sm font-mono text-white">
                       {viewModal.data.email}
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-3">
-                      <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                        <Shield size={10} /> Role
+                  <div className="grid grid-cols-2 gap-5">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <Shield size={11} className="text-indigo-400" /> Role
                       </label>
-                      <div className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-to-br ${getRoleColor(viewModal.data.role).bg} border ${getRoleColor(viewModal.data.role).border}`}>
+                      <div className={`inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-gradient-to-br ${getRoleColor(viewModal.data.role).bg} border ${getRoleColor(viewModal.data.role).border}`}>
                         {getRoleColor(viewModal.data.role).icon}
-                        <span className={`text-[8px] font-black uppercase ${getRoleColor(viewModal.data.role).text}`}>{viewModal.data.role}</span>
+                        <span className={`text-[11px] font-black uppercase ${getRoleColor(viewModal.data.role).text}`}>{viewModal.data.role}</span>
                       </div>
                     </div>
-                    <div className="space-y-3">
-                      <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                        <Activity size={10} /> Status
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <Activity size={11} className="text-indigo-400" /> Status
                       </label>
-                      <div className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border ${
+                      <div className={`inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl border ${
                         viewModal.data.is_active 
                           ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" 
                           : "bg-rose-500/10 border-rose-500/30 text-rose-400"
                       }`}>
-                        {viewModal.data.is_active ? <UserCheck size={10} /> : <UserX size={10} />}
-                        <span className="text-[8px] font-black uppercase">{viewModal.data.is_active ? "ACTIVE" : "INACTIVE"}</span>
+                        {viewModal.data.is_active ? <UserCheck size={12} /> : <UserX size={12} />}
+                        <span className="text-[11px] font-black uppercase">{viewModal.data.is_active ? "Active" : "Inactive"}</span>
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-3">
-                    <label className="text-[8px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                      <Calendar size={10} /> Created At
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <Calendar size={11} className="text-indigo-400" /> Created At
                     </label>
-                    <div className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm font-mono text-slate-300">
+                    <div className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-3 text-sm font-mono text-slate-300">
                       {new Date(viewModal.data.created_at).toLocaleString()}
                     </div>
                   </div>
-                  <div className="flex justify-end mt-2">
-                    <button
-                      onClick={() => setViewModal({ show: false, data: null })}
-                      className="px-5 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all"
-                    >
-                      Close
-                    </button>
-                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="relative px-7 py-5 border-t border-white/[0.06] bg-black/20 rounded-b-3xl flex justify-end flex-shrink-0">
+                  <button
+                    onClick={() => setViewModal({ show: false, data: null })}
+                    className="px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all"
+                  >
+                    Close
+                  </button>
                 </div>
               </motion.div>
             </motion.div>

@@ -1,10 +1,11 @@
+// header.tsx - Responsive hoàn chỉnh
 "use client";
 
 import {
   Search, Globe, User, TrendingUp, Menu, X, LogOut,
-  ArrowRightLeft, LayoutDashboard, Newspaper, Users, Bell,
+  ArrowRightLeft, LayoutDashboard, Newspaper, Bell,
   ChevronDown, ThumbsUp, MessageSquare, AlertTriangle, ShieldAlert,
-  Dot, Circle, CheckCircle2, Clock, Sparkles, ChevronRight
+  ChevronRight
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -41,6 +42,8 @@ interface NotificationItem {
   actorGoogleId?: string | null;
   postId?: number;
   commentId?: number;
+  grouped?: boolean;
+  groupedCount?: number;
 }
 
 interface ApiNotification {
@@ -56,6 +59,8 @@ interface ApiNotification {
   comment_content: string | null;
   is_read: number;
   created_at: string;
+  grouped?: boolean;
+  grouped_count?: number;
 }
 
 type AuthUser = {
@@ -67,6 +72,8 @@ type AuthUser = {
   facebook_id?: string | null;
   google_id?: string | null;
 };
+
+// --- HELPER FUNCTIONS (Được đưa lên trên để tránh lỗi Hoisting / Temporal Dead Zone) ---
 
 function readStoredUser(): AuthUser | null {
   if (typeof window === "undefined") return null;
@@ -108,6 +115,53 @@ function getInitials(username: string): string {
   return username?.charAt(0)?.toUpperCase() || '?';
 }
 
+const readStoredBroadcastIds = (): number[] => {
+  if (typeof window === "undefined") return [];
+  try {
+    const stored = localStorage.getItem("broadcastReadIds");
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+type AvatarProps = {
+  user: AuthUser | null;
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+};
+
+function Avatar({ user, size = 'md', className = '' }: AvatarProps) {
+  const [error, setError] = useState(false);
+
+  const sizeClass = {
+    sm: 'w-7 h-7 sm:w-8 sm:h-8 text-xs sm:text-sm',
+    md: 'w-9 h-9 sm:w-10 sm:h-10 text-sm sm:text-base',
+    lg: 'w-10 h-10 sm:w-12 sm:h-12 text-base sm:text-lg'
+  }[size] || 'w-9 h-9 sm:w-10 sm:h-10 text-sm sm:text-base';
+
+  const avatarUrl = getAvatarUrl(user);
+
+  if (avatarUrl && !error) {
+    return (
+      <img
+        src={avatarUrl}
+        alt={user?.username || 'User'}
+        className={`${sizeClass} rounded-full object-cover ring-2 ring-indigo-500/50 ${className}`}
+        onError={() => setError(true)}
+      />
+    );
+  }
+
+  return (
+    <div className={`${sizeClass} rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold flex items-center justify-center uppercase shadow-inner ring-2 ring-indigo-500/50 ${className}`}>
+      {user?.username ? getInitials(user.username) : '?'}
+    </div>
+  );
+}
+
+// --- MAIN COMPONENT ---
+
 export default function Header() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -117,17 +171,17 @@ export default function Header() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [tickerItems, setTickerItems] = useState<TickerItem[]>([]);
   const [broadcastNotices, setBroadcastNotices] = useState<BroadcastNotice[]>([]);
+  const [broadcastReadIds, setBroadcastReadIds] = useState<number[]>(() => readStoredBroadcastIds());
   const [userNotifications, setUserNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<NotificationItem | null>(null);
-  const [avatarError, setAvatarError] = useState(false);
   const pathname = usePathname();
   const API_BASE = `${BACK_END}/api`;
   
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const notifyRef = useRef<HTMLDivElement>(null);
 
-  // Translated time strings to English
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -144,23 +198,58 @@ export default function Header() {
     return count > 99 ? "99+" : String(count);
   };
 
+  const storeBroadcastIds = (ids: number[]) => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem("broadcastReadIds", JSON.stringify(ids));
+    setBroadcastReadIds(ids);
+  };
+
+  const markVisibleBroadcastsRead = () => {
+    const ids = broadcastNotices.map((notice) => notice.notice_id);
+    if (ids.length === 0) return;
+    const merged = Array.from(new Set([...broadcastReadIds, ...ids]));
+    storeBroadcastIds(merged);
+  };
+
+  const markVisibleUserNotificationsRead = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const hasUnread = userNotifications.some((notif) => !notif.read);
+    if (!hasUnread) return;
+
+    try {
+      await fetch(`${API_BASE}/notifications/mark-all-read`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/json"
+        }
+      });
+      setUserNotifications((prev) => prev.map((notif) => ({ ...notif, read: true })));
+      setUnreadCount(0);
+    } catch (err) {
+      console.error("Error marking visible notifications as read:", err);
+    }
+  };
+
   const getNotifIcon = (type?: string) => {
     switch (type) {
       case 'like':
         return (
           <div className="absolute -bottom-0.5 -right-0.5 bg-blue-500 text-white p-0.5 rounded-full ring-2 ring-[#0f0f1a] shadow-sm">
-            <ThumbsUp size={8} fill="currentColor" strokeWidth={2.5} />
+            <ThumbsUp size={7} className="sm:w-[8px] sm:h-[8px]" fill="currentColor" strokeWidth={2.5} />
           </div>
         );
       case 'reply':
         return (
           <div className="absolute -bottom-0.5 -right-0.5 bg-emerald-500 text-white p-0.5 rounded-full ring-2 ring-[#0f0f1a] shadow-sm">
-            <MessageSquare size={8} fill="currentColor" strokeWidth={2.5} />
+            <MessageSquare size={7} className="sm:w-[8px] sm:h-[8px]" fill="currentColor" strokeWidth={2.5} />
           </div>
         );
       case 'mention':
         return (
-          <div className="absolute -bottom-0.5 -right-0.5 bg-purple-500 text-white font-bold text-[7px] w-3.5 h-3.5 rounded-full ring-2 ring-[#0f0f1a] shadow-sm flex items-center justify-center">
+          <div className="absolute -bottom-0.5 -right-0.5 bg-purple-500 text-white font-bold text-[6px] sm:text-[7px] w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full ring-2 ring-[#0f0f1a] shadow-sm flex items-center justify-center">
             @
           </div>
         );
@@ -168,23 +257,37 @@ export default function Header() {
       case 'report':
         return (
           <div className="absolute -bottom-0.5 -right-0.5 bg-amber-500 text-white p-0.5 rounded-full ring-2 ring-[#0f0f1a] shadow-sm">
-            <AlertTriangle size={8} strokeWidth={2.5} />
+            <AlertTriangle size={7} className="sm:w-[8px] sm:h-[8px]" strokeWidth={2.5} />
           </div>
         );
       case 'ban':
         return (
           <div className="absolute -bottom-0.5 -right-0.5 bg-red-500 text-white p-0.5 rounded-full ring-2 ring-[#0f0f1a] shadow-sm">
-            <ShieldAlert size={8} strokeWidth={2.5} />
+            <ShieldAlert size={7} className="sm:w-[8px] sm:h-[8px]" strokeWidth={2.5} />
           </div>
         );
       default:
         return (
           <div className="absolute -bottom-0.5 -right-0.5 bg-indigo-500 text-white p-0.5 rounded-full ring-2 ring-[#0f0f1a] shadow-sm">
-            <Bell size={8} strokeWidth={2.5} />
+            <Bell size={7} className="sm:w-[8px] sm:h-[8px]" strokeWidth={2.5} />
           </div>
         );
     }
   };
+
+  // Click outside handlers
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserOpen(false);
+      }
+      if (notifyRef.current && !notifyRef.current.contains(event.target as Node)) {
+        setIsNotifyOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const fetchBroadcastNotices = async () => {
@@ -203,6 +306,7 @@ export default function Header() {
     const interval = setInterval(fetchBroadcastNotices, 60000);
     return () => clearInterval(interval);
   }, [API_BASE]);
+
 
   useEffect(() => {
     const fetchUnreadCount = async () => {
@@ -244,35 +348,47 @@ export default function Header() {
         });
         const data = await response.json();
         if (data.success) {
-          const notifications = data.notifications.map((notif: ApiNotification) => ({
-            id: notif.notification_id,
-            title: notif.type === 'like'
-              ? `liked your post.`
+          const notifications = data.notifications.map((notif: ApiNotification) => {
+            const actorLabel = notif.grouped && notif.grouped_count && notif.grouped_count > 1
+              ? `${notif.grouped_count} users`
+              : notif.actor_username
+              ? `@${notif.actor_username}`
+              : 'Someone';
+
+            const title = notif.type === 'like'
+              ? `${actorLabel} liked your post.`
               : notif.type === 'reply'
-              ? `replied to your comment.`
+              ? `${actorLabel} replied to your comment.`
               : notif.type === 'mention'
-              ? `mentioned you in a comment.`
+              ? `${actorLabel} mentioned you in a comment.`
               : notif.type === 'report'
               ? `Your comment has been reported.`
               : notif.type === 'warning'
               ? `You received a system warning.`
               : notif.type === 'ban'
               ? `Your account has been suspended.`
-              : notif.comment_content?.includes('support ticket') 
-                ? `📩 ${notif.comment_content}`
-                : 'New notification',
-            content: notif.comment_content || '',
-            time: formatTimeAgo(notif.created_at),
-            read: notif.is_read === 1,
-            isBroadcast: false,
-            type: notif.type,
-            actorUsername: notif.actor_username,
-            actorAvatar: notif.actor_avatar,
-            actorFacebookId: notif.actor_facebook_id,
-            actorGoogleId: notif.actor_google_id,
-            postId: notif.post_id || undefined,
-            commentId: notif.comment_id || undefined
-          }));
+              : notif.comment_content?.includes('support ticket')
+              ? `📩 ${notif.comment_content}`
+              : 'New notification';
+
+            return {
+              id: notif.notification_id,
+              title,
+              content: notif.comment_content || '',
+              time: formatTimeAgo(notif.created_at),
+              read: notif.is_read === 1,
+              isBroadcast: false,
+              type: notif.type,
+              actorUsername: notif.actor_username,
+              actorAvatar: notif.actor_avatar,
+              actorFacebookId: notif.actor_facebook_id,
+              actorGoogleId: notif.actor_google_id,
+              postId: notif.post_id || undefined,
+              commentId: notif.comment_id || undefined,
+              grouped: notif.grouped || false,
+              groupedCount: notif.grouped_count || 1,
+            };
+          });
           setUserNotifications(notifications);
         }
       } catch (error) {
@@ -292,7 +408,7 @@ export default function Header() {
       title: notice.title || "System Notification",
       content: notice.content,
       time: formatTimeAgo(notice.created_at),
-      read: false,
+      read: broadcastReadIds.includes(notice.notice_id),
       isBroadcast: true,
       type: undefined,
       actorUsername: undefined,
@@ -304,7 +420,6 @@ export default function Header() {
 
   const syncUser = useCallback(() => {
     setUser(readStoredUser());
-    setAvatarError(false);
   }, []);
 
   const handleLogout = () => {
@@ -313,10 +428,16 @@ export default function Header() {
     window.dispatchEvent(new Event("auth-changed"));
     setUser(null);
     setIsUserOpen(false);
+    setIsMenuOpen(false);
     router.push("/login");
   };
 
-  const handleNotificationClick = async (notif: any) => {
+  const handleNotificationClick = async (notif: NotificationItem) => {
+    if (notif.isBroadcast) {
+      const newIds = Array.from(new Set([...broadcastReadIds, notif.id]));
+      storeBroadcastIds(newIds);
+    }
+
     if (!notif.isBroadcast && !notif.read) {
       const token = localStorage.getItem("token");
       if (token) {
@@ -328,14 +449,24 @@ export default function Header() {
               "Accept": "application/json"
             }
           });
-          setUserNotifications(prev =>
-            prev.map(n => n.id === notif.id ? { ...n, read: true } : n)
+          setUserNotifications((prev) =>
+            prev.map((n) => (n.id === notif.id ? { ...n, read: true } : n))
           );
-          setUnreadCount(prev => Math.max(0, prev - 1));
+          setUnreadCount((prev) => Math.max(0, prev - 1));
         } catch (error) {
           console.error("Error marking notification as read:", error);
         }
       }
+    }
+
+    // Admin notifications (broadcast, warning, ban, report) only show modal, no redirect
+    const isAdminNotification = notif.isBroadcast || ['warning', 'ban', 'report'].includes(notif.type || '');
+    
+    if (!isAdminNotification && notif.postId) {
+      setIsNotifyOpen(false);
+      const target = notif.commentId ? `/post/${notif.postId}#comment-${notif.commentId}` : `/post/${notif.postId}`;
+      router.push(target);
+      return;
     }
 
     setSelectedNotification(notif);
@@ -355,8 +486,8 @@ export default function Header() {
           "Accept": "application/json"
         }
       });
-      setUserNotifications(prev =>
-        prev.map(n => ({ ...n, read: true }))
+      setUserNotifications((prev) =>
+        prev.map((n) => ({ ...n, read: true }))
       );
       setUnreadCount(0);
     } catch (error) {
@@ -388,16 +519,6 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-        setIsUserOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  useEffect(() => {
     const fetchTickerData = async () => {
       try {
         const res = await fetch(`${API_BASE}/rates/market-matrix`);
@@ -423,45 +544,16 @@ export default function Header() {
     fetchTickerData();
     const interval = setInterval(fetchTickerData, 30000);
     return () => clearInterval(interval);
-  }, []);
-
-  const Avatar = ({ user, size = 'md', className = '' }: { user: AuthUser | null, size?: 'sm' | 'md' | 'lg', className?: string }) => {
-    const [error, setError] = useState(false);
-    
-    const sizeClass = {
-      sm: 'w-8 h-8 text-sm',
-      md: 'w-10 h-10 text-base',
-      lg: 'w-12 h-12 text-lg'
-    }[size] || 'w-10 h-10 text-base';
-
-    const avatarUrl = getAvatarUrl(user);
-    
-    if (avatarUrl && !error) {
-      return (
-        <img
-          src={avatarUrl}
-          alt={user?.username || 'User'}
-          className={`${sizeClass} rounded-full object-cover ring-2 ring-indigo-500/50 ${className}`}
-          onError={() => setError(true)}
-        />
-      );
-    }
-
-    return (
-      <div className={`${sizeClass} rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-bold flex items-center justify-center uppercase shadow-inner ring-2 ring-indigo-500/50 ${className}`}>
-        {user?.username ? getInitials(user.username) : '?'}
-      </div>
-    );
-  };
+  }, [API_BASE]);
 
   return (
     <header className="fixed top-0 z-50 w-full transition-all duration-300">
-      {/* Ticker Bar */}
-      <div className="bg-black text-slate-500 py-2 border-b border-white/10 relative z-20 hidden md:block overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center text-[10px] uppercase tracking-widest font-bold">
-          <div className="flex animate-ticker whitespace-nowrap gap-12">
+      {/* Ticker Bar - Hidden on mobile */}
+      <div className="hidden md:block bg-black text-slate-500 py-2 border-b border-white/10 relative z-20 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center text-[8px] sm:text-[10px] uppercase tracking-widest font-bold">
+          <div className="flex animate-ticker whitespace-nowrap gap-8 sm:gap-12">
             {[...tickerItems, ...tickerItems].map((item, i) => (
-              <div key={i} className="flex items-center gap-3 shrink-0">
+              <div key={i} className="flex items-center gap-2 sm:gap-3 shrink-0">
                 <span className="text-slate-500">{item.pair}</span>
                 <span className="text-white font-mono">{item.value}</span>
                 <span className={item.positive ? "text-emerald-400" : "text-rose-500"}>
@@ -470,9 +562,9 @@ export default function Header() {
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-2 text-slate-400 shrink-0 ml-8 bg-black z-10 pl-4">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-            LIVE MARKET DATA
+          <div className="flex items-center gap-1.5 sm:gap-2 text-slate-400 shrink-0 ml-4 sm:ml-8 bg-black z-10 pl-3 sm:pl-4">
+            <div className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            LIVE
           </div>
         </div>
       </div>
@@ -480,34 +572,34 @@ export default function Header() {
       {/* Main Navigation Bar */}
       <div className={`transition-all duration-500 ${
         scrolled 
-        ? 'bg-[#0a0a0f]/90 backdrop-blur-xl border-b border-white/10 py-3' 
-        : 'bg-transparent border-b border-white/5 py-5'
+        ? 'bg-[#0a0a0f]/90 backdrop-blur-xl border-b border-white/10 py-2 sm:py-3' 
+        : 'bg-transparent border-b border-white/5 py-3 sm:py-5'
       }`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="relative flex items-center justify-start gap-12">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="relative flex items-center justify-between lg:justify-start gap-3 sm:gap-4 lg:gap-12">
             
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 group shrink-0">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3 group shrink-0">
               <div className="relative">
                 <div className="absolute inset-0 bg-indigo-600 blur-lg opacity-20 group-hover:opacity-40 transition-opacity" />
-                <div className="relative bg-indigo-600 p-2.5 rounded-xl group-hover:scale-105 transition-transform duration-300">
-                  <Globe className="text-white" size={22} />
+                <div className="relative bg-indigo-600 p-2 sm:p-2.5 rounded-lg sm:rounded-xl group-hover:scale-105 transition-transform duration-300">
+                  <Globe className="text-white sm:w-[22px] sm:h-[22px]" size={18} />
                 </div>
               </div>
-              <span className="text-xl font-black tracking-tighter text-white uppercase">
+              <span className="text-base sm:text-xl font-black tracking-tighter text-white uppercase">
                 Currency<span className="text-indigo-500">X</span>
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-8">
+            {/* Desktop Navigation - Hidden on mobile/tablet */}
+            <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
               {navLinks.map((link) => {
                 const isActive = pathname === link.href;
                 return (
                   <Link 
                     key={link.name} 
                     href={link.href}
-                    className={`relative text-[13px] font-bold transition-colors uppercase tracking-wider ${
+                    className={`relative text-[12px] xl:text-[13px] font-bold transition-colors uppercase tracking-wider ${
                       isActive ? 'text-white' : 'text-slate-400 hover:text-white'
                     }`}
                   >
@@ -524,8 +616,8 @@ export default function Header() {
             </nav>
 
             {/* Actions */}
-            <div className="flex items-center gap-4 ml-auto">
-              {/* Search */}
+            <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-4 ml-auto">
+              {/* Search Desktop */}
               <div className="relative hidden xl:flex items-center">
                 <Search className="absolute left-3 text-slate-500" size={14} />
                 <input 
@@ -536,14 +628,22 @@ export default function Header() {
               </div>
 
               {/* Notification Button & Box */}
-              <div className="relative">
+              <div className="relative" ref={notifyRef}>
                 <button
-                  onClick={() => setIsNotifyOpen(!isNotifyOpen)}
-                  className="relative p-2 rounded-xl hover:bg-white/5 transition-all duration-200 group"
+                  onClick={async () => {
+                    const nextOpen = !isNotifyOpen;
+                    setIsNotifyOpen(nextOpen);
+                    if (nextOpen) {
+                      markVisibleBroadcastsRead();
+                      await markVisibleUserNotificationsRead();
+                    }
+                  }}
+                  className="relative p-1.5 sm:p-2 rounded-xl hover:bg-white/5 transition-all duration-200 group"
+                  aria-label="Notifications"
                 >
-                  <Bell size={20} className={`transition-colors duration-200 ${isNotifyOpen ? 'text-indigo-400' : 'text-slate-400 group-hover:text-white'}`} />
+                  <Bell size={18} className={`sm:w-[20px] sm:h-[20px] transition-colors duration-200 ${isNotifyOpen ? 'text-indigo-400' : 'text-slate-400 group-hover:text-white'}`} />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-[20px] flex items-center justify-center bg-indigo-500 text-white text-[10px] font-bold rounded-full border-2 border-[#0a0a0f]">
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[18px] sm:min-w-[20px] h-[18px] sm:h-[20px] flex items-center justify-center bg-indigo-500 text-white text-[8px] sm:text-[10px] font-bold rounded-full border-2 border-[#0a0a0f] px-1">
                       {formatNotificationCount(unreadCount)}
                     </span>
                   )}
@@ -551,294 +651,266 @@ export default function Header() {
 
                 <AnimatePresence>
                   {isNotifyOpen && (
-                    <>
-                      <div className="fixed inset-0 z-0" onClick={() => setIsNotifyOpen(false)} />
-                      <motion.div
-                        initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="absolute right-0 mt-2 w-[380px] bg-[#0f0f1a] border border-white/5 rounded-2xl shadow-2xl shadow-black/70 overflow-hidden z-50"
-                      >
-                        {/* Header (EN) */}
-                        <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/5 bg-[#0a0a14]">
-                          <div className="flex items-center gap-2">
-                            <h3 className="text-sm font-bold text-white tracking-wide">Notifications</h3>
-                            {unreadCount > 0 && (
-                              <span className="px-2 py-0.5 bg-indigo-500 text-white text-[9px] font-bold rounded">
-                                {unreadCount} new
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <button 
-                              onClick={handleMarkAllAsRead}
-                              className="text-[11px] text-indigo-400 hover:text-indigo-300 font-normal transition-colors duration-200"
-                            >
-                              Mark all as read
-                            </button>
-                            <div className="w-px h-3 bg-white/5" />
-                            <button
-                              onClick={() => setIsNotifyOpen(false)}
-                              className="text-slate-500 hover:text-white transition-colors duration-200"
-                            >
-                              <X size={15} />
-                            </button>
-                          </div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                      className="absolute right-[-40px] sm:right-0 mt-2 w-[280px] sm:w-[340px] md:w-[380px] bg-[#0f0f1a] border border-white/5 rounded-2xl shadow-2xl shadow-black/70 overflow-hidden z-50"
+                    >
+                      {/* Header */}
+                      <div className="flex flex-wrap items-center justify-between px-3 sm:px-5 py-2.5 sm:py-3.5 border-b border-white/5 bg-[#0a0a14] gap-1">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
+                          <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide">Notifications</h3>
+                          {unreadCount > 0 && (
+                            <span className="px-1.5 sm:px-2 py-0.5 bg-indigo-500 text-white text-[7px] sm:text-[9px] font-bold rounded">
+                              {unreadCount} new
+                            </span>
+                          )}
                         </div>
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <button 
+                            onClick={handleMarkAllAsRead}
+                            className="text-[9px] sm:text-[11px] text-indigo-400 hover:text-indigo-300 font-normal transition-colors duration-200"
+                          >
+                            Mark all read
+                          </button>
+                          <button
+                            onClick={() => setIsNotifyOpen(false)}
+                            className="text-slate-500 hover:text-white transition-colors duration-200 p-0.5"
+                          >
+                            <X size={13} className="sm:w-[15px] sm:h-[15px]" />
+                          </button>
+                        </div>
+                      </div>
 
-                        {/* Notification List (EN) */}
-                        <div className="max-h-[420px] overflow-y-auto scrollbar-thin">
-                          {allNotifications.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-12 px-5">
-                              <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-3">
-                                <Bell size={22} className="text-slate-600" />
-                              </div>
-                              <p className="text-xs text-slate-400 font-medium">No notifications yet</p>
+                      {/* Notification List */}
+                      <div className="max-h-[280px] sm:max-h-[380px] md:max-h-[420px] overflow-y-auto scrollbar-thin">
+                        {allNotifications.length === 0 ? (
+                          <div className="flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-5">
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/5 flex items-center justify-center mb-2 sm:mb-3">
+                              <Bell size={18} className="sm:w-[22px] sm:h-[22px] text-slate-600" />
                             </div>
-                          ) : (
-                            <div className="flex flex-col py-1">
-                              {allNotifications.map((notif, index) => (
-                                <motion.div
-                                  key={notif.id}
-                                  initial={{ opacity: 0 }}
-                                  animate={{ opacity: 1 }}
-                                  transition={{ delay: index * 0.01 }}
-                                  onClick={() => handleNotificationClick(notif)}
-                                  className={`group flex items-center gap-3 mx-1.5 my-0.5 px-3 py-2 rounded-lg cursor-pointer transition-all duration-150 relative ${
-                                    !notif.read 
-                                      ? 'bg-indigo-500/[0.03] hover:bg-white/[0.03]' 
-                                      : 'hover:bg-white/[0.03]'
-                                  }`}
-                                >
-                                  {/* Left: Slim Avatar */}
-                                  <div className="relative flex-shrink-0">
-                                    {notif.isBroadcast ? (
-                                      <div className="w-9 h-9 rounded-full bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-inner">
-                                        <Globe size={15} />
-                                      </div>
-                                    ) : (() => {
-                                      const avatarUrl = getNotificationAvatarUrl(
-                                        notif.actorAvatar,
-                                        notif.actorFacebookId,
-                                        notif.actorGoogleId
-                                      );
-                                      if (avatarUrl) {
-                                        return (
-                                          <div className="relative">
-                                            <img
-                                              src={avatarUrl}
-                                              alt={notif.actorUsername || 'User'}
-                                              className="w-9 h-9 rounded-full object-cover ring-1 ring-white/5"
-                                            />
-                                            {getNotifIcon(notif.type)}
-                                          </div>
-                                        );
-                                      }
+                            <p className="text-[10px] sm:text-xs text-slate-400 font-medium">No notifications yet</p>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col py-1">
+                            {allNotifications.map((notif, index) => (
+                              <motion.div
+                                key={notif.id}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: index * 0.01 }}
+                                onClick={() => handleNotificationClick(notif)}
+                                className={`group flex items-center gap-2 sm:gap-3 mx-1 sm:mx-1.5 my-0.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg cursor-pointer transition-all duration-150 relative ${
+                                  !notif.read 
+                                    ? 'bg-indigo-500/[0.03] hover:bg-white/[0.03]' 
+                                    : 'hover:bg-white/[0.03]'
+                                }`}
+                              >
+                                {/* Left: Avatar */}
+                                <div className="relative flex-shrink-0">
+                                  {notif.isBroadcast ? (
+                                    <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-inner">
+                                      <Globe size={12} className="sm:w-[15px] sm:h-[15px]" />
+                                    </div>
+                                  ) : (() => {
+                                    const avatarUrl = getNotificationAvatarUrl(
+                                      notif.actorAvatar,
+                                      notif.actorFacebookId,
+                                      notif.actorGoogleId
+                                    );
+                                    if (avatarUrl) {
                                       return (
-                                        <div className="relative w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-medium flex items-center justify-center uppercase text-xs ring-1 ring-white/5">
-                                          {notif.actorUsername ? notif.actorUsername.charAt(0).toUpperCase() : '?'}
+                                        <div className="relative">
+                                          <img
+                                            src={avatarUrl}
+                                            alt={notif.actorUsername || 'User'}
+                                            className="w-7 h-7 sm:w-9 sm:h-9 rounded-full object-cover ring-1 ring-white/5"
+                                          />
                                           {getNotifIcon(notif.type)}
                                         </div>
                                       );
-                                    })()}
-                                  </div>
+                                    }
+                                    return (
+                                      <div className="relative w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white font-medium flex items-center justify-center uppercase text-[9px] sm:text-xs ring-1 ring-white/5">
+                                        {notif.actorUsername ? notif.actorUsername.charAt(0).toUpperCase() : '?'}
+                                        {getNotifIcon(notif.type)}
+                                      </div>
+                                    );
+                                  })()}
+                                </div>
 
-                                  {/* Middle: Light Text */}
-                                  <div className="flex-1 min-w-0 pr-1">
-                                    <p className="text-[11.5px] leading-snug font-light text-slate-300">
-                                      {notif.isBroadcast ? (
-                                        <>
-                                          <span className="font-semibold text-white">{notif.title}</span>{' '}
-                                          <span className="text-slate-400">{notif.content}</span>
-                                        </>
-                                      ) : (
-                                        <>
-                                          <span className="font-semibold text-white hover:underline mr-0.5">
-                                            {notif.actorUsername ? `@${notif.actorUsername}` : 'User'}
+                                {/* Middle: Text */}
+                                <div className="flex-1 min-w-0 pr-0.5 sm:pr-1">
+                                  <p className="text-[10px] sm:text-[11.5px] leading-snug font-light text-slate-300">
+                                    {notif.isBroadcast ? (
+                                      <>
+                                        <span className="font-semibold text-white">{notif.title}</span>{' '}
+                                        <span className="text-slate-400">{notif.content}</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <span className="font-semibold text-white hover:underline mr-0.5">
+                                          {notif.actorUsername ? `@${notif.actorUsername}` : 'User'}
+                                        </span>
+                                        <span className={!notif.read ? 'text-slate-200' : 'text-slate-400'}>
+                                          {notif.title}
+                                        </span>
+                                        {notif.content && notif.type !== 'like' && (
+                                          <span className="block text-[9px] sm:text-[10.5px] text-slate-500 mt-0.5 line-clamp-1 italic bg-white/[0.02] px-1.5 py-0.5 rounded border border-white/5">
+                                            "{notif.content}"
                                           </span>
-                                          <span className={!notif.read ? 'text-slate-200' : 'text-slate-400'}>
-                                            {notif.title}
-                                          </span>
-                                          {notif.content && notif.type !== 'like' && (
-                                            <span className="block text-[10.5px] text-slate-500 mt-0.5 line-clamp-1 italic bg-white/[0.02] px-1.5 py-0.5 rounded border border-white/5">
-                                              "{notif.content}"
-                                            </span>
-                                          )}
-                                        </>
-                                      )}
-                                    </p>
-                                    
-                                    {/* Time */}
-                                    <span className={`text-[10px] block mt-0.5 ${!notif.read ? 'text-indigo-400/90 font-medium' : 'text-slate-500'}`}>
-                                      {notif.time}
-                                    </span>
+                                        )}
+                                      </>
+                                    )}
+                                  </p>
+                                  
+                                  {/* Time */}
+                                  <span className={`text-[8px] sm:text-[10px] block mt-0.5 ${!notif.read ? 'text-indigo-400/90 font-medium' : 'text-slate-500'}`}>
+                                    {notif.time}
+                                  </span>
+                                </div>
+
+                                {/* Right: Unread Indicator */}
+                                {!notif.read && (
+                                  <div className="flex-shrink-0 flex items-center justify-center pr-0.5">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-sm" />
                                   </div>
+                                )}
+                              </motion.div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
 
-                                  {/* Right: Unread indicator */}
-                                  {!notif.read && (
-                                    <div className="flex-shrink-0 flex items-center justify-center pr-0.5">
-                                      <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-sm" />
-                                    </div>
-                                  )}
-                                </motion.div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Footer (EN) */}
-                        <div className="border-t border-white/5 px-4 py-2 bg-[#0c0c16]">
-                          <Link
-                            href="/notifications"
-                            onClick={() => setIsNotifyOpen(false)}
-                            className="flex items-center justify-center gap-1 text-[11px] text-slate-400 hover:text-white font-light transition-colors duration-200 group"
-                          >
-                            <span>See all notifications</span>
-                            <span className="group-hover:translate-x-0.5 transition-transform text-[10px]">→</span>
-                          </Link>
-                        </div>
-                      </motion.div>
-                    </>
+                      {/* Footer */}
+                      <div className="border-t border-white/5 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#0c0c16]">
+                        <Link
+                          href="/notifications"
+                          onClick={() => setIsNotifyOpen(false)}
+                          className="flex items-center justify-center gap-1 text-[9px] sm:text-[11px] text-slate-400 hover:text-white font-light transition-colors duration-200 group"
+                        >
+                          <span>See all notifications</span>
+                          <span className="group-hover:translate-x-0.5 transition-transform text-[8px] sm:text-[10px]">→</span>
+                        </Link>
+                      </div>
+                    </motion.div>
                   )}
                 </AnimatePresence>
               </div>
 
-              {/* User Section - ĐÃ CHỈNH SỬA DROPDOWN GIỐNG ADMIN */}
-              <div className="flex items-center" ref={userMenuRef}>
+              {/* User Section Desktop */}
+              <div className="hidden sm:flex items-center" ref={userMenuRef}>
                 {user ? (
-                  <div className="relative hidden sm:block">
+                  <div className="relative">
                     <button 
                       onClick={() => setIsUserOpen(!isUserOpen)}
-                      className={`flex items-center gap-2 pl-1 pr-2 py-1 rounded-full border transition-all duration-200 ${
+                      className={`flex items-center gap-1 sm:gap-2 pl-1 pr-1.5 sm:pr-2 py-0.5 sm:py-1 rounded-full border transition-all duration-200 ${
                         isUserOpen 
                         ? "bg-indigo-600/15 border-indigo-500/60" 
                         : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
                       }`}
+                      aria-label="User menu"
                     >
                       <Avatar user={user} size="sm" />
                       <ChevronDown 
-                        size={14} 
-                        className={`text-slate-400 transition-transform duration-300 ${
-                          isUserOpen ? "rotate-180 text-white" : ""
-                        }`} 
+                        size={12} className={`sm:w-[14px] sm:h-[14px] text-slate-400 transition-transform duration-300 ${isUserOpen ? 'rotate-180 text-white' : ''}`} 
                       />
                     </button>
                     
                     <AnimatePresence>
                       {isUserOpen && (
-                        <>
-                          <div
-                            className="fixed inset-0 z-40"
-                            onClick={() => setIsUserOpen(false)}
-                          />
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0.96, y: 10 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.96, y: 10 }}
-                            transition={{ duration: 0.15, ease: "easeOut" }}
-                            className="absolute right-0 mt-3 w-80 rounded-2xl bg-[#12121c]/95 border border-white/10 shadow-2xl shadow-black/50 p-3 space-y-3 z-50 backdrop-blur-2xl"
-                          >
-                            {/* Profile summary - Style Admin */}
-                            <div className="relative overflow-hidden p-3 rounded-xl bg-gradient-to-br from-indigo-600/15 via-white/[0.02] to-transparent border border-indigo-500/25">
-                              <Link
-                                href="/User"
-                                onClick={() => setIsUserOpen(false)}
-                                className="flex items-center gap-3"
-                              >
-                                <Avatar user={user} size="sm" />
-                                <div className="flex flex-col min-w-0">
-                                  <span className="text-xs font-black text-white uppercase tracking-tight truncate">
-                                    @{user.username}
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.96, y: 10 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.96, y: 10 }}
+                          transition={{ duration: 0.15, ease: "easeOut" }}
+                          className="absolute right-0 mt-2 sm:mt-3 w-64 sm:w-72 md:w-80 rounded-2xl bg-[#12121c]/95 border border-white/10 shadow-2xl shadow-black/50 p-2.5 sm:p-3 space-y-2 sm:space-y-3 z-50 backdrop-blur-2xl"
+                        >
+                          {/* Profile Summary - Link to Profile page */}
+                          <div className="relative overflow-hidden p-2.5 sm:p-3 rounded-xl bg-gradient-to-br from-indigo-600/15 via-white/[0.02] to-transparent border border-indigo-500/25">
+                            <Link href="/Profile" onClick={() => setIsUserOpen(false)} className="flex items-center gap-2 sm:gap-3">
+                              <Avatar user={user} size="sm" />
+                              <div className="flex flex-col min-w-0">
+                                <span className="text-[10px] sm:text-xs font-black text-white uppercase tracking-tight truncate">
+                                  @{user.username}
+                                </span>
+                                <div className="flex items-center gap-1 sm:gap-1.5 mt-0.5 sm:mt-1">
+                                  <span className="w-1 sm:w-1.5 h-1 sm:h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                  <span className="text-[7px] sm:text-[9px] text-slate-400 font-mono uppercase tracking-wider font-bold">
+                                    {user.role || 'USER'} NODE
                                   </span>
-                                  <div className="flex items-center gap-1.5 mt-1">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                    <span className="text-[9px] text-slate-400 font-mono uppercase tracking-wider font-bold">
-                                      {user.role || 'USER'} NODE
-                                    </span>
-                                  </div>
                                 </div>
-                              </Link>
+                              </div>
+                            </Link>
+                            <Link
+                              href="/Profile"
+                              onClick={() => setIsUserOpen(false)}
+                              className="mt-2 sm:mt-3 w-full flex items-center justify-center gap-1.5 sm:gap-2 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg bg-white/[0.06] hover:bg-white/10 text-[10px] sm:text-[11px] font-bold text-slate-200 transition-colors text-center"
+                            >
+                              <User size={11} className="sm:w-[13px] sm:h-[13px]" />
+                              <span>Profile Settings</span>
+                            </Link>
+                          </div>
 
-                              <Link
-                                href="/User"
-                                onClick={() => setIsUserOpen(false)}
-                                className="mt-3 w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-white/[0.06] hover:bg-white/10 text-[11px] font-bold text-slate-200 transition-colors text-center"
-                              >
-                                <User size={13} />
-                                <span>See all user settings</span>
-                              </Link>
-                            </div>
-
-                            {/* Navigation rows - Style Admin */}
-                            <div className="space-y-1">
-                              <Link
-                                href="/User"
-                                onClick={() => setIsUserOpen(false)}
-                                className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-white/5 text-slate-300 hover:text-white transition-colors group"
-                              >
-                                <div className="flex items-center gap-3">
-                                  <div className="w-9 h-9 rounded-full bg-white/5 text-slate-300 group-hover:bg-indigo-600/20 group-hover:text-indigo-400 flex items-center justify-center transition-colors">
-                                    <LayoutDashboard size={17} />
-                                  </div>
-                                  <span className="text-xs font-semibold">Dashboard</span>
+                          {/* Nav Rows */}
+                          <div className="space-y-0.5 sm:space-y-1">
+                            <Link
+                              href="/Profile"
+                              onClick={() => setIsUserOpen(false)}
+                              className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-xl hover:bg-white/5 text-slate-300 hover:text-white transition-colors group"
+                            >
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/5 text-slate-300 group-hover:bg-indigo-600/20 group-hover:text-indigo-400 flex items-center justify-center transition-colors">
+                                  <LayoutDashboard size={14} className="sm:w-[17px] sm:h-[17px]" />
                                 </div>
-                                <ChevronRight size={15} className="text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
-                              </Link>
+                                <span className="text-[10px] sm:text-xs font-semibold">Dashboard</span>
+                              </div>
+                              <ChevronRight size={13} className="sm:w-[15px] sm:h-[15px] text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                            </Link>
 
-                              <Link
-                                href="/profile"
-                                onClick={() => setIsUserOpen(false)}
-                                className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-white/5 text-slate-300 hover:text-white transition-colors group"
-                              >
-                                <div className="flex items-center gap-3">
-                                  <div className="w-9 h-9 rounded-full bg-white/5 text-slate-300 group-hover:bg-emerald-600/20 group-hover:text-emerald-400 flex items-center justify-center transition-colors">
-                                    <User size={17} />
-                                  </div>
-                                  <span className="text-xs font-semibold">Profile Settings</span>
+                            <div className="h-px bg-white/[0.06] my-0.5 sm:my-1" />
+
+                            <button
+                              onClick={handleLogout}
+                              className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-xl hover:bg-rose-500/10 text-slate-300 hover:text-rose-400 transition-colors group"
+                            >
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/5 text-slate-300 group-hover:bg-rose-500/20 group-hover:text-rose-400 flex items-center justify-center transition-colors">
+                                  <LogOut size={14} className="sm:w-[17px] sm:h-[17px]" />
                                 </div>
-                                <ChevronRight size={15} className="text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
-                              </Link>
-
-                              <div className="h-px bg-white/[0.06] my-1" />
-
-                              <button
-                                onClick={handleLogout}
-                                className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-rose-500/10 text-slate-300 hover:text-rose-400 transition-colors group"
-                              >
-                                <div className="flex items-center gap-3">
-                                  <div className="w-9 h-9 rounded-full bg-white/5 text-slate-300 group-hover:bg-rose-500/20 group-hover:text-rose-400 flex items-center justify-center transition-colors">
-                                    <LogOut size={17} />
-                                  </div>
-                                  <span className="text-xs font-semibold">Log Out</span>
-                                </div>
-                                <ChevronRight size={15} className="text-slate-500 group-hover:text-rose-400 group-hover:translate-x-0.5 transition-all" />
-                              </button>
-                            </div>
-                          </motion.div>
-                        </>
+                                <span className="text-[10px] sm:text-xs font-semibold">Log Out</span>
+                              </div>
+                              <ChevronRight size={13} className="sm:w-[15px] sm:h-[15px] text-slate-500 group-hover:text-rose-400 group-hover:translate-x-0.5 transition-all" />
+                            </button>
+                          </div>
+                        </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
                 ) : (
-                  <Link href="/login" className="hidden sm:block text-xs font-bold bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-500 transition-all active:scale-95 uppercase tracking-wider shadow-lg shadow-indigo-600/20">
+                  <Link href="/login" className="text-[10px] sm:text-xs font-bold bg-indigo-600 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-xl hover:bg-indigo-500 transition-all active:scale-95 uppercase tracking-wider shadow-lg shadow-indigo-600/20">
                     Open Account
                   </Link>
                 )}
-
-                <button 
-                  className="lg:hidden p-2 text-white hover:bg-white/5 rounded-xl transition-colors ml-2"
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                >
-                  {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                </button>
               </div>
+
+              {/* Hamburger Button (Mobile / Tablet) */}
+              <button 
+                className="lg:hidden p-1.5 sm:p-2 text-white hover:bg-white/5 rounded-xl transition-colors"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                {isMenuOpen ? <X size={20} className="sm:w-[24px] sm:h-[24px]" /> : <Menu size={20} className="sm:w-[24px] sm:h-[24px]" />}
+              </button>
             </div>
+
           </div>
         </div>
       </div>
 
-      {/* Mobile Navigation */}
+      {/* Mobile Menu Drawer */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div 
@@ -852,20 +924,49 @@ export default function Header() {
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -20, opacity: 0 }}
-              className="absolute inset-x-0 top-24 bg-[#12121c] border-b border-white/10 shadow-2xl p-6"
+              className="absolute inset-x-0 top-[72px] sm:top-[80px] lg:top-[88px] bg-[#12121c] border-b border-white/10 shadow-2xl p-4 sm:p-6 max-h-[calc(100vh-5rem)] overflow-y-auto"
             >
-              <div className="grid grid-cols-2 gap-4">
+              {/* User Block inside Mobile Menu - Link to Profile page */}
+              {user ? (
+                <div className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
+                  <Link href="/Profile" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 sm:gap-3 flex-1">
+                    <Avatar user={user} size="sm" />
+                    <div className="flex flex-col">
+                      <span className="text-[10px] sm:text-xs font-bold text-white">@{user.username}</span>
+                      <span className="text-[8px] sm:text-[10px] text-slate-400 font-mono">{user.role || 'USER'}</span>
+                    </div>
+                  </Link>
+                  <button 
+                    onClick={handleLogout}
+                    className="p-1.5 sm:p-2 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-colors"
+                    aria-label="Logout"
+                  >
+                    <LogOut size={14} className="sm:w-[16px] sm:h-[16px]" />
+                  </button>
+                </div>
+              ) : (
+                <Link 
+                  href="/login" 
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block w-full text-center text-[10px] sm:text-xs font-bold bg-indigo-600 text-white py-3 sm:py-3.5 rounded-xl mb-4 sm:mb-6 uppercase tracking-wider"
+                >
+                  Open Account
+                </Link>
+              )}
+
+              {/* Navigation Grid */}
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 {navLinks.map((link) => (
                   <Link 
                     key={link.name} 
                     href={link.href}
                     onClick={() => setIsMenuOpen(false)}
-                    className="flex flex-col gap-3 p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-indigo-500/30 group"
+                    className="flex flex-col gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-indigo-500/30 group"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
                       {link.icon}
                     </div>
-                    <span className="font-bold text-white text-sm uppercase tracking-wide">{link.name}</span>
+                    <span className="font-bold text-white text-[10px] sm:text-xs uppercase tracking-wide">{link.name}</span>
                   </Link>
                 ))}
               </div>
@@ -874,7 +975,7 @@ export default function Header() {
         )}
       </AnimatePresence>
 
-      {/* NOTIFICATION DETAIL MODAL (EN) */}
+      {/* NOTIFICATION DETAIL MODAL */}
       <AnimatePresence>
         {showNotificationModal && selectedNotification && (
           <>
@@ -890,14 +991,14 @@ export default function Header() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md mx-4 bg-[#0f0f1a] border border-white/5 rounded-2xl shadow-2xl shadow-black/70 z-[70] overflow-hidden"
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-1.5rem)] sm:w-[calc(100%-2rem)] max-w-md bg-[#0f0f1a] border border-white/5 rounded-2xl shadow-2xl shadow-black/70 z-[70] overflow-hidden"
             >
-              {/* Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
-                <div className="flex items-center gap-3">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-white/5">
+                <div className="flex items-center gap-2 sm:gap-3">
                   {selectedNotification.isBroadcast ? (
-                    <div className="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center">
-                      <Globe size={16} className="text-indigo-400" />
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-indigo-500/10 flex items-center justify-center">
+                      <Globe size={14} className="sm:w-[16px] sm:h-[16px] text-indigo-400" />
                     </div>
                   ) : (() => {
                     const avatarUrl = getNotificationAvatarUrl(
@@ -910,70 +1011,68 @@ export default function Header() {
                         <img
                           src={avatarUrl}
                           alt={selectedNotification.actorUsername || 'User'}
-                          className="w-8 h-8 rounded-full object-cover ring-1 ring-white/5"
+                          className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover ring-1 ring-white/5"
                         />
                       );
                     }
                     return (
-                      <div className="w-8 h-8 rounded-full bg-slate-500/10 flex items-center justify-center">
-                        <Bell size={16} className="text-slate-400" />
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-500/10 flex items-center justify-center">
+                        <Bell size={14} className="sm:w-[16px] sm:h-[16px] text-slate-400" />
                       </div>
                     );
                   })()}
                   <div>
-                    <h3 className="text-sm font-semibold text-white">Notification Details</h3>
-                    <span className="text-[10px] text-slate-500">{selectedNotification.time}</span>
+                    <h3 className="text-xs sm:text-sm font-semibold text-white">Notification Details</h3>
+                    <span className="text-[8px] sm:text-[10px] text-slate-500">{selectedNotification.time}</span>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowNotificationModal(false)}
-                  className="p-1.5 hover:bg-white/5 rounded-lg transition-colors text-slate-400 hover:text-white"
+                  className="p-1 hover:bg-white/5 rounded-lg transition-colors text-slate-400 hover:text-white"
                 >
-                  <X size={18} />
+                  <X size={16} className="sm:w-[18px] sm:h-[18px]" />
                 </button>
               </div>
 
-              {/* Content */}
-              <div className="px-6 py-5">
-                <div className="mb-4">
-                  <p className="text-sm text-slate-300 leading-relaxed">
+              {/* Modal Content */}
+              <div className="px-4 sm:px-6 py-4 sm:py-5">
+                <div className="mb-3 sm:mb-4">
+                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                     {selectedNotification.actorUsername ? `@${selectedNotification.actorUsername} ` : ''}
                     {selectedNotification.title}
                   </p>
                   {selectedNotification.content && (
-                    <p className="text-sm text-slate-400 leading-relaxed mt-2 bg-white/5 p-3 rounded-xl border border-white/5">
+                    <p className="text-xs sm:text-sm text-slate-400 leading-relaxed mt-2 bg-white/5 p-2.5 sm:p-3 rounded-xl border border-white/5">
                       {selectedNotification.content}
                     </p>
                   )}
                 </div>
 
-                {/* Actor info */}
                 {selectedNotification.actorUsername && (
-                  <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                  <div className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 bg-white/5 rounded-xl">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-[9px] sm:text-xs font-bold">
                       {selectedNotification.actorUsername.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p className="text-[10px] text-slate-500 uppercase tracking-wider">From user</p>
-                      <p className="text-sm text-white font-medium">@{selectedNotification.actorUsername}</p>
+                      <p className="text-[8px] sm:text-[10px] text-slate-500 uppercase tracking-wider">From user</p>
+                      <p className="text-xs sm:text-sm text-white font-medium">@{selectedNotification.actorUsername}</p>
                     </div>
                   </div>
                 )}
 
-                {/* Tags */}
-                <div className="flex items-center gap-2 mt-4">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-3 sm:mt-4">
                   {selectedNotification.isBroadcast && (
-                    <span className="px-2 py-1 bg-indigo-500/10 text-indigo-400 text-[10px] font-medium rounded-lg">
+                    <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-indigo-500/10 text-indigo-400 text-[8px] sm:text-[10px] font-medium rounded-lg">
                       System
                     </span>
                   )}
                   {selectedNotification.type === 'like' && (
-                    <span className="px-2 py-1 bg-rose-500/10 text-rose-400 text-[10px] font-medium rounded-lg">
+                    <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-rose-500/10 text-rose-400 text-[8px] sm:text-[10px] font-medium rounded-lg">
                       ❤️ Like
                     </span>
                   )}
                   {selectedNotification.type === 'reply' && (
-                    <span className="px-2 py-1 bg-emerald-500/10 text-emerald-400 text-[10px] font-medium rounded-lg">
+                    <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-emerald-500/10 text-emerald-400 text-[8px] sm:text-[10px] font-medium rounded-lg">
                       💬 Reply
                     </span>
                   )}
@@ -981,22 +1080,22 @@ export default function Header() {
               </div>
 
               {/* Actions */}
-              <div className="px-6 py-4 border-t border-white/5 bg-[#0c0c16]">
-                <div className="flex gap-2">
+              <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-white/5 bg-[#0c0c16]">
+                <div className="flex flex-col sm:flex-row gap-2">
                   {selectedNotification.postId && (
                     <button
                       onClick={() => {
                         setShowNotificationModal(false);
                         router.push(`/post/${selectedNotification.postId}`);
                       }}
-                      className="flex-1 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-500 transition-all"
+                      className="w-full sm:flex-1 py-2 sm:py-2.5 bg-indigo-600 text-white text-xs sm:text-sm font-medium rounded-xl hover:bg-indigo-500 transition-all"
                     >
                       View Post
                     </button>
                   )}
                   <button
                     onClick={() => setShowNotificationModal(false)}
-                    className={`${selectedNotification.postId ? 'flex-1' : 'w-full'} py-2.5 bg-white/5 text-slate-300 text-sm font-medium rounded-xl hover:bg-white/10 transition-all border border-white/5`}
+                    className={`w-full py-2 sm:py-2.5 bg-white/5 text-slate-300 text-xs sm:text-sm font-medium rounded-xl hover:bg-white/10 transition-all border border-white/5 ${!selectedNotification.postId ? 'sm:w-full' : 'sm:flex-1'}`}
                   >
                     Close
                   </button>

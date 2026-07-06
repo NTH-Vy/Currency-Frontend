@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BACK_END } from "@/lib/echo";
+import "../../css/Admin/Setting.css";
 
 // ============================================================
 // SKELETON COMPONENTS

@@ -365,67 +365,7 @@ const CustomDatePicker = ({
   );
 };
 
-// Skeleton Components
-const HeaderSkeleton = () => (
-  <div className="relative group">
-    <div className="relative bg-gradient-to-br from-[#11111a] to-[#0c0c12] rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-      <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="flex flex-col gap-3 w-full md:w-2/3">
-          <div className="h-6 w-48 bg-white/5 rounded-full animate-pulse" />
-          <div className="h-12 w-3/4 bg-white/5 rounded-xl animate-pulse" />
-          <div className="h-4 w-full max-w-2xl bg-white/5 rounded-lg animate-pulse" />
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="h-12 w-28 bg-white/5 rounded-xl animate-pulse" />
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-const StatsSkeleton = () => (
-  <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-    {[...Array(6)].map((_, idx) => (
-      <div key={idx} className="bg-[#11111a] border border-white/10 rounded-2xl p-4 shadow-xl">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/5 animate-pulse" />
-          <div className="flex-1">
-            <div className="h-3 w-20 bg-white/5 rounded animate-pulse mb-1" />
-            <div className="h-7 w-12 bg-white/5 rounded animate-pulse" />
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
-);
-
-const SearchSkeleton = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
-  return (
-    <div 
-      className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-end"
-      style={{
-        opacity: isVisible ? 1 : 0,
-        transform: isVisible ? 'translateX(0)' : 'translateX(50px)',
-        transition: 'all 0.4s ease-out'
-      }}
-    >
-      <div className="relative w-full sm:w-80">
-        <div className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-10 pr-4 h-12 animate-pulse" />
-      </div>
-      <div className="flex items-center gap-2">
-        <div className="h-12 w-28 bg-white/5 rounded-xl animate-pulse" />
-      </div>
-    </div>
-  );
-};
-
+// Skeleton Components - chỉ giữ lại skeleton cho bảng
 const TableHeaderSkeleton = () => (
   <tr className="border-b border-white/10 bg-white/5">
     <th className="px-4 py-4 w-16"><div className="h-3 w-8 bg-white/5 rounded animate-pulse" /></th>
@@ -460,8 +400,8 @@ const TableSkeleton = () => {
           <thead>
             <TableHeaderSkeleton />
           </thead>
-          <tbody className="divide-y divide-white/5">
-            {[...Array(5)].map((_, idx) => {
+          <tbody>
+            {[...Array(10)].map((_, idx) => {
               const delay = idx * 80;
               return (
                 <tr 
@@ -548,12 +488,50 @@ const PaginationSkeleton = () => {
   );
 };
 
+// Skeleton tổng thể cho trang - khớp với giao diện mới (không có stats cards)
 const PageSkeleton = () => (
   <div className="flex flex-col gap-8">
-    <HeaderSkeleton />
-    <StatsSkeleton />
-    <SearchSkeleton />
+    {/* Header Skeleton */}
+    <div className="relative group">
+      <div className="relative bg-gradient-to-br from-[#11111a] to-[#0c0c12] rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+        <div className="relative z-10 flex flex-col gap-6">
+          {/* Row 1 */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex flex-col gap-3 w-full md:w-2/3">
+              <div className="h-6 w-32 bg-white/5 rounded-full animate-pulse" />
+              <div className="h-12 w-3/4 bg-white/5 rounded-xl animate-pulse" />
+              <div className="h-4 w-full max-w-2xl bg-white/5 rounded-lg animate-pulse" />
+            </div>
+          </div>
+          {/* Row 2 */}
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-white/10">
+            <div className="flex items-center gap-6">
+              <div className="h-3 w-24 bg-white/5 rounded animate-pulse" />
+              <div className="h-3 w-20 bg-white/5 rounded animate-pulse" />
+              <div className="h-3 w-28 bg-white/5 rounded animate-pulse" />
+              <div className="h-3 w-24 bg-white/5 rounded animate-pulse" />
+            </div>
+            <div className="h-10 w-28 bg-white/5 rounded-xl animate-pulse" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Search & Filters Skeleton */}
+    <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-end">
+      <div className="relative w-full sm:w-80">
+        <div className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-10 pr-4 h-12 animate-pulse" />
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="h-12 w-24 bg-white/5 rounded-xl animate-pulse" />
+      </div>
+    </div>
+
+    {/* Table Skeleton */}
     <TableSkeleton />
+
+    {/* Pagination Skeleton */}
     <PaginationSkeleton />
   </div>
 );
@@ -635,7 +613,6 @@ export default function AdminContact() {
 
       const data = await res.json();
       if (data.success) {
-        // Laravel paginate returns object with 'data' field containing items
         setTickets(data.tickets.data || []);
         setPagination({
           current_page: data.tickets.current_page || 1,
@@ -643,11 +620,7 @@ export default function AdminContact() {
           per_page: data.tickets.per_page || 20,
           total: data.tickets.total || 0
         });
-        console.log('Pagination data:', {
-          current_page: data.tickets.current_page,
-          last_page: data.tickets.last_page,
-          total: data.tickets.total
-        });
+        if (data.stats) setStats(data.stats);
       }
     } catch (error) {
       console.error("Error fetching tickets:", error);
@@ -688,42 +661,42 @@ export default function AdminContact() {
     return () => clearTimeout(timer);
   }, [filters.search]);
 
-    const handleRespond = async () => {
+  const handleRespond = async () => {
     if (!selectedTicket || !responseText.trim()) return;
 
     setIsSubmitting(true);
     try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(`${API_BASE}/admin/support-tickets/${selectedTicket.ticket_id}/respond`, {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE}/admin/support-tickets/${selectedTicket.ticket_id}/respond`, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-            "Accept": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/json"
         },
         body: JSON.stringify({
-            response: responseText,
-            status: selectedTicket.status === 'open' ? 'in_progress' : selectedTicket.status
+          response: responseText,
+          status: selectedTicket.status === 'open' ? 'in_progress' : selectedTicket.status
         })
-        });
+      });
 
-        const data = await res.json();
-        if (data.success) {
+      const data = await res.json();
+      if (data.success) {
         setSelectedTicket(data.ticket);
         setResponseText("");
         fetchTickets();
         fetchStats();
         showToast("Response sent successfully - User will receive notification", "success");
-        } else {
+      } else {
         showToast("Failed to send response", "error");
-        }
+      }
     } catch (error) {
-        console.error("Error responding to ticket:", error);
-        showToast("Failed to send response", "error");
+      console.error("Error responding to ticket:", error);
+      showToast("Failed to send response", "error");
     } finally {
-        setIsSubmitting(false);
+      setIsSubmitting(false);
     }
-    };
+  };
 
   const handleUpdateStatus = async (ticketId: number, status: string) => {
     try {
@@ -847,8 +820,25 @@ export default function AdminContact() {
     setCurrentPage(1);
   };
 
+  // Updated: Luôn hiển thị ít nhất 1 trang
   const renderPaginationPages = () => {
-    if (!pagination) return null;
+    if (!pagination || pagination.total === 0 || pagination.last_page <= 1) {
+      return (
+        <motion.button
+          key={1}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setCurrentPage(1)}
+          className={`px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-wider transition-all ${
+            currentPage === 1
+              ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md'
+              : 'bg-white/5 hover:bg-white/10 text-slate-400'
+          }`}
+        >
+          1
+        </motion.button>
+      );
+    }
     
     const total = pagination.last_page;
     const current = pagination.current_page;
@@ -888,6 +878,173 @@ export default function AdminContact() {
         </motion.button>
       );
     });
+  };
+
+  // Render rows - luôn hiển thị đúng 10 dòng
+  const renderRows = () => {
+    const rows = [];
+    const totalRows = 10;
+    
+    if (tickets.length === 0) {
+      // Không có dữ liệu -> 10 dòng trống, KHÔNG có gạch ngang
+      for (let i = 0; i < totalRows; i++) {
+        rows.push(
+          <tr key={`empty-${i}`} className="pointer-events-none">
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] text-center border-none">&nbsp;</td>
+          </tr>
+        );
+      }
+    } else {
+      // Có dữ liệu - TẤT CẢ các dòng có nội dung đều có gạch ngang
+      for (let i = 0; i < tickets.length; i++) {
+        const ticket = tickets[i];
+        rows.push(
+          <motion.tr 
+            key={ticket.ticket_id} 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: Math.min(i * 0.03, 0.3) }}
+            className={`hover:bg-white/5 transition-all group cursor-pointer ${ticket.priority === 'urgent' ? 'bg-rose-500/5' : ''} border-b border-white/5`}
+            onClick={() => setSelectedTicket(ticket)}
+          >
+            <td className="px-4 py-4">
+              <span className="text-indigo-400 font-black text-[11px] whitespace-nowrap">#{ticket.ticket_id}</span>
+            </td>
+            <td className="px-4 py-4">
+              <div className="flex items-center gap-2 min-w-[140px]">
+                {ticket.user ? (
+                  <>
+                    {getUserAvatar(ticket.user) ? (
+                      <img 
+                        src={getUserAvatar(ticket.user) || ''} 
+                        alt={ticket.user.username}
+                        className="w-7 h-7 rounded-full object-cover border border-indigo-500/30 flex-shrink-0"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+                        <span className="text-[8px] text-white font-black">
+                          {getInitials(ticket.user.username)}
+                        </span>
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-white text-xs font-bold truncate">@{ticket.user.username}</p>
+                      <p className="text-[7px] text-slate-500 font-mono truncate">{ticket.user.email}</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-slate-500 to-slate-600 flex items-center justify-center flex-shrink-0">
+                      <span className="text-[8px] text-white font-black">
+                        {getInitials(ticket.name)}
+                      </span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-white text-xs font-bold truncate">{ticket.name}</p>
+                      <p className="text-[7px] text-slate-500 font-mono truncate">{ticket.email}</p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </td>
+            <td className="px-4 py-4">
+              <div className="flex justify-start">
+                {getPriorityBadge(ticket)}
+              </div>
+            </td>
+            <td className="px-4 py-4 max-w-[250px]">
+              <div className="space-y-1">
+                <p className="text-white text-xs font-bold truncate">
+                  {ticket.subject || 'Infrastructure Request'}
+                </p>
+                <p className="text-[10px] text-slate-400 line-clamp-1">
+                  {ticket.message}
+                </p>
+              </div>
+            </td>
+            <td className="px-4 py-4 text-center">
+              <div className="flex justify-center min-w-[80px]">
+                {getStatusBadge(ticket)}
+              </div>
+            </td>
+            <td className="px-4 py-4 text-center">
+              {ticket.admin_response ? (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-500/20 border border-emerald-500/30 rounded-full text-[8px] text-emerald-400 font-mono font-bold whitespace-nowrap">
+                  <Check size={8} /> Replied
+                </span>
+              ) : (
+                <span className="text-[8px] text-slate-500 font-mono">Pending</span>
+              )}
+            </td>
+            <td className="px-4 py-4">
+              <div className="flex flex-col whitespace-nowrap">
+                <span className="text-[9px] text-slate-400 font-mono">{formatDate(ticket.created_at)}</span>
+              </div>
+            </td>
+            <td className="px-4 py-4 text-center">
+              <div className="flex items-center justify-center gap-1.5">
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedTicket(ticket);
+                  }}
+                  className="p-2 bg-white/5 hover:bg-indigo-500/20 rounded-lg text-slate-400 hover:text-indigo-400 transition-all border border-transparent hover:border-indigo-500/30"
+                  title="View details"
+                >
+                  <Eye size={12} />
+                </motion.button>
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowDeleteConfirm(ticket.ticket_id);
+                  }}
+                  className="p-2 bg-white/5 hover:bg-rose-500/20 rounded-lg text-slate-400 hover:text-rose-400 transition-all border border-transparent hover:border-rose-500/30"
+                  title="Delete ticket"
+                >
+                  {isDeleting === ticket.ticket_id ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : (
+                    <Trash2 size={12} />
+                  )}
+                </motion.button>
+              </div>
+            </td>
+          </motion.tr>
+        );
+      }
+      
+      // Thêm các dòng trống phía dưới để đủ 10 dòng - KHÔNG CÓ gạch ngang
+      for (let i = tickets.length; i < totalRows; i++) {
+        rows.push(
+          <tr key={`empty-${i}`} className="pointer-events-none">
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] text-center border-none">&nbsp;</td>
+          </tr>
+        );
+      }
+    }
+
+    return rows;
   };
 
   return (
@@ -939,25 +1096,56 @@ export default function AdminContact() {
               <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/30 via-purple-500/30 to-indigo-500/30 rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-100 transition duration-700" />
               <div className="relative bg-gradient-to-br from-[#11111a] to-[#0c0c12] rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl overflow-hidden">
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-                <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                  <div className="flex flex-col gap-3">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full w-fit">
-                      <ShieldAlert size={12} className="text-indigo-400" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 font-mono">Support Center</span>
+                <div className="relative z-10 flex flex-col gap-6">
+                  {/* Row 1: Title + Badge (trên cùng) */}
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div className="flex flex-col gap-3">
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full w-fit">
+                        <ShieldAlert size={12} className="text-indigo-400" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 font-mono">Support Center</span>
+                      </div>
+                      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tighter uppercase text-white leading-none">
+                        Support <span className="text-indigo-400">Tickets</span>
+                      </h1>
+                      <p className="text-xs text-slate-500 max-w-2xl">
+                        Manage and respond to user support tickets. Track issues, provide solutions, and maintain customer satisfaction.
+                      </p>
                     </div>
-                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tighter uppercase text-white leading-none">
-                      Support <span className="text-indigo-400">Tickets</span>
-                    </h1>
-                    <p className="text-xs text-slate-500 max-w-2xl">
-                      Manage and respond to user support tickets. Track issues, provide solutions, and maintain customer satisfaction.
-                    </p>
                   </div>
-                  <div className="flex items-center gap-3 flex-wrap">
+                  
+                  {/* Row 2: Refresh button + các thông số khác (phía dưới) */}
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-white/10">
+                    <div className="flex items-center gap-6 text-[11px] font-mono text-slate-500 uppercase tracking-wider">
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-400">Total:</span>
+                        <span className="text-white font-bold">{stats.total}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-amber-400">●</span>
+                        <span>Open: {stats.open}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-blue-400">●</span>
+                        <span>In Progress: {stats.in_progress}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-emerald-400">●</span>
+                        <span>Resolved: {stats.resolved}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-400">●</span>
+                        <span>Closed: {stats.closed}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-rose-400">●</span>
+                        <span>High: {stats.high_priority}</span>
+                      </div>
+                    </div>
                     <motion.button 
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => { fetchTickets(); fetchStats(); }}
-                      className="bg-white/5 hover:bg-white/10 text-slate-300 font-mono text-[9px] font-black uppercase tracking-widest px-4 py-3 rounded-xl transition-all flex items-center gap-2 border border-white/10"
+                      className="bg-white/5 hover:bg-white/10 text-slate-300 font-mono text-[9px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 border border-white/10 hover:border-white/20"
                     >
                       <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> 
                       {loading ? "Loading..." : "Refresh"}
@@ -1113,198 +1301,51 @@ export default function AdminContact() {
                       <th className="px-4 py-4 w-28 text-center">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {tickets.length === 0 ? (
-                      <tr>
-                        <td colSpan={8} className="py-20 text-center">
-                          <div className="flex flex-col items-center gap-4">
-                            <div className="p-4 bg-indigo-500/10 rounded-2xl border border-indigo-500/20">
-                              <LifeBuoy size={32} className="text-indigo-400" />
-                            </div>
-                            <p className="text-slate-400 font-mono text-sm font-bold">No tickets found</p>
-                            <p className="text-slate-500 text-[9px] font-mono">Try adjusting your search or filters</p>
-                          </div>
-                        </td>
-                      </tr>
-                    ) : (
-                      tickets.map((ticket, idx) => (
-                        <motion.tr 
-                          key={ticket.ticket_id} 
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: Math.min(idx * 0.03, 0.3) }}
-                          className={`hover:bg-white/5 transition-all group cursor-pointer ${ticket.priority === 'urgent' ? 'bg-rose-500/5' : ''}`}
-                          onClick={() => setSelectedTicket(ticket)}
-                        >
-                          {/* ID */}
-                          <td className="px-4 py-4">
-                            <span className="text-indigo-400 font-black text-[11px] whitespace-nowrap">#{ticket.ticket_id}</span>
-                          </td>
-                          
-                          {/* User - với Avatar */}
-                          <td className="px-4 py-4">
-                            <div className="flex items-center gap-2 min-w-[140px]">
-                              {ticket.user ? (
-                                <>
-                                  {getUserAvatar(ticket.user) ? (
-                                    <img 
-                                      src={getUserAvatar(ticket.user) || ''} 
-                                      alt={ticket.user.username}
-                                      className="w-7 h-7 rounded-full object-cover border border-indigo-500/30 flex-shrink-0"
-                                      onError={(e) => {
-                                        e.currentTarget.style.display = 'none';
-                                      }}
-                                    />
-                                  ) : (
-                                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0">
-                                      <span className="text-[8px] text-white font-black">
-                                        {getInitials(ticket.user.username)}
-                                      </span>
-                                    </div>
-                                  )}
-                                  <div className="min-w-0">
-                                    <p className="text-white text-xs font-bold truncate">@{ticket.user.username}</p>
-                                    <p className="text-[7px] text-slate-500 font-mono truncate">{ticket.user.email}</p>
-                                  </div>
-                                </>
-                              ) : (
-                                <>
-                                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-slate-500 to-slate-600 flex items-center justify-center flex-shrink-0">
-                                    <span className="text-[8px] text-white font-black">
-                                      {getInitials(ticket.name)}
-                                    </span>
-                                  </div>
-                                  <div className="min-w-0">
-                                    <p className="text-white text-xs font-bold truncate">{ticket.name}</p>
-                                    <p className="text-[7px] text-slate-500 font-mono truncate">{ticket.email}</p>
-                                  </div>
-                                </>
-                              )}
-                            </div>
-                          </td>
-                          
-                          {/* Priority */}
-                          <td className="px-4 py-4">
-                            <div className="flex justify-start">
-                              {getPriorityBadge(ticket)}
-                            </div>
-                          </td>
-                          
-                          {/* Subject / Message */}
-                          <td className="px-4 py-4 max-w-[250px]">
-                            <div className="space-y-1">
-                              <p className="text-white text-xs font-bold truncate">
-                                {ticket.subject || 'Infrastructure Request'}
-                              </p>
-                              <p className="text-[10px] text-slate-400 line-clamp-1">
-                                {ticket.message}
-                              </p>
-                            </div>
-                          </td>
-                          
-                          {/* Status */}
-                          <td className="px-4 py-4 text-center">
-                            <div className="flex justify-center min-w-[80px]">
-                              {getStatusBadge(ticket)}
-                            </div>
-                          </td>
-                          
-                          {/* Response */}
-                          <td className="px-4 py-4 text-center">
-                            {ticket.admin_response ? (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-500/20 border border-emerald-500/30 rounded-full text-[8px] text-emerald-400 font-mono font-bold whitespace-nowrap">
-                                <Check size={8} /> Replied
-                              </span>
-                            ) : (
-                              <span className="text-[8px] text-slate-500 font-mono">Pending</span>
-                            )}
-                          </td>
-                          
-                          {/* Date */}
-                          <td className="px-4 py-4">
-                            <div className="flex flex-col whitespace-nowrap">
-                              <span className="text-[9px] text-slate-400 font-mono">{formatDate(ticket.created_at)}</span>
-                            </div>
-                          </td>
-                          
-                          {/* Actions */}
-                          <td className="px-4 py-4 text-center">
-                            <div className="flex items-center justify-center gap-1.5">
-                              <motion.button 
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedTicket(ticket);
-                                }}
-                                className="p-2 bg-white/5 hover:bg-indigo-500/20 rounded-lg text-slate-400 hover:text-indigo-400 transition-all border border-transparent hover:border-indigo-500/30"
-                                title="View details"
-                              >
-                                <Eye size={12} />
-                              </motion.button>
-                              <motion.button 
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setShowDeleteConfirm(ticket.ticket_id);
-                                }}
-                                className="p-2 bg-white/5 hover:bg-rose-500/20 rounded-lg text-slate-400 hover:text-rose-400 transition-all border border-transparent hover:border-rose-500/30"
-                                title="Delete ticket"
-                              >
-                                {isDeleting === ticket.ticket_id ? (
-                                  <Loader2 size={12} className="animate-spin" />
-                                ) : (
-                                  <Trash2 size={12} />
-                                )}
-                              </motion.button>
-                            </div>
-                          </td>
-                        </motion.tr>
-                      ))
-                    )}
+                  <tbody>
+                    {renderRows()}
                   </tbody>
                 </table>
               </div>
             </motion.div>
 
-            {/* Pagination */}
-            {pagination && pagination.total > 0 && (
-              <motion.div 
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2, duration: 0.4 }}
-                className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-xl p-4"
-              >
-                <div className="text-[8px] font-mono text-slate-500">
-                  Showing {((pagination.current_page - 1) * pagination.per_page) + 1} to{' '}
-                  {Math.min(pagination.current_page * pagination.per_page, pagination.total)} of {pagination.total} entries
-                </div>
-                <div className="flex items-center gap-1.5 flex-wrap justify-center">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    disabled={pagination.current_page === 1}
-                    className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
-                  >
-                    <ChevronLeft size={10} /> Prev
-                  </motion.button>
-                  
-                  {renderPaginationPages()}
-                  
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setCurrentPage(p => Math.min(pagination.last_page, p + 1))}
-                    disabled={pagination.current_page === pagination.last_page}
-                    className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
-                  >
-                    Next <ChevronRight size={10} />
-                  </motion.button>
-                </div>
-              </motion.div>
-            )}
+            {/* Pagination - Luôn hiển thị */}
+            <motion.div 
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+              className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-xl p-4"
+            >
+              <div className="text-[8px] font-mono text-slate-500">
+                {pagination && pagination.total > 0 ? (
+                  `Showing ${((pagination.current_page - 1) * pagination.per_page) + 1} to ${Math.min(pagination.current_page * pagination.per_page, pagination.total)} of ${pagination.total} entries`
+                ) : (
+                  `Showing 0 of 0 entries`
+                )}
+              </div>
+              <div className="flex items-center gap-1.5 flex-wrap justify-center">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={!pagination || pagination.current_page === 1 || pagination.total === 0}
+                  className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
+                >
+                  <ChevronLeft size={10} /> Prev
+                </motion.button>
+                
+                {renderPaginationPages()}
+                
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setCurrentPage(p => Math.min(pagination?.last_page || 1, p + 1))}
+                  disabled={!pagination || pagination.current_page === pagination.last_page || pagination.total === 0}
+                  className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
+                >
+                  Next <ChevronRight size={10} />
+                </motion.button>
+              </div>
+            </motion.div>
 
             {/* Ticket Detail Modal */}
             <AnimatePresence>

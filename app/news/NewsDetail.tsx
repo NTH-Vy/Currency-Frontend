@@ -1,3 +1,4 @@
+// NewsDetail.tsx - Responsive hoàn chỉnh
 "use client";
 
 import { useParams } from "next/navigation";
@@ -40,9 +41,9 @@ interface Article {
   content: string;
   image_url?: string;
   category: string;
-  author: { username: string }; // Đã sửa từ string sang object để khớp với code sử dụng
+  author: { username: string };
   created_at: string;
-  published_at?: string; // Thêm trường này vì có dùng ở dưới
+  published_at?: string;
   comments?: Comment[];
   views?: number;
 }
@@ -79,13 +80,13 @@ import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion";
 
 // Twitter và LinkedIn Icons
 const TwitterIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" className="sm:w-[20px] sm:h-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
   </svg>
 );
 
 const LinkedinIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" className="sm:w-[20px] sm:h-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
     <rect x="2" y="9" width="4" height="12" />
     <circle cx="4" cy="4" r="2" />
@@ -95,21 +96,21 @@ const LinkedinIcon = () => (
 // Skeleton Components
 const ArticleHeaderSkeleton = () => (
   <div className="mb-6">
-    <div className="flex flex-wrap items-center gap-3 mb-4">
-      <div className="h-7 w-24 bg-white/10 rounded-full animate-pulse" />
-      <div className="flex items-center gap-3">
-        <div className="h-4 w-20 bg-white/10 rounded animate-pulse" />
-        <div className="h-4 w-16 bg-white/10 rounded animate-pulse" />
+    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+      <div className="h-5 sm:h-7 w-20 sm:w-24 bg-white/10 rounded-full animate-pulse" />
+      <div className="flex items-center gap-2 sm:gap-3">
+        <div className="h-3 sm:h-4 w-16 sm:w-20 bg-white/10 rounded animate-pulse" />
+        <div className="h-3 sm:h-4 w-12 sm:w-16 bg-white/10 rounded animate-pulse" />
       </div>
     </div>
-    <div className="h-12 w-3/4 bg-white/10 rounded animate-pulse mb-4" />
-    <div className="h-12 w-1/2 bg-white/10 rounded animate-pulse mb-4" />
-    <div className="flex items-center gap-3 mt-4 pb-4 border-b border-white/10">
+    <div className="h-8 sm:h-10 lg:h-12 w-3/4 bg-white/10 rounded animate-pulse mb-3 sm:mb-4" />
+    <div className="h-8 sm:h-10 lg:h-12 w-1/2 bg-white/10 rounded animate-pulse mb-3 sm:mb-4" />
+    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-3 sm:mt-4 pb-3 sm:pb-4 border-b border-white/10">
       <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-white/10 animate-pulse" />
+        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white/10 animate-pulse" />
         <div className="flex flex-col gap-1">
-          <div className="h-4 w-24 bg-white/10 rounded animate-pulse" />
-          <div className="h-3 w-20 bg-white/10 rounded animate-pulse" />
+          <div className="h-3 sm:h-4 w-20 sm:w-24 bg-white/10 rounded animate-pulse" />
+          <div className="h-2 sm:h-3 w-16 sm:w-20 bg-white/10 rounded animate-pulse" />
         </div>
       </div>
     </div>
@@ -123,27 +124,27 @@ const FeaturedImageSkeleton = () => (
 );
 
 const ArticleContentSkeleton = () => (
-  <div className="space-y-4">
-    <div className="h-4 w-full bg-white/10 rounded animate-pulse" />
-    <div className="h-4 w-5/6 bg-white/10 rounded animate-pulse" />
-    <div className="h-4 w-4/6 bg-white/10 rounded animate-pulse" />
-    <div className="h-4 w-full bg-white/10 rounded animate-pulse" />
-    <div className="h-4 w-3/4 bg-white/10 rounded animate-pulse" />
-    <div className="h-4 w-5/6 bg-white/10 rounded animate-pulse" />
-    <div className="h-4 w-2/3 bg-white/10 rounded animate-pulse" />
-    <div className="h-4 w-full bg-white/10 rounded animate-pulse" />
+  <div className="space-y-3 sm:space-y-4">
+    <div className="h-3 sm:h-4 w-full bg-white/10 rounded animate-pulse" />
+    <div className="h-3 sm:h-4 w-5/6 bg-white/10 rounded animate-pulse" />
+    <div className="h-3 sm:h-4 w-4/6 bg-white/10 rounded animate-pulse" />
+    <div className="h-3 sm:h-4 w-full bg-white/10 rounded animate-pulse" />
+    <div className="h-3 sm:h-4 w-3/4 bg-white/10 rounded animate-pulse" />
+    <div className="h-3 sm:h-4 w-5/6 bg-white/10 rounded animate-pulse" />
+    <div className="h-3 sm:h-4 w-2/3 bg-white/10 rounded animate-pulse" />
+    <div className="h-3 sm:h-4 w-full bg-white/10 rounded animate-pulse" />
   </div>
 );
 
 const CommentsSkeleton = () => (
-  <div className="space-y-4">
+  <div className="space-y-3 sm:space-y-4">
     {[...Array(3)].map((_, i) => (
-      <div key={i} className="flex gap-3 p-4 bg-white/5 rounded-xl border border-white/10">
-        <div className="w-10 h-10 rounded-full bg-white/10 animate-pulse flex-shrink-0" />
+      <div key={i} className="flex gap-2 sm:gap-3 p-3 sm:p-4 bg-white/5 rounded-xl border border-white/10">
+        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/10 animate-pulse flex-shrink-0" />
         <div className="flex-1 space-y-2">
-          <div className="h-4 w-24 bg-white/10 rounded animate-pulse" />
-          <div className="h-3 w-full bg-white/10 rounded animate-pulse" />
-          <div className="h-3 w-4/5 bg-white/10 rounded animate-pulse" />
+          <div className="h-3 sm:h-4 w-20 sm:w-24 bg-white/10 rounded animate-pulse" />
+          <div className="h-2 sm:h-3 w-full bg-white/10 rounded animate-pulse" />
+          <div className="h-2 sm:h-3 w-4/5 bg-white/10 rounded animate-pulse" />
         </div>
       </div>
     ))}
@@ -151,13 +152,13 @@ const CommentsSkeleton = () => (
 );
 
 const RelatedNewsSkeleton = () => (
-  <div className="space-y-3">
+  <div className="space-y-2 sm:space-y-3">
     {[...Array(4)].map((_, i) => (
-      <div key={i} className="flex gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
-        <div className="w-20 h-14 bg-white/10 rounded-lg animate-pulse flex-shrink-0" />
+      <div key={i} className="flex gap-2 sm:gap-3 p-2 sm:p-3 bg-white/5 rounded-xl border border-white/10">
+        <div className="w-16 sm:w-20 h-11 sm:h-14 bg-white/10 rounded-lg animate-pulse flex-shrink-0" />
         <div className="flex-1 space-y-2">
-          <div className="h-3 w-full bg-white/10 rounded animate-pulse" />
-          <div className="h-3 w-2/3 bg-white/10 rounded animate-pulse" />
+          <div className="h-2 sm:h-3 w-full bg-white/10 rounded animate-pulse" />
+          <div className="h-2 sm:h-3 w-2/3 bg-white/10 rounded animate-pulse" />
         </div>
       </div>
     ))}
@@ -191,7 +192,7 @@ const CommentItem = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Tính toán độ thụt vào dựa trên depth
-  const indentLevel = depth > 0 ? `${depth * 44}px` : '0px';
+  const indentLevel = depth > 0 ? `${Math.min(depth * 32, 160)}px` : '0px';
 
   // Hàm xử lý khi bắt đầu reply
   const handleStartReply = () => {
@@ -200,15 +201,12 @@ const CommentItem = ({
       setReplyContent("");
     } else {
       setReplyingTo(comment.comment_id);
-      // Đặt nội dung reply với tag @username và khoảng trắng sau nó
       const username = comment.user?.username || 'user';
       setReplyContent(`@${username} `);
       
-      // Focus vào textarea sau khi state được cập nhật
       setTimeout(() => {
         if (textareaRef.current) {
           textareaRef.current.focus();
-          // Đặt cursor ở cuối text (sau dấu cách)
           const length = textareaRef.current.value.length;
           textareaRef.current.setSelectionRange(length, length);
         }
@@ -219,11 +217,9 @@ const CommentItem = ({
   // Hàm xử lý khi gõ trong textarea reply
   const handleReplyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    // Nếu đang reply và tag bị xóa hoặc thay đổi, tự động thêm lại
     if (replyingTo && value.trim().length === 0) {
       const username = comment.user?.username || 'user';
       setReplyContent(`@${username} `);
-      // Đặt cursor sau tag
       setTimeout(() => {
         if (textareaRef.current) {
           const length = textareaRef.current.value.length;
@@ -237,7 +233,6 @@ const CommentItem = ({
 
   // Hàm render nội dung với tag được bôi màu
   const renderContentWithHighlight = (content: string) => {
-    // Tìm tất cả các tag @username trong nội dung
     const parts = content.split(/(@\w+)/g);
     return parts.map((part, index) => {
       if (part.startsWith('@')) {
@@ -253,7 +248,8 @@ const CommentItem = ({
 
   return (
     <div
-      className={`relative ${depth > 0 ? 'mt-2' : 'mb-4'}`}
+      id={`comment-${comment.comment_id}`}
+      className={`relative ${depth > 0 ? 'mt-2' : 'mb-3 sm:mb-4'}`}
       style={{ marginLeft: depth > 0 ? indentLevel : '0' }}
       tabIndex={0}
       role="article"
@@ -268,52 +264,51 @@ const CommentItem = ({
       {/* Đường kẻ dọc cho replies - style Facebook */}
       {depth > 0 && (
         <div 
-          className="absolute left-0 top-0 bottom-0 w-0.5 bg-indigo-500/20 rounded-full"
-          style={{ left: '16px' }}
+          className="absolute left-3 sm:left-4 top-0 bottom-0 w-0.5 bg-indigo-500/20 rounded-full"
         />
       )}
 
       {/* Comment Card - style Facebook */}
-      <div className="flex gap-3">
+      <div className="flex gap-2 sm:gap-3">
         {/* Avatar */}
         <div className="flex-shrink-0">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <User size={16} className="text-white" />
+          <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <User size={12} className="sm:w-[16px] sm:h-[16px] text-white" />
           </div>
         </div>
 
         {/* Comment Body */}
         <div className="flex-1 min-w-0">
-          <div className={`${depth > 0 ? 'bg-[#1a1a24]' : 'bg-[#18181f]'} rounded-2xl px-4 py-2.5 border border-white/5`}>
+          <div className={`${depth > 0 ? 'bg-[#1a1a24]' : 'bg-[#18181f]'} rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 border border-white/5`}>
             {/* Header: Username + Time + Rating */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm font-semibold text-white hover:underline cursor-pointer">
+            <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+              <span className="text-xs sm:text-sm font-semibold text-white hover:underline cursor-pointer">
                 {comment.user?.username || 'Anonymous'}
               </span>
               {comment.user?.user_id === currentUserId && (
-                <span className="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full border border-emerald-500/20">
+                <span className="text-[7px] sm:text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-1 sm:px-1.5 py-0.5 rounded-full border border-emerald-500/20">
                   You
                 </span>
               )}
               {depth > 0 && comment.parent_user?.username && (
-                <span className="text-[9px] font-mono text-indigo-300 bg-indigo-500/10 px-1.5 py-0.5 rounded-full border border-indigo-500/20">
+                <span className="text-[7px] sm:text-[9px] font-mono text-indigo-300 bg-indigo-500/10 px-1 sm:px-1.5 py-0.5 rounded-full border border-indigo-500/20">
                   @{comment.parent_user.username}
                 </span>
               )}
-              <span className="text-[10px] text-slate-500">·</span>
-              <span className="text-[10px] text-slate-500">
+              <span className="text-[8px] sm:text-[10px] text-slate-500">·</span>
+              <span className="text-[8px] sm:text-[10px] text-slate-500">
                 {new Date(comment.created_at).toLocaleDateString('vi-VN', { 
                   day: '2-digit', 
                   month: '2-digit', 
                   year: 'numeric' 
                 })}
               </span>
-              {comment.rating && (
+              {comment.rating && !comment.parent_comment_id && (
                 <>
-                  <span className="text-[10px] text-slate-600">·</span>
+                  <span className="text-[8px] sm:text-[10px] text-slate-600">·</span>
                   <div className="flex items-center gap-0.5">
-                    <Star size={10} className="text-yellow-500 fill-yellow-500" />
-                    <span className="text-[9px] text-slate-400">{comment.rating}</span>
+                    <Star size={8} className="sm:w-[10px] sm:h-[10px] text-yellow-500 fill-yellow-500" />
+                    <span className="text-[7px] sm:text-[9px] text-slate-400">{comment.rating}</span>
                   </div>
                 </>
               )}
@@ -325,53 +320,53 @@ const CommentItem = ({
                 <textarea
                   value={editContent}
                   onChange={(e) => setEditContent(e.target.value)}
-                  className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-slate-200 text-sm outline-none focus:border-indigo-500/50 resize-none min-h-[60px]"
+                  className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-slate-200 text-xs sm:text-sm outline-none focus:border-indigo-500/50 resize-none min-h-[50px] sm:min-h-[60px]"
                   placeholder="Edit your comment..."
                   autoFocus
                 />
                 <div className="flex gap-2 justify-end">
                   <button
                     onClick={onCancelEdit}
-                    className="px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+                    className="px-2 sm:px-3 py-1 rounded-lg text-[10px] sm:text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={() => onSaveEdit(comment.comment_id)}
-                    className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition-all"
+                    className="px-2 sm:px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] sm:text-xs font-medium transition-all"
                   >
                     Save
                   </button>
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-slate-200 leading-relaxed mt-0.5 break-words">
+              <p className="text-xs sm:text-sm text-slate-200 leading-relaxed mt-0.5 break-words">
                 {renderContentWithHighlight(comment.content)}
               </p>
             )}
           </div>
 
           {/* Action Buttons - style Facebook */}
-          <div className="flex items-center gap-1 mt-0.5 ml-1">
+          <div className="flex flex-wrap items-center gap-0.5 mt-0.5 ml-0.5 sm:ml-1">
             <button
               onClick={() => onLike(comment.comment_id)}
-              className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium transition-all hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 ${
+              className={`flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-medium transition-all hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 ${
                 comment.is_liked
                   ? 'text-indigo-400'
                   : 'text-slate-500 hover:text-slate-300'
               }`}
               aria-label={`Like comment by ${comment.user?.username || 'Anonymous'}`}
             >
-              <ThumbsUp size={12} className={comment.is_liked ? 'fill-indigo-400' : ''} />
+              <ThumbsUp size={10} className="sm:w-[12px] sm:h-[12px] ${comment.is_liked ? 'fill-indigo-400' : ''}" />
               <span>{comment.likes || 0}</span>
             </button>
 
             <button
               onClick={handleStartReply}
-              className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+              className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-medium text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
               aria-label={`Reply to comment by ${comment.user?.username || 'Anonymous'}`}
             >
-              <MessageCircle size={12} />
+              <MessageCircle size={10} className="sm:w-[12px] sm:h-[12px]" />
               Reply
             </button>
 
@@ -379,10 +374,10 @@ const CommentItem = ({
             {comment.user?.user_id !== currentUserId && (
               <button
                 onClick={() => onReport(comment.comment_id, comment.user?.username)}
-                className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all focus:outline-none focus:ring-2 focus:ring-red-500/50"
+                className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-medium text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all focus:outline-none focus:ring-2 focus:ring-red-500/50"
                 aria-label={`Report comment by ${comment.user?.username || 'Anonymous'}`}
               >
-                <Flag size={12} />
+                <Flag size={10} className="sm:w-[12px] sm:h-[12px]" />
               </button>
             )}
 
@@ -391,21 +386,21 @@ const CommentItem = ({
               <>
                 <button
                   onClick={() => onEdit(comment)}
-                  className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                  className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                   aria-label="Edit your comment"
                 >
-                  <Edit size={12} />
+                  <Edit size={10} className="sm:w-[12px] sm:h-[12px]" />
                 </button>
                 <button
                   onClick={() => onDelete(comment.comment_id)}
                   disabled={isDeleting === comment.comment_id}
-                  className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-red-500/50"
+                  className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-medium text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-red-500/50"
                   aria-label="Delete your comment"
                 >
                   {isDeleting === comment.comment_id ? (
-                    <Loader2 size={12} className="animate-spin" />
+                    <Loader2 size={10} className="sm:w-[12px] sm:h-[12px] animate-spin" />
                   ) : (
-                    <Trash2 size={12} />
+                    <Trash2 size={10} className="sm:w-[12px] sm:h-[12px]" />
                   )}
                 </button>
               </>
@@ -414,19 +409,19 @@ const CommentItem = ({
 
           {/* Reply Form - với tag @username được bôi màu */}
           {replyingTo === comment.comment_id && (
-            <div className="mt-2 ml-1">
+            <div className="mt-2 ml-0.5 sm:ml-1">
               <div className="flex gap-2 items-start">
-                <div className="flex-shrink-0">
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-                    <User size={12} className="text-white" />
+                <div className="flex-shrink-0 hidden sm:block">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+                    <User size={10} className="sm:w-[12px] sm:h-[12px] text-white" />
                   </div>
                 </div>
-                <div className="flex-1 bg-[#1a1a24] rounded-2xl px-3 py-2 border border-white/5">
+                <div className="flex-1 bg-[#1a1a24] rounded-2xl px-2 sm:px-3 py-1.5 sm:py-2 border border-white/5">
                   <textarea
                     ref={textareaRef}
                     value={replyContent}
                     onChange={handleReplyChange}
-                    className="w-full bg-transparent border-none text-slate-200 text-sm outline-none resize-none min-h-[40px] placeholder:text-slate-600"
+                    className="w-full bg-transparent border-none text-slate-200 text-xs sm:text-sm outline-none resize-none min-h-[32px] sm:min-h-[40px] placeholder:text-slate-600"
                     placeholder={`Reply to ${comment.user?.username}...`}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.shiftKey) {
@@ -441,16 +436,16 @@ const CommentItem = ({
                         setReplyingTo(null);
                         setReplyContent("");
                       }}
-                      className="px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+                      className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={(e) => onSubmitReply(e, comment.comment_id)}
                       disabled={isSubmittingReply || !replyContent.trim() || replyContent === `@${comment.user?.username} `}
-                      className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                      className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] sm:text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-0.5 sm:gap-1"
                     >
-                      {isSubmittingReply ? <Loader2 className="animate-spin" size={12} /> : <Send size={12} />}
+                      {isSubmittingReply ? <Loader2 className="animate-spin sm:w-[12px] sm:h-[12px]" size={10} /> : <Send size={10} className="sm:w-[12px] sm:h-[12px]" />}
                       Reply
                     </button>
                   </div>
@@ -466,13 +461,13 @@ const CommentItem = ({
         <div className="mt-1">
           <button
             onClick={() => setShowReplies(!showReplies)}
-            className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-indigo-400 transition-colors mb-1 ml-12"
+            className="flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs font-medium text-slate-500 hover:text-indigo-400 transition-colors mb-1 ml-10 sm:ml-12"
           >
-            {showReplies ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            {showReplies ? <ChevronUp size={12} className="sm:w-[14px] sm:h-[14px]" /> : <ChevronDown size={12} className="sm:w-[14px] sm:h-[14px]" />}
             {showReplies ? 'Hide' : 'View'} {comment.replies.length} {comment.replies.length === 1 ? 'reply' : 'replies'}
           </button>
           {showReplies && (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {comment.replies.map((reply: any) => (
                 <CommentItem
                   key={reply.comment_id}
@@ -551,11 +546,10 @@ export default function NewsDetailPage() {
 
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
-  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // Constants
-  const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes cache TTL
-  const COMMENT_SUBMISSION_COOLDOWN_MS = 2000; // 2 seconds cooldown
+  const CACHE_TTL_MS = 5 * 60 * 1000;
+  const COMMENT_SUBMISSION_COOLDOWN_MS = 2000;
   const INTERSECTION_THRESHOLD = 0.1;
   const TOAST_DURATION_MS = 3000;
   const COPY_FEEDBACK_DURATION_MS = 2000;
@@ -600,7 +594,6 @@ export default function NewsDetailPage() {
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
       try {
-        // Fetch all data in parallel using Promise.all
         const [
           articleData,
           commentsData,
@@ -609,7 +602,6 @@ export default function NewsDetailPage() {
           currentUserData,
           banStatusData
         ] = await Promise.allSettled([
-          // Fetch article
           (async () => {
             const cacheKey = `article_${params.id}`;
             const cachedData = getCachedData(cacheKey);
@@ -628,7 +620,6 @@ export default function NewsDetailPage() {
             return data;
           })(),
 
-          // Fetch comments (first page only)
           (async () => {
             const cacheKey = `comments_${params.id}_page_1`;
             const cachedData = getCachedData(cacheKey);
@@ -637,7 +628,7 @@ export default function NewsDetailPage() {
               return cachedData;
             }
 
-            const res = await fetch(`${API_BASE}/news/${params.id}/comments?page=1`, { headers });
+            const res = await fetch(`${API_BASE}/news/${params.id}/comments?page=1&per_page=5`, { headers });
             const data = await res.json();
             if (data && data.success) {
               setCachedData(cacheKey, data);
@@ -645,7 +636,6 @@ export default function NewsDetailPage() {
             return data;
           })(),
 
-          // Fetch related news
           (async () => {
             const cacheKey = `related_${params.id}`;
             const cachedData = getCachedData(cacheKey);
@@ -662,14 +652,12 @@ export default function NewsDetailPage() {
             return data;
           })(),
 
-          // Fetch top comments
           (async () => {
             const res = await fetch(`${API_BASE}/news/${params.id}/top-comments`, { headers });
             const data = await res.json();
             return data;
           })(),
 
-          // Fetch current user
           (async () => {
             if (!token) return null;
             const res = await fetch(`${API_BASE}/user`, {
@@ -682,7 +670,6 @@ export default function NewsDetailPage() {
             return null;
           })(),
 
-          // Check ban status
           (async () => {
             if (!token) return null;
             const res = await fetch(`${API_BASE}/user/ban-status`, {
@@ -693,14 +680,12 @@ export default function NewsDetailPage() {
           })()
         ]);
 
-        // Handle results
         if (articleData.status === 'fulfilled' && articleData.value && articleData.value.news) {
           setArticle({ ...articleData.value.news, comments: [] });
           setIsFavorited(articleData.value.is_favorited);
         }
 
         if (commentsData.status === 'fulfilled' && commentsData.value && commentsData.value.success) {
-          // FIX: Thêm kiểm tra điều kiện prev khác null
           setArticle(prev => prev ? { ...prev, comments: commentsData.value.data || [] } : null);
           setCommentPagination(commentsData.value.pagination);
           setHasMoreComments(commentsData.value.pagination?.current_page < commentsData.value.pagination?.last_page);
@@ -733,16 +718,9 @@ export default function NewsDetailPage() {
     fetchInitialData();
   }, [params.id]);
 
-  const loadMoreComments = useCallback(() => {
-    if (!isLoadingMoreComments && hasMoreComments) {
-      setCommentPage(prev => prev + 1);
-    }
-  }, [isLoadingMoreComments, hasMoreComments]);
-
-  // Separate useEffect for load more comments (triggered by intersection observer)
   useEffect(() => {
     const fetchComments = async () => {
-      if (!params.id || commentPage === 1) return; // Skip first page (already loaded)
+      if (!params.id) return;
 
       setIsLoadingMoreComments(true);
       try {
@@ -750,8 +728,7 @@ export default function NewsDetailPage() {
         const cachedData = getCachedData(cacheKey);
 
         if (cachedData) {
-          // FIX: Thêm kiểm tra điều kiện prev khác null
-          setArticle(prev => prev ? { ...prev, comments: [...(prev.comments || []), ...cachedData.data] } : null);
+          setArticle(prev => prev ? { ...prev, comments: cachedData.data } : null);
           setCommentPagination(cachedData.pagination);
           setHasMoreComments(cachedData.pagination?.current_page < cachedData.pagination?.last_page);
           return;
@@ -761,18 +738,17 @@ export default function NewsDetailPage() {
         const headers: any = { "Accept": "application/json" };
         if (token) headers["Authorization"] = `Bearer ${token}`;
 
-        const res = await fetch(`${API_BASE}/news/${params.id}/comments?page=${commentPage}`, { headers });
+        const res = await fetch(`${API_BASE}/news/${params.id}/comments?page=${commentPage}&per_page=5`, { headers });
         const data = await res.json();
 
         if (data && data.success) {
-          // FIX: Thêm kiểm tra điều kiện prev khác null
-          setArticle(prev => prev ? { ...prev, comments: [...(prev.comments || []), ...data.data] } : null);
+          setArticle(prev => prev ? { ...prev, comments: data.data } : null);
           setCommentPagination(data.pagination);
           setHasMoreComments(data.pagination?.current_page < data.pagination?.last_page);
           setCachedData(cacheKey, data);
         }
       } catch (error) {
-        console.error("Error loading more comments:", error);
+        console.error("Error loading comments:", error);
       } finally {
         setIsLoadingMoreComments(false);
       }
@@ -781,26 +757,28 @@ export default function NewsDetailPage() {
     fetchComments();
   }, [params.id, commentPage]);
 
+  // Auto-scroll to comment when URL has hash anchor
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMoreComments && !isLoadingMoreComments) {
-          loadMoreComments();
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#comment-')) {
+      const commentId = hash.replace('#comment-', '');
+      const scrollToComment = () => {
+        const element = document.getElementById(`comment-${commentId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Highlight effect
+          element.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2', 'ring-offset-[#02020a]');
+          setTimeout(() => {
+            element.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2', 'ring-offset-[#02020a]');
+          }, 2000);
         }
-      },
-      { threshold: INTERSECTION_THRESHOLD }
-    );
+      };
 
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
+      // Wait for comments to load
+      const timer = setTimeout(scrollToComment, 500);
+      return () => clearTimeout(timer);
     }
-
-    return () => {
-      if (loadMoreRef.current) {
-        observer.unobserve(loadMoreRef.current);
-      }
-    };
-  }, [hasMoreComments, isLoadingMoreComments, loadMoreComments]);
+  }, [article]);
 
   const handleToggleFavorite = async () => {
     const token = localStorage.getItem("token");
@@ -828,7 +806,6 @@ export default function NewsDetailPage() {
       return;
     }
 
-    // Kiểm tra user bị ban
     if (userBanStatus?.banned) {
       showToast(`You are banned from commenting: ${userBanStatus.ban_reason}`, "error");
       return;
@@ -836,7 +813,6 @@ export default function NewsDetailPage() {
 
     if (!comment.trim()) return;
 
-    // Check cooldown to prevent spam
     const now = Date.now();
     if (now - lastCommentSubmissionTime.current < COMMENT_SUBMISSION_COOLDOWN_MS) {
       const remainingTime = Math.ceil((COMMENT_SUBMISSION_COOLDOWN_MS - (now - lastCommentSubmissionTime.current)) / 1000);
@@ -844,9 +820,8 @@ export default function NewsDetailPage() {
       return;
     }
 
-    // Create optimistic comment
     const optimisticComment = {
-      comment_id: Date.now(), // Temporary ID
+      comment_id: Date.now(),
       content: comment,
       rating: rating,
       user: {
@@ -857,11 +832,9 @@ export default function NewsDetailPage() {
       is_liked: false,
       created_at: new Date().toISOString(),
       replies: [],
-      is_optimistic: true, // Flag to identify optimistic comments
+      is_optimistic: true,
     };
 
-    // Add optimistic comment immediately
-    // FIX: Thêm kiểm tra điều kiện prev khác null
     setArticle(prev => prev ? {
       ...prev,
       comments: [optimisticComment, ...(prev.comments || [])]
@@ -871,7 +844,6 @@ export default function NewsDetailPage() {
     setComment("");
     setRating(5);
 
-    // Update last submission time
     lastCommentSubmissionTime.current = Date.now();
 
     setIsSubmitting(true);
@@ -883,8 +855,6 @@ export default function NewsDetailPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        // Replace optimistic comment with real server response
-        // FIX: Thêm kiểm tra điều kiện prev khác null
         setArticle(prev => prev ? {
           ...prev,
           comments: prev.comments?.map(c =>
@@ -895,42 +865,30 @@ export default function NewsDetailPage() {
         const articleId = Array.isArray(params.id) ? params.id[0] : params.id;
         track('comment_submit', { article_id: String(articleId) });
       } else if (res.status === 403) {
-        // User bị ban - remove optimistic comment
-        // FIX: Thêm kiểm tra điều kiện prev khác null
         setArticle(prev => prev ? {
           ...prev,
           comments: prev.comments?.filter(c => !c.is_optimistic) || []
         } : null);
         showToast(data.message || "You are banned from commenting", "error");
         setUserBanStatus(data);
-        // Restore comment text
         setComment(originalComment);
-        // Reset cooldown on error
         lastCommentSubmissionTime.current = 0;
       } else {
-        // Other error - remove optimistic comment
-        // FIX: Thêm kiểm tra điều kiện prev khác null
         setArticle(prev => prev ? {
           ...prev,
           comments: prev.comments?.filter(c => !c.is_optimistic) || []
         } : null);
         showToast(data.message || "Failed to post comment", "error");
-        // Restore comment text
         setComment(originalComment);
-        // Reset cooldown on error
         lastCommentSubmissionTime.current = 0;
       }
     } catch (error) {
-      // Network error - remove optimistic comment
-      // FIX: Thêm kiểm tra điều kiện prev khác null
       setArticle(prev => prev ? {
         ...prev,
         comments: prev.comments?.filter(c => !c.is_optimistic) || []
       } : null);
       showToast("Failed to post comment. Please try again.", "error");
-      // Restore comment text
       setComment(originalComment);
-      // Reset cooldown on error
       lastCommentSubmissionTime.current = 0;
     } finally { setIsSubmitting(false); }
   };
@@ -951,7 +909,6 @@ export default function NewsDetailPage() {
         headers: { "Authorization": `Bearer ${token}` }
       });
       if (res.ok) {
-        // Remove comment from nested structure
         const removeComment = (comments: any[], id: number): any[] => {
           return comments.filter((c: any) => {
             if (c.comment_id === id) return false;
@@ -961,7 +918,6 @@ export default function NewsDetailPage() {
             return true;
           });
         };
-        // FIX: Thêm kiểm tra điều kiện prev khác null
         setArticle(prev => prev ? {
           ...prev,
           comments: removeComment(prev.comments || [], commentId)
@@ -992,7 +948,6 @@ export default function NewsDetailPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        // Update comment in nested structure
         const updateComment = (comments: any[]): any[] => {
           return comments.map((c: any) => {
             if (c.comment_id === commentId) {
@@ -1004,7 +959,6 @@ export default function NewsDetailPage() {
             return c;
           });
         };
-        // FIX: Thêm kiểm tra điều kiện prev khác null
         setArticle(prev => prev ? {
           ...prev,
           comments: updateComment(prev.comments || [])
@@ -1038,7 +992,6 @@ export default function NewsDetailPage() {
       const data = await res.json();
       
       if (res.ok) {
-        // Update like in nested structure
         const updateLike = (comments: any[]): any[] => {
           return comments.map((c: any) => {
             if (c.comment_id === commentId) {
@@ -1050,7 +1003,6 @@ export default function NewsDetailPage() {
             return c;
           });
         };
-        // FIX: Thêm kiểm tra điều kiện prev khác null
         setArticle(prev => prev ? {
           ...prev,
           comments: updateLike(prev.comments || [])
@@ -1076,7 +1028,6 @@ export default function NewsDetailPage() {
     }
     if (!replyContent.trim()) return;
 
-    // Check cooldown to prevent spam
     const now = Date.now();
     if (now - lastCommentSubmissionTime.current < COMMENT_SUBMISSION_COOLDOWN_MS) {
       const remainingTime = Math.ceil((COMMENT_SUBMISSION_COOLDOWN_MS - (now - lastCommentSubmissionTime.current)) / 1000);
@@ -1084,9 +1035,8 @@ export default function NewsDetailPage() {
       return;
     }
 
-    // Create optimistic reply
     const optimisticReply = {
-      comment_id: Date.now(), // Temporary ID
+      comment_id: Date.now(),
       content: replyContent,
       rating: 5,
       user: {
@@ -1097,10 +1047,9 @@ export default function NewsDetailPage() {
       is_liked: false,
       created_at: new Date().toISOString(),
       replies: [],
-      is_optimistic: true, // Flag to identify optimistic comments
+      is_optimistic: true,
     };
 
-    // Add optimistic reply immediately
     const addOptimisticReply = (comments: any[]): any[] => {
       return comments.map((c: any) => {
         if (c.comment_id === parentCommentId) {
@@ -1112,7 +1061,6 @@ export default function NewsDetailPage() {
         return c;
       });
     };
-    // FIX: Thêm kiểm tra điều kiện prev khác null
     setArticle(prev => prev ? {
       ...prev,
       comments: addOptimisticReply(prev.comments || [])
@@ -1122,7 +1070,6 @@ export default function NewsDetailPage() {
     setReplyContent("");
     setReplyingTo(null);
 
-    // Update last submission time
     lastCommentSubmissionTime.current = Date.now();
 
     setIsSubmittingReply(true);
@@ -1134,7 +1081,6 @@ export default function NewsDetailPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        // Replace optimistic reply with real server response
         const replaceOptimisticReply = (comments: any[]): any[] => {
           return comments.map((c: any) => {
             if (c.comment_id === parentCommentId) {
@@ -1151,14 +1097,12 @@ export default function NewsDetailPage() {
             return c;
           });
         };
-        // FIX: Thêm kiểm tra điều kiện prev khác null
         setArticle(prev => prev ? {
           ...prev,
           comments: replaceOptimisticReply(prev.comments || [])
         } : null);
         showToast("Reply posted successfully!", "success");
       } else if (res.status === 403) {
-        // User bị ban - remove optimistic reply
         const removeOptimisticReply = (comments: any[]): any[] => {
           return comments.map((c: any) => {
             if (c.comment_id === parentCommentId) {
@@ -1173,20 +1117,16 @@ export default function NewsDetailPage() {
             return c;
           });
         };
-        // FIX: Thêm kiểm tra điều kiện prev khác null
         setArticle(prev => prev ? {
           ...prev,
           comments: removeOptimisticReply(prev.comments || [])
         } : null);
         showToast(data.message || "You are banned from commenting", "error");
         setUserBanStatus(data);
-        // Restore reply text
         setReplyContent(originalReplyContent);
         setReplyingTo(parentCommentId);
-        // Reset cooldown on error
         lastCommentSubmissionTime.current = 0;
       } else {
-        // Other error - remove optimistic reply
         const removeOptimisticReply = (comments: any[]): any[] => {
           return comments.map((c: any) => {
             if (c.comment_id === parentCommentId) {
@@ -1201,20 +1141,16 @@ export default function NewsDetailPage() {
             return c;
           });
         };
-        // FIX: Thêm kiểm tra điều kiện prev khác null
         setArticle(prev => prev ? {
           ...prev,
           comments: removeOptimisticReply(prev.comments || [])
         } : null);
         showToast(data.message || "Failed to post reply", "error");
-        // Restore reply text
         setReplyContent(originalReplyContent);
         setReplyingTo(parentCommentId);
-        // Reset cooldown on error
         lastCommentSubmissionTime.current = 0;
       }
     } catch (error) {
-      // Network error - remove optimistic reply
       const removeOptimisticReply = (comments: any[]): any[] => {
         return comments.map((c: any) => {
           if (c.comment_id === parentCommentId) {
@@ -1229,21 +1165,17 @@ export default function NewsDetailPage() {
           return c;
         });
       };
-      // FIX: Thêm kiểm tra điều kiện prev khác null
       setArticle(prev => prev ? {
         ...prev,
         comments: removeOptimisticReply(prev.comments || [])
       } : null);
       showToast("Failed to post reply. Please try again.", "error");
-      // Restore reply text
       setReplyContent(originalReplyContent);
       setReplyingTo(parentCommentId);
-      // Reset cooldown on error
       lastCommentSubmissionTime.current = 0;
     } finally { setIsSubmittingReply(false); }
   };
 
-  // Handle Report
   const handleOpenReport = (commentId: number, username: string) => {
     setReportingCommentId(commentId);
     setReportingUsername(username);
@@ -1356,7 +1288,6 @@ export default function NewsDetailPage() {
     }
   };
 
-  // Function to count total comments including replies
   const countTotalComments = (comments: any[]): number => {
     let total = comments.length;
     comments.forEach(comment => {
@@ -1370,16 +1301,16 @@ export default function NewsDetailPage() {
   if (loading) return (
     <div className="min-h-screen bg-gradient-to-br from-[#02020a] via-[#050510] to-[#02020a] text-slate-100 selection:bg-indigo-500/30 font-sans overflow-x-hidden">
       <Header />
-      <main className="pt-32 pb-20 relative px-4 sm:px-6 lg:px-8">
+      <main className="pt-28 sm:pt-32 pb-16 sm:pb-20 relative px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="grid lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-8 flex flex-col gap-8">
+          <div className="grid lg:grid-cols-12 gap-6 sm:gap-8">
+            <div className="lg:col-span-8 flex flex-col gap-6 sm:gap-8">
               <ArticleHeaderSkeleton />
               <FeaturedImageSkeleton />
               <ArticleContentSkeleton />
               <CommentsSkeleton />
             </div>
-            <div className="lg:col-span-4 space-y-6">
+            <div className="hidden lg:block lg:col-span-4 space-y-4 sm:space-y-6">
               <RelatedNewsSkeleton />
             </div>
           </div>
@@ -1390,12 +1321,12 @@ export default function NewsDetailPage() {
   );
 
   if (!article) return (
-    <div className="min-h-screen bg-gradient-to-br from-[#02020a] via-[#050510] to-[#02020a] flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-[#02020a] via-[#050510] to-[#02020a] flex items-center justify-center px-4">
       <div className="text-center">
-        <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-          <AlertCircle size={40} className="text-red-400" />
+        <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+          <AlertCircle size={32} className="sm:w-[40px] sm:h-[40px] text-red-400" />
         </div>
-        <p className="text-slate-400 font-mono text-xs uppercase tracking-widest">Article Not Found.</p>
+        <p className="text-slate-400 font-mono text-[10px] sm:text-xs uppercase tracking-widest">Article Not Found.</p>
       </div>
     </div>
   );
@@ -1421,16 +1352,16 @@ export default function NewsDetailPage() {
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 100, scale: 0.9 }}
             transition={{ duration: 0.3, type: "spring", stiffness: 400 }}
-            className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl border backdrop-blur-xl flex items-center gap-3 shadow-2xl ${
+            className={`fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 px-3 sm:px-4 py-2 sm:py-3 rounded-xl border backdrop-blur-xl flex items-center gap-2 sm:gap-3 shadow-2xl text-xs sm:text-sm ${
               toast.type === 'success' ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-200' :
               toast.type === 'error' ? 'bg-red-500/15 border-red-500/40 text-red-200' :
               'bg-indigo-500/15 border-indigo-500/40 text-indigo-200'
             }`}
           >
-            {toast.type === 'success' && <CheckCircle2 size={16} />}
-            {toast.type === 'error' && <AlertCircle size={16} />}
-            {toast.type === 'info' && <Sparkles size={16} />}
-            <p className="text-sm font-medium">{toast.message}</p>
+            {toast.type === 'success' && <CheckCircle2 size={14} className="sm:w-[16px] sm:h-[16px]" />}
+            {toast.type === 'error' && <AlertCircle size={14} className="sm:w-[16px] sm:h-[16px]" />}
+            {toast.type === 'info' && <Sparkles size={14} className="sm:w-[16px] sm:h-[16px]" />}
+            <p className="text-xs sm:text-sm font-medium">{toast.message}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -1448,7 +1379,7 @@ export default function NewsDetailPage() {
                 setShareModalOpen(false);
               }
             }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4"
             role="dialog"
             aria-modal="true"
             aria-labelledby="share-modal-title"
@@ -1458,7 +1389,7 @@ export default function NewsDetailPage() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl p-6 w-full max-w-sm"
+              className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl p-5 sm:p-6 w-full max-w-sm"
               ref={(el) => {
                 if (el) {
                   const focusableElements = el.querySelectorAll('button');
@@ -1468,45 +1399,45 @@ export default function NewsDetailPage() {
                 }
               }}
             >
-              <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center justify-between mb-4 sm:mb-5">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-indigo-500/10 rounded-lg">
-                    <Share2 size={16} className="text-indigo-400" />
+                  <div className="p-1.5 sm:p-2 bg-indigo-500/10 rounded-lg">
+                    <Share2 size={14} className="sm:w-[16px] sm:h-[16px] text-indigo-400" />
                   </div>
-                  <h3 id="share-modal-title" className="text-sm font-black text-white font-mono uppercase">Share Intel</h3>
+                  <h3 id="share-modal-title" className="text-xs sm:text-sm font-black text-white font-mono uppercase">Share Intel</h3>
                 </div>
                 <button
                   onClick={() => setShareModalOpen(false)}
                   className="text-slate-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 rounded-lg p-1"
                   aria-label="Close share modal"
                 >
-                  <X size={16} />
+                  <X size={14} className="sm:w-[16px] sm:h-[16px]" />
                 </button>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 <button
                   onClick={() => handleShare('twitter')}
-                  className="flex flex-col items-center gap-2 p-3 bg-white/5 border border-white/10 rounded-xl hover:border-sky-500/30 hover:bg-sky-500/10 transition-all group focus:outline-none focus:ring-2 focus:ring-sky-500/50"
+                  className="flex flex-col items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-white/5 border border-white/10 rounded-xl hover:border-sky-500/30 hover:bg-sky-500/10 transition-all group focus:outline-none focus:ring-2 focus:ring-sky-500/50"
                   aria-label="Share on Twitter"
                 >
                   <TwitterIcon />
-                  <span className="text-[8px] font-mono text-slate-400 group-hover:text-sky-400">Twitter</span>
+                  <span className="text-[7px] sm:text-[8px] font-mono text-slate-400 group-hover:text-sky-400">Twitter</span>
                 </button>
                 <button
                   onClick={() => handleShare('linkedin')}
-                  className="flex flex-col items-center gap-2 p-3 bg-white/5 border border-white/10 rounded-xl hover:border-blue-500/30 hover:bg-blue-500/10 transition-all group focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  className="flex flex-col items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-white/5 border border-white/10 rounded-xl hover:border-blue-500/30 hover:bg-blue-500/10 transition-all group focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                   aria-label="Share on LinkedIn"
                 >
                   <LinkedinIcon />
-                  <span className="text-[8px] font-mono text-slate-400 group-hover:text-blue-400">LinkedIn</span>
+                  <span className="text-[7px] sm:text-[8px] font-mono text-slate-400 group-hover:text-blue-400">LinkedIn</span>
                 </button>
                 <button
                   onClick={() => handleShare('copy')}
-                  className="flex flex-col items-center gap-2 p-3 bg-white/5 border border-white/10 rounded-xl hover:border-emerald-500/30 hover:bg-emerald-500/10 transition-all group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  className="flex flex-col items-center gap-1.5 sm:gap-2 p-2 sm:p-3 bg-white/5 border border-white/10 rounded-xl hover:border-emerald-500/30 hover:bg-emerald-500/10 transition-all group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   aria-label="Copy link to clipboard"
                 >
-                  {copied ? <Check size={20} className="text-emerald-400" /> : <Copy size={20} className="text-emerald-400" />}
-                  <span className="text-[8px] font-mono text-slate-400 group-hover:text-emerald-400">Copy Link</span>
+                  {copied ? <Check size={16} className="sm:w-[20px] sm:h-[20px] text-emerald-400" /> : <Copy size={16} className="sm:w-[20px] sm:h-[20px] text-emerald-400" />}
+                  <span className="text-[7px] sm:text-[8px] font-mono text-slate-400 group-hover:text-emerald-400">Copy Link</span>
                 </button>
               </div>
             </motion.div>
@@ -1527,7 +1458,7 @@ export default function NewsDetailPage() {
                 setShowReportModal(false);
               }
             }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4"
             role="dialog"
             aria-modal="true"
             aria-labelledby="report-modal-title"
@@ -1537,7 +1468,7 @@ export default function NewsDetailPage() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl p-6 w-full max-w-md"
+              className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl p-5 sm:p-6 w-full max-w-md"
               ref={(el) => {
                 if (el) {
                   const selectElement = el.querySelector('select');
@@ -1547,38 +1478,38 @@ export default function NewsDetailPage() {
                 }
               }}
             >
-              <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center justify-between mb-4 sm:mb-5">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-red-500/10 rounded-lg">
-                    <Flag size={16} className="text-red-400" />
+                  <div className="p-1.5 sm:p-2 bg-red-500/10 rounded-lg">
+                    <Flag size={14} className="sm:w-[16px] sm:h-[16px] text-red-400" />
                   </div>
-                  <h3 id="report-modal-title" className="text-sm font-black text-white font-mono uppercase">Report Comment</h3>
+                  <h3 id="report-modal-title" className="text-xs sm:text-sm font-black text-white font-mono uppercase">Report Comment</h3>
                 </div>
                 <button
                   onClick={() => setShowReportModal(false)}
                   className="text-slate-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-500/50 rounded-lg p-1"
                   aria-label="Close report modal"
                 >
-                  <X size={16} />
+                  <X size={14} className="sm:w-[16px] sm:h-[16px]" />
                 </button>
               </div>
 
               {reportingUsername && (
-                <p className="text-[9px] text-slate-400 font-mono mb-4">
+                <p className="text-[8px] sm:text-[9px] text-slate-400 font-mono mb-3 sm:mb-4">
                   Reporting comment by <span className="text-red-400 font-bold">@{reportingUsername}</span>
                 </p>
               )}
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <label htmlFor="report-reason" className="text-[9px] font-mono text-slate-400 uppercase tracking-wider block mb-2">
+                  <label htmlFor="report-reason" className="text-[8px] sm:text-[9px] font-mono text-slate-400 uppercase tracking-wider block mb-1.5 sm:mb-2">
                     Reason *
                   </label>
                   <select
                     id="report-reason"
                     value={reportReason}
                     onChange={(e) => setReportReason(e.target.value)}
-                    className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-slate-200 text-sm outline-none focus:border-red-500/50 focus:ring-2 focus:ring-red-500/50 font-mono"
+                    className="w-full bg-black/30 border border-white/10 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-slate-200 text-xs sm:text-sm outline-none focus:border-red-500/50 focus:ring-2 focus:ring-red-500/50 font-mono"
                   >
                     <option value="">Select a reason...</option>
                     <option value="spam">Spam / Advertising</option>
@@ -1592,7 +1523,7 @@ export default function NewsDetailPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="report-description" className="text-[9px] font-mono text-slate-400 uppercase tracking-wider block mb-2">
+                  <label htmlFor="report-description" className="text-[8px] sm:text-[9px] font-mono text-slate-400 uppercase tracking-wider block mb-1.5 sm:mb-2">
                     Additional Details
                   </label>
                   <textarea
@@ -1600,23 +1531,23 @@ export default function NewsDetailPage() {
                     value={reportDescription}
                     onChange={(e) => setReportDescription(e.target.value)}
                     placeholder="Please provide more details about the violation..."
-                    className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-slate-200 text-sm outline-none focus:border-red-500/50 focus:ring-2 focus:ring-red-500/50 resize-none min-h-[80px] font-mono"
+                    className="w-full bg-black/30 border border-white/10 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-slate-200 text-xs sm:text-sm outline-none focus:border-red-500/50 focus:ring-2 focus:ring-red-500/50 resize-none min-h-[60px] sm:min-h-[80px] font-mono"
                   />
                 </div>
 
-                <div className="flex gap-3 pt-2">
+                <div className="flex gap-2 sm:gap-3 pt-2">
                   <button
                     onClick={() => setShowReportModal(false)}
-                    className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-all font-mono text-[9px] font-bold uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-white/20"
+                    className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-all font-mono text-[8px] sm:text-[9px] font-bold uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-white/20"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSubmitReport}
                     disabled={isSubmittingReport || !reportReason}
-                    className="flex-1 px-4 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white transition-all font-mono text-[9px] font-bold uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500/50"
+                    className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white transition-all font-mono text-[8px] sm:text-[9px] font-bold uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500/50"
                   >
-                    {isSubmittingReport ? <Loader2 className="animate-spin inline" size={12} /> : 'Submit Report'}
+                    {isSubmittingReport ? <Loader2 className="animate-spin inline sm:w-[12px] sm:h-[12px]" size={10} /> : 'Submit Report'}
                   </button>
                 </div>
               </div>
@@ -1627,22 +1558,22 @@ export default function NewsDetailPage() {
 
       <Header />
       
-      <main className="pt-32 pb-20 relative px-4 sm:px-6 lg:px-8">
+      <main className="pt-28 sm:pt-32 pb-16 sm:pb-20 relative px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto relative z-10">
           
           {/* Breadcrumb */}
           <motion.nav 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-3 mb-6"
+            className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 sm:mb-6"
           >
-            <Link href="/news" className="flex items-center gap-2 text-indigo-400 font-bold font-mono text-[10px] uppercase tracking-[0.2em] hover:text-white transition-all group">
-              <ArrowLeft size={12} className="group-hover:-translate-x-1 transition-transform" />
+            <Link href="/news" className="flex items-center gap-1.5 sm:gap-2 text-indigo-400 font-bold font-mono text-[8px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.2em] hover:text-white transition-all group">
+              <ArrowLeft size={10} className="sm:w-[12px] sm:h-[12px] group-hover:-translate-x-1 transition-transform" />
               <span>Back to Terminal</span>
             </Link>
-            <span className="w-1 h-1 rounded-full bg-slate-700" />
-            <div className="flex items-center gap-2 font-mono text-[9px] text-slate-500 uppercase tracking-widest">
-              <Hash size={9} /> Intel ID: {article?.news_id}
+            <span className="w-0.5 sm:w-1 h-3 sm:h-4 rounded-full bg-slate-700" />
+            <div className="flex items-center gap-1.5 sm:gap-2 font-mono text-[8px] sm:text-[9px] text-slate-500 uppercase tracking-widest">
+              <Hash size={8} className="sm:w-[9px] sm:h-[9px]" /> Intel ID: {article?.news_id}
             </div>
           </motion.nav>
 
@@ -1651,17 +1582,17 @@ export default function NewsDetailPage() {
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-6 bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start gap-3"
+              className="mb-5 sm:mb-6 bg-red-500/10 border border-red-500/30 rounded-xl p-3 sm:p-4 flex items-start gap-2 sm:gap-3"
             >
-              <AlertCircle size={18} className="text-red-400 flex-shrink-0 mt-0.5" />
+              <AlertCircle size={16} className="sm:w-[18px] sm:h-[18px] text-red-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-red-400 font-mono text-[10px] font-bold uppercase tracking-wider">
+                <p className="text-red-400 font-mono text-[8px] sm:text-[10px] font-bold uppercase tracking-wider">
                   Account Restricted
                 </p>
-                <p className="text-slate-400 text-xs mt-1">
+                <p className="text-slate-400 text-[10px] sm:text-xs mt-0.5 sm:mt-1">
                   {userBanStatus.ban_reason || 'You have been banned from commenting.'}
                   {userBanStatus.ban_remaining && (
-                    <span className="block text-[9px] text-slate-500 mt-0.5">
+                    <span className="block text-[8px] sm:text-[9px] text-slate-500 mt-0.5">
                       Remaining: {userBanStatus.ban_remaining}
                     </span>
                   )}
@@ -1676,34 +1607,34 @@ export default function NewsDetailPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="mb-6"
+              className="mb-5 sm:mb-6"
             >
-              <div className="flex flex-wrap items-center gap-3 mb-4">
-                <span className="px-3 py-1.5 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 rounded-full text-[9px] font-mono font-bold text-indigo-400 uppercase tracking-widest">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <span className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 rounded-full text-[7px] sm:text-[9px] font-mono font-bold text-indigo-400 uppercase tracking-widest">
                   {article?.category}
                 </span>
-                <div className="flex items-center gap-3 font-mono text-[9px] text-slate-500 uppercase tracking-wider">
-                  <span className="flex items-center gap-1.5"><Calendar size={10} /> {article?.published_at ? new Date(article.published_at).toLocaleDateString() : 'N/A'}</span>
-                  <span className="flex items-center gap-1.5 text-indigo-400"><Eye size={10} /> {article?.views || 0} Views</span>
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 font-mono text-[7px] sm:text-[9px] text-slate-500 uppercase tracking-wider">
+                  <span className="flex items-center gap-1 sm:gap-1.5"><Calendar size={8} className="sm:w-[10px] sm:h-[10px]" /> {article?.published_at ? new Date(article.published_at).toLocaleDateString() : 'N/A'}</span>
+                  <span className="flex items-center gap-1 sm:gap-1.5 text-indigo-400"><Eye size={8} className="sm:w-[10px] sm:h-[10px]" /> {article?.views || 0} Views</span>
                 </div>
               </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-[1.1] max-w-4xl">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tight leading-[1.1] max-w-4xl">
                 {article?.title}
               </h1>
-              <div className="flex items-center gap-3 mt-4 pb-4 border-b border-white/10">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-3 sm:mt-4 pb-3 sm:pb-4 border-b border-white/10">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-                    <User size={14} className="text-white" />
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+                    <User size={12} className="sm:w-[14px] sm:h-[14px] text-white" />
                   </div>
                   <div>
-                    <span className="text-xs font-bold text-white">{article?.author?.username || 'System'}</span>
-                    <span className="text-[8px] text-slate-500 block font-mono">Verified Author</span>
+                    <span className="text-[10px] sm:text-xs font-bold text-white">{article?.author?.username || 'System'}</span>
+                    <span className="text-[6px] sm:text-[8px] text-slate-500 block font-mono">Verified Author</span>
                   </div>
                 </div>
-                <div className="ml-auto flex items-center gap-2">
+                <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
                   <div className="flex items-center gap-0.5">
-                    <Star size={12} className="text-yellow-500 fill-yellow-500" />
-                    <span className="text-[10px] font-mono text-slate-400">4.8</span>
+                    <Star size={10} className="sm:w-[12px] sm:h-[12px] text-yellow-500 fill-yellow-500" />
+                    <span className="text-[8px] sm:text-[10px] font-mono text-slate-400">4.8</span>
                   </div>
                 </div>
               </div>
@@ -1711,10 +1642,10 @@ export default function NewsDetailPage() {
           </ErrorBoundary>
 
           {/* 2-COLUMN LAYOUT */}
-          <div className="grid lg:grid-cols-12 gap-8">
+          <div className="grid lg:grid-cols-12 gap-6 sm:gap-8">
             
             {/* Left Column */}
-            <div className="lg:col-span-8 flex flex-col gap-8">
+            <div className="lg:col-span-8 flex flex-col gap-6 sm:gap-8">
               
               {/* Featured Image */}
               <ErrorBoundary>
@@ -1741,18 +1672,18 @@ export default function NewsDetailPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="bg-gradient-to-br from-indigo-950/30 via-purple-950/20 to-transparent border border-indigo-500/20 rounded-2xl p-5 relative overflow-hidden"
+                  className="bg-gradient-to-br from-indigo-950/30 via-purple-950/20 to-transparent border border-indigo-500/20 rounded-2xl p-4 sm:p-5 relative overflow-hidden"
                 >
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-500/10 rounded-full blur-[60px]" />
+                  <div className="absolute top-0 right-0 w-32 sm:w-40 h-32 sm:h-40 bg-indigo-500/10 rounded-full blur-[60px]" />
                   <div className="relative z-10">
-                    <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-indigo-500/20 rounded-xl border border-indigo-500/30">
-                          <Sparkles size={16} className="text-indigo-400" />
+                    <div className="flex flex-wrap items-center justify-between mb-3 sm:mb-4 gap-2 sm:gap-3">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="p-1.5 sm:p-2 bg-indigo-500/20 rounded-xl border border-indigo-500/30">
+                          <Sparkles size={14} className="sm:w-[16px] sm:h-[16px] text-indigo-400" />
                         </div>
                         <div>
-                          <h4 className="text-[10px] font-mono font-bold text-indigo-400 uppercase tracking-[0.2em]">AI Executive Briefing</h4>
-                          <p className="text-[8px] font-mono text-slate-500 uppercase tracking-wider">Neural Intelligence Summary</p>
+                          <h4 className="text-[8px] sm:text-[10px] font-mono font-bold text-indigo-400 uppercase tracking-[0.15em] sm:tracking-[0.2em]">AI Executive Briefing</h4>
+                          <p className="text-[6px] sm:text-[8px] font-mono text-slate-500 uppercase tracking-wider">Neural Intelligence Summary</p>
                         </div>
                       </div>
                       {!showBriefing && (
@@ -1761,9 +1692,9 @@ export default function NewsDetailPage() {
                           whileTap={{ scale: 0.98 }}
                           onClick={handleGenerateSummary}
                           disabled={isGeneratingSummary}
-                          className="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 rounded-lg text-[9px] font-mono font-bold text-indigo-400 uppercase tracking-wider transition-all disabled:opacity-50 flex items-center gap-2"
+                          className="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 rounded-lg text-[7px] sm:text-[9px] font-mono font-bold text-indigo-400 uppercase tracking-wider transition-all disabled:opacity-50 flex items-center gap-1.5 sm:gap-2"
                         >
-                          {isGeneratingSummary ? <><Loader2 className="animate-spin" size={10} /> Processing</> : <><Zap size={10} /> Generate Summary</>}
+                          {isGeneratingSummary ? <><Loader2 className="animate-spin sm:w-[10px] sm:h-[10px]" size={8} /> Processing</> : <><Zap size={8} className="sm:w-[10px] sm:h-[10px]" /> Generate Summary</>}
                         </motion.button>
                       )}
                     </div>
@@ -1775,7 +1706,7 @@ export default function NewsDetailPage() {
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: 'auto' }}
                           exit={{ opacity: 0, height: 0 }}
-                          className="space-y-3"
+                          className="space-y-2 sm:space-y-3"
                         >
                           {aiSummary.map((point, index) => (
                             <motion.li
@@ -1783,19 +1714,19 @@ export default function NewsDetailPage() {
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ delay: index * 0.1 }}
-                              className="flex items-start gap-3 group"
+                              className="flex items-start gap-2 sm:gap-3 group"
                             >
-                              <div className="flex-shrink-0 w-5 h-5 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center mt-0.5">
-                                <span className="text-[8px] font-mono font-bold text-indigo-400">{index + 1}</span>
+                              <div className="flex-shrink-0 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center mt-0.5">
+                                <span className="text-[6px] sm:text-[8px] font-mono font-bold text-indigo-400">{index + 1}</span>
                               </div>
-                              <p className="text-slate-300 text-xs leading-relaxed font-normal flex-1">{point}</p>
+                              <p className="text-slate-300 text-[10px] sm:text-xs leading-relaxed font-normal flex-1">{point}</p>
                             </motion.li>
                           ))}
                         </motion.ul>
                       ) : showBriefing && aiSummary.length === 0 ? (
-                        <p className="text-slate-500 text-[10px] font-mono text-center py-3">No summary available</p>
+                        <p className="text-slate-500 text-[8px] sm:text-[10px] font-mono text-center py-2 sm:py-3">No summary available</p>
                       ) : (
-                        <p className="text-slate-600 text-[10px] font-mono text-center py-3">Click "Generate Summary" for AI-powered insights</p>
+                        <p className="text-slate-600 text-[8px] sm:text-[10px] font-mono text-center py-2 sm:py-3">Click "Generate Summary" for AI-powered insights</p>
                       )}
                     </AnimatePresence>
                   </div>
@@ -1810,23 +1741,23 @@ export default function NewsDetailPage() {
                   transition={{ delay: 0.4 }}
                   className="relative"
                 >
-                  <div className="text-slate-300 text-base leading-relaxed space-y-6 font-normal prose prose-invert prose-headings:text-white prose-p:text-slate-300 prose-a:text-indigo-400 prose-strong:text-white prose-em:text-slate-200 prose-ul:text-slate-300 prose-ol:text-slate-300 prose-li:text-slate-300 prose-blockquote:text-slate-400 prose-code:text-indigo-300 prose-pre:bg-black/30 prose-pre:border prose-pre:border-white/10 max-w-none">
+                  <div className="text-slate-300 text-sm sm:text-base leading-relaxed space-y-4 sm:space-y-6 font-normal prose prose-invert prose-headings:text-white prose-p:text-slate-300 prose-a:text-indigo-400 prose-strong:text-white prose-em:text-slate-200 prose-ul:text-slate-300 prose-ol:text-slate-300 prose-li:text-slate-300 prose-blockquote:text-slate-400 prose-code:text-indigo-300 prose-pre:bg-black/30 prose-pre:border prose-pre:border-white/10 max-w-none">
                     <ReactMarkdown
                       components={{
-                        h1: ({ children }) => <h1 className="text-3xl font-black text-white mb-6">{children}</h1>,
-                        h2: ({ children }) => <h2 className="text-2xl font-bold text-white mb-4 mt-8 border-l-4 border-indigo-500 pl-4">{children}</h2>,
-                        h3: ({ children }) => <h3 className="text-xl font-semibold text-white mb-3 mt-6">{children}</h3>,
-                        p: ({ children }) => <p className="mb-4 leading-relaxed">{children}</p>,
-                        ul: ({ children }) => <ul className="list-disc list-inside mb-4 space-y-2 ml-4">{children}</ul>,
-                        ol: ({ children }) => <ol className="list-decimal list-inside mb-4 space-y-2 ml-4">{children}</ol>,
+                        h1: ({ children }) => <h1 className="text-2xl sm:text-3xl font-black text-white mb-4 sm:mb-6">{children}</h1>,
+                        h2: ({ children }) => <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 mt-6 sm:mt-8 border-l-4 border-indigo-500 pl-3 sm:pl-4">{children}</h2>,
+                        h3: ({ children }) => <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3 mt-4 sm:mt-6">{children}</h3>,
+                        p: ({ children }) => <p className="mb-3 sm:mb-4 leading-relaxed">{children}</p>,
+                        ul: ({ children }) => <ul className="list-disc list-inside mb-3 sm:mb-4 space-y-1.5 sm:space-y-2 ml-2 sm:ml-4">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal list-inside mb-3 sm:mb-4 space-y-1.5 sm:space-y-2 ml-2 sm:ml-4">{children}</ol>,
                         li: ({ children }) => <li className="text-slate-300">{children}</li>,
-                        blockquote: ({ children }) => <blockquote className="border-l-4 border-indigo-500 pl-4 italic text-slate-400 my-4 bg-indigo-500/5 py-2 rounded-r">{children}</blockquote>,
+                        blockquote: ({ children }) => <blockquote className="border-l-4 border-indigo-500 pl-3 sm:pl-4 italic text-slate-400 my-3 sm:my-4 bg-indigo-500/5 py-2 rounded-r">{children}</blockquote>,
                         a: ({ children, href }) => <a href={href} className="text-indigo-400 hover:text-indigo-300 underline transition-colors" target="_blank" rel="noopener noreferrer">{children}</a>,
                         strong: ({ children }) => <strong className="text-white font-bold">{children}</strong>,
                         em: ({ children }) => <em className="text-slate-200 italic">{children}</em>,
-                        code: ({ children }) => <code className="bg-indigo-500/10 text-indigo-300 px-1.5 py-0.5 rounded text-xs font-mono">{children}</code>,
+                        code: ({ children }) => <code className="bg-indigo-500/10 text-indigo-300 px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-mono">{children}</code>,
                         img: ({ src, alt }) => {
-                          return <img src={src as string} alt={alt || ''} className="rounded-xl my-6 w-full border border-white/10" />;
+                          return <img src={src as string} alt={alt || ''} className="rounded-xl my-4 sm:my-6 w-full border border-white/10" />;
                         },
                       }}
                     >
@@ -1843,35 +1774,35 @@ export default function NewsDetailPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="mt-8 border-t border-white/10 pt-10"
+                  className="mt-6 sm:mt-8 border-t border-white/10 pt-6 sm:pt-10"
                 >
-                <div className="mb-6">
-                  <div className="flex items-center gap-2 text-indigo-400 font-mono text-[9px] font-bold uppercase tracking-[0.25em] mb-2">
-                    <MessageSquare size={12} /> Discussion Terminal
+                <div className="mb-4 sm:mb-6">
+                  <div className="flex items-center gap-2 text-indigo-400 font-mono text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.2em] sm:tracking-[0.25em] mb-2">
+                    <MessageSquare size={10} className="sm:w-[12px] sm:h-[12px]" /> Discussion Terminal
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
-                      <h3 className="text-xl font-black text-white uppercase tracking-tight">
+                      <h3 className="text-lg sm:text-xl font-black text-white uppercase tracking-tight">
                         Public <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Ledger</span>
                       </h3>
-                      <p className="text-[9px] text-slate-500 font-mono mt-1">
+                      <p className="text-[8px] sm:text-[9px] text-slate-500 font-mono mt-0.5 sm:mt-1">
                         {totalComments} {totalComments === 1 ? 'comment' : 'comments'} • Join the conversation
                       </p>
                     </div>
-                    <div className="flex items-center gap-1 text-[7px] text-slate-500 font-mono">
-                      <Sparkles size={8} className="text-indigo-400" />
+                    <div className="flex items-center gap-0.5 sm:gap-1 text-[6px] sm:text-[7px] text-slate-500 font-mono">
+                      <Sparkles size={6} className="sm:w-[8px] sm:h-[8px] text-indigo-400" />
                       Threaded discussion
                     </div>
                   </div>
                 </div>
 
                 {/* Comment Form - style Facebook */}
-                <div className="bg-[#11111a] border border-white/10 rounded-2xl overflow-hidden mb-8">
-                  <div className="px-4 py-3 border-b border-white/[0.06] bg-white/[0.02] flex items-center justify-between flex-wrap gap-3">
-                    <span className="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                      <Sparkles size={10} className="text-indigo-400" /> Post Analysis
+                <div className="bg-[#11111a] border border-white/10 rounded-2xl overflow-hidden mb-6 sm:mb-8">
+                  <div className="px-3 sm:px-4 py-2 sm:py-3 border-b border-white/[0.06] bg-white/[0.02] flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+                    <span className="text-[8px] sm:text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5 sm:gap-2">
+                      <Sparkles size={8} className="sm:w-[10px] sm:h-[10px] text-indigo-400" /> Post Analysis
                     </span>
-                    <div className="flex gap-1">
+                    <div className="flex gap-0.5 sm:gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <motion.button
                           key={star}
@@ -1880,16 +1811,20 @@ export default function NewsDetailPage() {
                           onClick={() => setRating(star)}
                           className="cursor-pointer"
                         >
-                          <Star size={14} className={`transition-all ${star <= rating ? 'text-yellow-500 fill-yellow-500' : 'text-slate-700 hover:text-slate-500'}`} />
+                          <Star 
+                            size={12} 
+                            className={`sm:w-[14px] sm:h-[14px] transition-all ${star <= rating ? 'text-yellow-500 fill-yellow-500' : 'text-slate-700 hover:text-slate-500'}`} 
+                            fill={star <= rating ? "currentColor" : "none"}
+                          />
                         </motion.button>
                       ))}
                     </div>
                   </div>
-                  <form onSubmit={handlePostComment} className="p-4">
-                    <div className="flex gap-3">
-                      <div className="flex-shrink-0">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-                          <User size={16} className="text-white" />
+                  <form onSubmit={handlePostComment} className="p-3 sm:p-4">
+                    <div className="flex gap-2 sm:gap-3">
+                      <div className="flex-shrink-0 hidden sm:block">
+                        <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+                          <User size={12} className="sm:w-[16px] sm:h-[16px] text-white" />
                         </div>
                       </div>
                       <div className="flex-1">
@@ -1897,17 +1832,17 @@ export default function NewsDetailPage() {
                           value={comment} 
                           onChange={(e) => setComment(e.target.value)} 
                           placeholder={userBanStatus?.banned ? "You are banned from commenting" : "Share your insights on this analysis..."} 
-                          className="w-full bg-transparent border-none text-slate-200 text-sm outline-none min-h-[60px] placeholder:text-slate-600 resize-none disabled:opacity-50"
+                          className="w-full bg-transparent border-none text-slate-200 text-xs sm:text-sm outline-none min-h-[50px] sm:min-h-[60px] placeholder:text-slate-600 resize-none disabled:opacity-50"
                           disabled={userBanStatus?.banned}
                         />
-                        <div className="flex justify-end mt-2">
+                        <div className="flex justify-end mt-1.5 sm:mt-2">
                           <motion.button 
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             disabled={isSubmitting || !comment.trim() || userBanStatus?.banned} 
-                            className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-medium shadow-lg shadow-indigo-600/30"
+                            className="bg-indigo-600 hover:bg-indigo-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium shadow-lg shadow-indigo-600/30"
                           >
-                            {isSubmitting ? <Loader2 className="animate-spin" size={14} /> : <><Send size={14} /> Comment</>}
+                            {isSubmitting ? <Loader2 className="animate-spin sm:w-[14px] sm:h-[14px]" size={12} /> : <><Send size={12} className="sm:w-[14px] sm:h-[14px]" /> Comment</>}
                           </motion.button>
                         </div>
                       </div>
@@ -1916,11 +1851,11 @@ export default function NewsDetailPage() {
                 </div>
 
                 {/* Threaded Comments List - style Facebook */}
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {isLoadingComments ? (
-                    <div className="text-center py-10 bg-white/[0.01] border border-white/10 rounded-xl">
-                      <Loader2 className="animate-spin text-indigo-500 mx-auto mb-2" size={24} />
-                      <p className="text-slate-500 font-mono text-[9px] uppercase tracking-wider">Loading comments...</p>
+                    <div className="text-center py-8 sm:py-10 bg-white/[0.01] border border-white/10 rounded-xl">
+                      <Loader2 className="animate-spin text-indigo-500 mx-auto mb-2 sm:w-[24px] sm:h-[24px]" size={20} />
+                      <p className="text-slate-500 font-mono text-[8px] sm:text-[9px] uppercase tracking-wider">Loading comments...</p>
                     </div>
                   ) : article?.comments?.length && article.comments.length > 0 ? (
                     <>
@@ -1949,33 +1884,34 @@ export default function NewsDetailPage() {
                         />
                       ))}
 
-                      {/* Load More Trigger for Infinite Scroll */}
-                      {hasMoreComments && (
-                        <div ref={loadMoreRef} className="py-4">
-                          {isLoadingMoreComments ? (
-                            <div className="flex items-center justify-center gap-2 py-4">
-                              <Loader2 className="animate-spin text-indigo-500" size={16} />
-                              <p className="text-slate-500 font-mono text-[9px] uppercase tracking-wider">Loading more comments...</p>
-                            </div>
-                          ) : (
-                            <div className="text-center py-4">
-                              <p className="text-slate-600 font-mono text-[8px] uppercase tracking-wider">Scroll to load more</p>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {!hasMoreComments && article?.comments?.length && article.comments.length > 0 && (
-                        <div className="text-center py-4">
-                          <p className="text-slate-600 font-mono text-[8px] uppercase tracking-wider">No more comments</p>
+                      {/* Pagination */}
+                      {commentPagination && commentPagination.last_page > 1 && (
+                        <div className="flex items-center justify-center gap-2 sm:gap-3 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-white/10">
+                          <button
+                            onClick={() => setCommentPage(prev => Math.max(1, prev - 1))}
+                            disabled={commentPage === 1 || isLoadingMoreComments}
+                            className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed text-[10px] sm:text-xs font-medium transition-all"
+                          >
+                            Previous
+                          </button>
+                          <span className="text-[10px] sm:text-xs font-mono text-slate-400">
+                            Page {commentPagination.current_page} of {commentPagination.last_page}
+                          </span>
+                          <button
+                            onClick={() => setCommentPage(prev => prev + 1)}
+                            disabled={commentPage === commentPagination.last_page || isLoadingMoreComments}
+                            className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed text-[10px] sm:text-xs font-medium transition-all"
+                          >
+                            Next
+                          </button>
                         </div>
                       )}
                     </>
                   ) : (
-                    <div className="text-center py-10 bg-white/[0.01] border border-white/10 rounded-xl">
-                      <MessageCircle size={24} className="text-slate-600 mx-auto mb-2" />
-                      <p className="text-slate-500 font-mono text-[9px] uppercase tracking-wider">No comments yet</p>
-                      <p className="text-slate-600 text-[7px] font-mono mt-1">Be the first to share your analysis</p>
+                    <div className="text-center py-8 sm:py-10 bg-white/[0.01] border border-white/10 rounded-xl">
+                      <MessageCircle size={20} className="sm:w-[24px] sm:h-[24px] text-slate-600 mx-auto mb-2" />
+                      <p className="text-slate-500 font-mono text-[8px] sm:text-[9px] uppercase tracking-wider">No comments yet</p>
+                      <p className="text-slate-600 text-[6px] sm:text-[7px] font-mono mt-0.5 sm:mt-1">Be the first to share your analysis</p>
                     </div>
                   )}
                 </div>
@@ -1983,36 +1919,36 @@ export default function NewsDetailPage() {
               </ErrorBoundary>
             </div>
 
-            {/* Right Sidebar */}
+            {/* Right Sidebar - Hidden on mobile, visible on tablet+ */}
             <ErrorBoundary>
-              <aside className="lg:col-span-4">
-                <div className="sticky top-28 flex flex-col gap-5">
+              <aside className="hidden md:block lg:col-span-4">
+                <div className="sticky top-28 flex flex-col gap-4 sm:gap-5">
                 
                 {/* Intel Metrics Box */}
                 <motion.div 
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.15 }}
-                  className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl p-5 shadow-xl"
+                  className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl p-4 sm:p-5 shadow-xl"
                 >
-                  <h4 className="text-[10px] font-mono font-bold text-slate-300 uppercase tracking-[0.2em] flex items-center gap-2 mb-4 pb-3 border-b border-white/10">
-                    <Activity size={12} className="text-indigo-500" /> Intel Metrics
+                  <h4 className="text-[9px] sm:text-[10px] font-mono font-bold text-slate-300 uppercase tracking-[0.15em] sm:tracking-[0.2em] flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4 pb-2 sm:pb-3 border-b border-white/10">
+                    <Activity size={10} className="sm:w-[12px] sm:h-[12px] text-indigo-500" /> Intel Metrics
                   </h4>
                   
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {[
                       { label: "AUTHOR", val: article?.author?.username || "System", icon: User },
                       { label: "CATEGORY", val: article?.category || "General", icon: Hash },
                       { label: "VIEWS", val: article?.views || 0, icon: Eye, suffix: "reads" },
                       { label: "STATUS", val: "Verified", icon: ShieldCheck, color: "text-emerald-400" },
                     ].map((item, i) => (
-                      <div key={i} className="flex items-center justify-between py-1 group">
-                        <div className="flex items-center gap-2">
-                          <item.icon size={11} className="text-slate-600 group-hover:text-indigo-400 transition-colors" />
-                          <span className="text-[8px] text-slate-500 font-mono uppercase tracking-wider">{item.label}</span>
+                      <div key={i} className="flex items-center justify-between py-0.5 sm:py-1 group">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
+                          <item.icon size={9} className="sm:w-[11px] sm:h-[11px] text-slate-600 group-hover:text-indigo-400 transition-colors" />
+                          <span className="text-[7px] sm:text-[8px] text-slate-500 font-mono uppercase tracking-wider">{item.label}</span>
                         </div>
-                        <span className={`text-[9px] font-mono font-bold uppercase ${item.color || 'text-slate-200'}`}>
-                          {item.val} {item.suffix && <span className="text-slate-500 text-[7px]">{item.suffix}</span>}
+                        <span className={`text-[8px] sm:text-[9px] font-mono font-bold uppercase ${item.color || 'text-slate-200'}`}>
+                          {item.val} {item.suffix && <span className="text-slate-500 text-[6px] sm:text-[7px]">{item.suffix}</span>}
                         </span>
                       </div>
                     ))}
@@ -2024,15 +1960,14 @@ export default function NewsDetailPage() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.18 }}
-                  className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl p-5 shadow-xl"
+                  className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl p-4 sm:p-5 shadow-xl"
                 >
-                  <h4 className="text-[10px] font-mono font-bold text-slate-300 uppercase tracking-[0.2em] flex items-center gap-2 mb-4 pb-3 border-b border-white/10">
-                    <MessageCircle size={12} className="text-indigo-500" /> User Activity
+                  <h4 className="text-[9px] sm:text-[10px] font-mono font-bold text-slate-300 uppercase tracking-[0.15em] sm:tracking-[0.2em] flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4 pb-2 sm:pb-3 border-b border-white/10">
+                    <MessageCircle size={10} className="sm:w-[12px] sm:h-[12px] text-indigo-500" /> User Activity
                   </h4>
                   
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {(() => {
-                      // Find all replies to current user's comments
                       const userReplies: any[] = [];
                       const findRepliesToUser = (comments: any[], targetUserId: number) => {
                         comments.forEach(comment => {
@@ -2056,31 +1991,51 @@ export default function NewsDetailPage() {
                         findRepliesToUser(article?.comments || [], currentUserId);
                       }
                       
-                      if (userReplies.length === 0) {
-                        return (
-                          <div className="text-center py-4">
-                            <MessageCircle size={20} className="text-slate-600 mx-auto mb-2" />
-                            <p className="text-[8px] text-slate-500 font-mono uppercase tracking-wider">No replies yet</p>
-                          </div>
-                        );
+                      // Sort by newest first and take top 5
+                      const sortedReplies = userReplies.sort((a, b) => 
+                        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                      ).slice(0, 5);
+                      
+                      // Always show 5 slots
+                      const displayItems = [...sortedReplies];
+                      while (displayItems.length < 5) {
+                        displayItems.push(null);
                       }
                       
-                      return userReplies.slice(0, 5).map((reply, idx) => (
-                        <div key={idx} className="bg-white/[0.02] border border-white/10 rounded-xl p-3 hover:border-indigo-500/30 transition-all">
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-                              <User size={8} className="text-white" />
+                      return displayItems.map((reply, idx) => (
+                        reply ? (
+                          <div key={idx} className="bg-white/[0.02] border border-white/10 rounded-xl p-2.5 sm:p-3 hover:border-indigo-500/30 transition-all">
+                            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                              <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+                                <User size={7} className="sm:w-[8px] sm:h-[8px] text-white" />
+                              </div>
+                              <span className="text-[7px] sm:text-[8px] font-mono font-bold text-indigo-400 uppercase">
+                                @{reply.username}
+                              </span>
+                              <span className="text-[6px] sm:text-[7px] text-slate-500 font-mono ml-auto">
+                                {new Date(reply.created_at).toLocaleDateString()}
+                              </span>
                             </div>
-                            <span className="text-[8px] font-mono font-bold text-indigo-400 uppercase">
-                              @{reply.username}
-                            </span>
-                            <span className="text-[7px] text-slate-500 font-mono ml-auto">
-                              {new Date(reply.created_at).toLocaleDateString()}
-                            </span>
+                            <p className="text-[7px] sm:text-[8px] text-slate-400 line-clamp-2 mb-0.5 sm:mb-1">"{reply.content}"</p>
+                            <p className="text-[6px] sm:text-[7px] text-slate-600 font-mono italic">replied to your comment</p>
                           </div>
-                          <p className="text-[8px] text-slate-400 line-clamp-2 mb-1">"{reply.content}"</p>
-                          <p className="text-[7px] text-slate-600 font-mono italic">replied to your comment</p>
-                        </div>
+                        ) : (
+                          <div key={idx} className="bg-white/[0.01] border border-white/5 rounded-xl p-2.5 sm:p-3 opacity-30">
+                            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                              <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-slate-700/50 flex items-center justify-center">
+                                <User size={7} className="sm:w-[8px] sm:h-[8px] text-slate-600" />
+                              </div>
+                              <span className="text-[7px] sm:text-[8px] font-mono font-bold text-slate-600 uppercase">
+                                @waiting
+                              </span>
+                              <span className="text-[6px] sm:text-[7px] text-slate-700 font-mono ml-auto">
+                                --
+                              </span>
+                            </div>
+                            <p className="text-[7px] sm:text-[8px] text-slate-700 line-clamp-2 mb-0.5 sm:mb-1">"Waiting for activity..."</p>
+                            <p className="text-[6px] sm:text-[7px] text-slate-700 font-mono italic">placeholder</p>
+                          </div>
+                        )
                       ));
                     })()}
                   </div>
@@ -2091,30 +2046,30 @@ export default function NewsDetailPage() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="grid grid-cols-2 gap-3"
+                  className="grid grid-cols-2 gap-2 sm:gap-3"
                 >
                   <motion.button 
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleToggleFavorite} 
                     disabled={favLoading} 
-                    className={`flex flex-col items-center justify-center gap-1.5 py-4 rounded-xl border transition-all ${
+                    className={`flex flex-col items-center justify-center gap-1 sm:gap-1.5 py-3 sm:py-4 rounded-xl border transition-all ${
                       isFavorited 
                         ? "bg-indigo-600/15 border-indigo-500/40 text-indigo-400 shadow-lg" 
                         : "bg-white/[0.02] border-white/10 text-slate-500 hover:text-white hover:border-white/20"
                     }`}
                   >
-                    {favLoading ? <Loader2 size={16} className="animate-spin" /> : <Bookmark size={16} fill={isFavorited ? "currentColor" : "none"} />}
-                    <span className="text-[8px] font-mono font-bold uppercase tracking-wider">{isFavorited ? "Saved" : "Archive"}</span>
+                    {favLoading ? <Loader2 size={14} className="sm:w-[16px] sm:h-[16px] animate-spin" /> : <Bookmark size={14} className="sm:w-[16px] sm:h-[16px]" fill={isFavorited ? "currentColor" : "none"} />}
+                    <span className="text-[7px] sm:text-[8px] font-mono font-bold uppercase tracking-wider">{isFavorited ? "Saved" : "Archive"}</span>
                   </motion.button>
                   <motion.button 
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setShareModalOpen(true)}
-                    className="flex flex-col items-center justify-center gap-1.5 py-4 bg-white/[0.02] border border-white/10 rounded-xl text-slate-500 hover:text-emerald-400 hover:border-emerald-500/30 transition-all"
+                    className="flex flex-col items-center justify-center gap-1 sm:gap-1.5 py-3 sm:py-4 bg-white/[0.02] border border-white/10 rounded-xl text-slate-500 hover:text-emerald-400 hover:border-emerald-500/30 transition-all"
                   >
-                    <Share2 size={16} />
-                    <span className="text-[8px] font-mono font-bold uppercase tracking-wider">Share</span>
+                    <Share2 size={14} className="sm:w-[16px] sm:h-[16px]" />
+                    <span className="text-[7px] sm:text-[8px] font-mono font-bold uppercase tracking-wider">Share</span>
                   </motion.button>
                 </motion.div>
 
@@ -2124,24 +2079,24 @@ export default function NewsDetailPage() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl p-5 shadow-xl"
+                    className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl p-4 sm:p-5 shadow-xl"
                   >
-                    <h4 className="text-[10px] font-mono font-bold text-slate-300 uppercase tracking-[0.2em] flex items-center gap-2 mb-4 pb-3 border-b border-white/10">
-                      <TrendingUp size={12} className="text-indigo-500" /> Related Intel
+                    <h4 className="text-[9px] sm:text-[10px] font-mono font-bold text-slate-300 uppercase tracking-[0.15em] sm:tracking-[0.2em] flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4 pb-2 sm:pb-3 border-b border-white/10">
+                      <TrendingUp size={10} className="sm:w-[12px] sm:h-[12px] text-indigo-500" /> Related Intel
                     </h4>
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                       {relatedNews.slice(0, 5).map((news: any, idx: number) => (
                         <Link key={news.news_id} href={`/news/${news.news_id}`} className="block group">
-                          <div className="bg-white/[0.02] border border-white/10 rounded-xl p-3 hover:border-indigo-500/40 transition-all group-hover:bg-white/[0.04]">
+                          <div className="bg-white/[0.02] border border-white/10 rounded-xl p-2.5 sm:p-3 hover:border-indigo-500/40 transition-all group-hover:bg-white/[0.04]">
                             <div className="flex items-start gap-2">
-                              <span className="text-[8px] font-mono font-bold text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded shrink-0">{idx + 1}</span>
+                              <span className="text-[7px] sm:text-[8px] font-mono font-bold text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded shrink-0">{idx + 1}</span>
                               <div className="flex-1 min-w-0">
-                                <h5 className="text-[10px] font-bold text-slate-200 mb-1 line-clamp-2 group-hover:text-indigo-400 transition-colors">
+                                <h5 className="text-[9px] sm:text-[10px] font-bold text-slate-200 mb-0.5 sm:mb-1 line-clamp-2 group-hover:text-indigo-400 transition-colors">
                                   {news.title}
                                 </h5>
-                                <div className="flex items-center gap-2 text-[7px] text-slate-500 font-mono uppercase tracking-wider">
+                                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[6px] sm:text-[7px] text-slate-500 font-mono uppercase tracking-wider">
                                   <span className="flex items-center gap-0.5">
-                                    <Eye size={7} /> {news.views || 0}
+                                    <Eye size={6} className="sm:w-[7px] sm:h-[7px]" /> {news.views || 0}
                                   </span>
                                   <span className="px-1.5 py-0.5 bg-indigo-500/10 rounded text-indigo-400">
                                     {news.category}
@@ -2162,17 +2117,17 @@ export default function NewsDetailPage() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.32 }}
-                    className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl p-5 shadow-xl"
+                    className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl p-4 sm:p-5 shadow-xl"
                   >
-                    <h4 className="text-[10px] font-mono font-bold text-slate-300 uppercase tracking-[0.2em] flex items-center gap-2 mb-4 pb-3 border-b border-white/10">
-                      <Award size={12} className="text-indigo-500" /> Top Comments
+                    <h4 className="text-[9px] sm:text-[10px] font-mono font-bold text-slate-300 uppercase tracking-[0.15em] sm:tracking-[0.2em] flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4 pb-2 sm:pb-3 border-b border-white/10">
+                      <Award size={10} className="sm:w-[12px] sm:h-[12px] text-indigo-500" /> Top Comments
                     </h4>
                     
                     {/* Header Row */}
                     <div className="grid grid-cols-3 gap-0 mb-0">
-                      <div className="text-[8px] font-mono font-bold text-slate-500 uppercase tracking-wider px-2 py-2 border-b border-white/10 border-r border-white/5">Rank</div>
-                      <div className="text-[8px] font-mono font-bold text-slate-500 uppercase tracking-wider px-2 py-2 border-b border-white/10 border-r border-white/5">User Name</div>
-                      <div className="text-[8px] font-mono font-bold text-slate-500 uppercase tracking-wider px-2 py-2 border-b border-white/10 text-right">Likes</div>
+                      <div className="text-[7px] sm:text-[8px] font-mono font-bold text-slate-500 uppercase tracking-wider px-1.5 sm:px-2 py-1.5 sm:py-2 border-b border-white/10 border-r border-white/5">Rank</div>
+                      <div className="text-[7px] sm:text-[8px] font-mono font-bold text-slate-500 uppercase tracking-wider px-1.5 sm:px-2 py-1.5 sm:py-2 border-b border-white/10 border-r border-white/5">User</div>
+                      <div className="text-[7px] sm:text-[8px] font-mono font-bold text-slate-500 uppercase tracking-wider px-1.5 sm:px-2 py-1.5 sm:py-2 border-b border-white/10 text-right">Likes</div>
                     </div>
 
                     {/* Data Rows */}
@@ -2189,21 +2144,21 @@ export default function NewsDetailPage() {
                         return (
                           <div key={comment.comment_id} className="grid grid-cols-3 gap-0 hover:bg-white/[0.03] transition-all">
                             {/* Rank Column */}
-                            <div className="flex items-center gap-1 px-2 py-2 border-b border-white/5 border-r border-white/5">
-                              <span className="text-sm">{getRankIcon(rank)}</span>
+                            <div className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-1.5 sm:py-2 border-b border-white/5 border-r border-white/5">
+                              <span className="text-xs sm:text-sm">{getRankIcon(rank)}</span>
                             </div>
                             
                             {/* User Name Column */}
-                            <div className="flex items-center gap-2 px-2 py-2 border-b border-white/5 border-r border-white/5">
-                              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0">
-                                <User size={9} className="text-white" />
+                            <div className="flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2 py-1.5 sm:py-2 border-b border-white/5 border-r border-white/5">
+                              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+                                <User size={8} className="sm:w-[9px] sm:h-[9px] text-white" />
                               </div>
                               <div className="min-w-0">
-                                <span className="text-[9px] font-semibold text-white truncate block">
+                                <span className="text-[8px] sm:text-[9px] font-semibold text-white truncate block">
                                   {comment.user?.username || 'Anonymous'}
                                 </span>
                                 {comment.user?.user_id === currentUserId && (
-                                  <span className="text-[7px] font-mono text-emerald-400 bg-emerald-500/10 px-1 py-0.5 rounded-full border border-emerald-500/20">
+                                  <span className="text-[6px] sm:text-[7px] font-mono text-emerald-400 bg-emerald-500/10 px-1 py-0.5 rounded-full border border-emerald-500/20">
                                     You
                                   </span>
                                 )}
@@ -2211,9 +2166,9 @@ export default function NewsDetailPage() {
                             </div>
                             
                             {/* Likes Column */}
-                            <div className="flex items-center justify-end gap-1 px-2 py-2 border-b border-white/5">
-                              <ThumbsUp size={8} className="text-indigo-400" />
-                              <span className="text-[9px] font-mono font-bold text-slate-300">{comment.likes || 0}</span>
+                            <div className="flex items-center justify-end gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-1.5 sm:py-2 border-b border-white/5">
+                              <ThumbsUp size={7} className="sm:w-[8px] sm:h-[8px] text-indigo-400" />
+                              <span className="text-[8px] sm:text-[9px] font-mono font-bold text-slate-300">{comment.likes || 0}</span>
                             </div>
                           </div>
                         );
@@ -2227,11 +2182,11 @@ export default function NewsDetailPage() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.35 }}
-                  className="bg-black/40 border border-white/10 px-3 py-2 rounded-xl flex items-center gap-2"
+                  className="bg-black/40 border border-white/10 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl flex items-center gap-1.5 sm:gap-2"
                 >
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[7px] font-mono text-slate-400 uppercase tracking-wider">Terminal Status: Secure</span>
-                  <ShieldCheck size={8} className="text-emerald-400 ml-auto" />
+                  <div className="w-1 sm:w-1.5 h-1 sm:h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[6px] sm:text-[7px] font-mono text-slate-400 uppercase tracking-wider">Terminal Status: Secure</span>
+                  <ShieldCheck size={7} className="sm:w-[8px] sm:h-[8px] text-emerald-400 ml-auto" />
                 </motion.div>
               </div>
             </aside>

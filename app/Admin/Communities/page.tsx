@@ -59,7 +59,7 @@ interface FilterState {
   dateTo: string;
 }
 
-// ---------- Custom themed dropdown (replaces native <select> popup) ----------
+// ---------- Custom themed dropdown ----------
 interface SelectOption {
   value: string;
   label: string;
@@ -138,7 +138,7 @@ const CustomSelect = ({
   );
 };
 
-// ---------- Custom themed date picker (replaces native <input type="date"> popup) ----------
+// ---------- Custom date picker ----------
 const MONTH_NAMES = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
@@ -310,68 +310,7 @@ const CustomDatePicker = ({
   );
 };
 
-// Skeleton Components
-const HeaderSkeleton = () => (
-  <div className="relative group">
-    <div className="relative bg-gradient-to-br from-[#11111a] to-[#0c0c12] rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-      <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="flex flex-col gap-3 w-full md:w-2/3">
-          <div className="h-6 w-48 bg-white/5 rounded-full animate-pulse" />
-          <div className="h-12 w-3/4 bg-white/5 rounded-xl animate-pulse" />
-          <div className="h-4 w-full max-w-2xl bg-white/5 rounded-lg animate-pulse" />
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="h-12 w-28 bg-white/5 rounded-xl animate-pulse" />
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-const StatsSkeleton = () => (
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-    {[...Array(4)].map((_, idx) => (
-      <div key={idx} className="bg-[#11111a] border border-white/10 rounded-2xl p-4 shadow-xl">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/5 animate-pulse" />
-          <div className="flex-1">
-            <div className="h-3 w-20 bg-white/5 rounded animate-pulse mb-1" />
-            <div className="h-7 w-12 bg-white/5 rounded animate-pulse" />
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
-);
-
-// Sửa SearchSkeleton - thêm animation từ phải sang
-const SearchSkeleton = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
-  return (
-    <div 
-      className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-end"
-      style={{
-        opacity: isVisible ? 1 : 0,
-        transform: isVisible ? 'translateX(0)' : 'translateX(50px)',
-        transition: 'all 0.4s ease-out'
-      }}
-    >
-      <div className="relative w-full sm:w-80">
-        <div className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-10 pr-4 h-12 animate-pulse" />
-      </div>
-      <div className="flex items-center gap-2">
-        <div className="h-12 w-28 bg-white/5 rounded-xl animate-pulse" />
-      </div>
-    </div>
-  );
-};
-
+// Skeleton Components - chỉ giữ skeleton cho bảng và pagination
 const TableHeaderSkeleton = () => (
   <tr className="border-b border-white/10 bg-white/5">
     <th className="px-4 py-4 w-16"><div className="h-3 w-8 bg-white/5 rounded animate-pulse" /></th>
@@ -385,53 +324,6 @@ const TableHeaderSkeleton = () => (
   </tr>
 );
 
-const TableRowSkeleton = () => (
-  <tr className="border-b border-white/5">
-    <td className="px-4 py-4"><div className="h-4 w-12 bg-white/5 rounded animate-pulse" /></td>
-    <td className="px-4 py-4">
-      <div className="flex items-center gap-2">
-        <div className="w-7 h-7 rounded-full bg-white/5 animate-pulse" />
-        <div className="flex-1">
-          <div className="h-3 w-16 bg-white/5 rounded animate-pulse mb-1" />
-          <div className="h-2 w-20 bg-white/5 rounded animate-pulse" />
-        </div>
-      </div>
-    </td>
-    <td className="px-4 py-4"><div className="h-6 w-20 bg-white/5 rounded-md animate-pulse" /></td>
-    <td className="px-4 py-4">
-      <div className="space-y-1.5">
-        <div className="h-3 w-48 bg-white/5 rounded animate-pulse" />
-        <div className="h-3 w-32 bg-white/5 rounded animate-pulse" />
-      </div>
-    </td>
-    <td className="px-4 py-4 text-center">
-      <div className="flex flex-col items-center gap-0.5">
-        <div className="flex gap-0.5">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="w-2.5 h-2.5 bg-white/5 rounded animate-pulse" />
-          ))}
-        </div>
-      </div>
-    </td>
-    <td className="px-4 py-4 text-center">
-      <div className="h-5 w-20 bg-white/5 rounded-full animate-pulse mx-auto" />
-    </td>
-    <td className="px-4 py-4">
-      <div className="space-y-1">
-        <div className="h-3 w-16 bg-white/5 rounded animate-pulse" />
-        <div className="h-2 w-12 bg-white/5 rounded animate-pulse" />
-      </div>
-    </td>
-    <td className="px-4 py-4 text-center">
-      <div className="flex items-center justify-center gap-1.5">
-        <div className="w-8 h-8 bg-white/5 rounded-lg animate-pulse" />
-        <div className="w-8 h-8 bg-white/5 rounded-lg animate-pulse" />
-      </div>
-    </td>
-  </tr>
-);
-
-// Sửa TableSkeleton - thêm animation từ phải sang
 const TableSkeleton = () => {
   const [isVisible, setIsVisible] = useState(false);
   
@@ -453,8 +345,8 @@ const TableSkeleton = () => {
           <thead>
             <TableHeaderSkeleton />
           </thead>
-          <tbody className="divide-y divide-white/5">
-            {[...Array(5)].map((_, idx) => {
+          <tbody>
+            {[...Array(10)].map((_, idx) => {
               const delay = idx * 80;
               return (
                 <tr 
@@ -545,13 +437,50 @@ const PaginationSkeleton = () => {
   );
 };
 
-// Skeleton cho toàn bộ trang - tất cả đều có animation từ phải sang
+// Skeleton tổng thể cho trang - khớp với giao diện mới (không có stats cards)
 const PageSkeleton = () => (
   <div className="flex flex-col gap-8">
-    <HeaderSkeleton />
-    <StatsSkeleton />
-    <SearchSkeleton />
+    {/* Header Skeleton */}
+    <div className="relative group">
+      <div className="relative bg-gradient-to-br from-[#11111a] to-[#0c0c12] rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+        <div className="relative z-10 flex flex-col gap-6">
+          {/* Row 1 */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex flex-col gap-3 w-full md:w-2/3">
+              <div className="h-6 w-32 bg-white/5 rounded-full animate-pulse" />
+              <div className="h-12 w-3/4 bg-white/5 rounded-xl animate-pulse" />
+              <div className="h-4 w-full max-w-2xl bg-white/5 rounded-lg animate-pulse" />
+            </div>
+          </div>
+          {/* Row 2 */}
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-white/10">
+            <div className="flex items-center gap-6">
+              <div className="h-3 w-24 bg-white/5 rounded animate-pulse" />
+              <div className="h-3 w-20 bg-white/5 rounded animate-pulse" />
+              <div className="h-3 w-28 bg-white/5 rounded animate-pulse" />
+              <div className="h-3 w-24 bg-white/5 rounded animate-pulse" />
+            </div>
+            <div className="h-10 w-28 bg-white/5 rounded-xl animate-pulse" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Search & Filters Skeleton */}
+    <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-end">
+      <div className="relative w-full sm:w-80">
+        <div className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-10 pr-4 h-12 animate-pulse" />
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="h-12 w-24 bg-white/5 rounded-xl animate-pulse" />
+      </div>
+    </div>
+
+    {/* Table Skeleton */}
     <TableSkeleton />
+
+    {/* Pagination Skeleton */}
     <PaginationSkeleton />
   </div>
 );
@@ -583,6 +512,7 @@ export default function NewsCommentsModerationView() {
     total: 0,
     withRating: 0,
     reported: 0,
+    highQuality: 0,
     today: 0
   });
 
@@ -633,6 +563,13 @@ export default function NewsCommentsModerationView() {
       if (data.success) {
         setComments(data.data);
         setPagination(data.pagination);
+        setStats({
+          total: data.stats?.total || data.pagination?.total || data.data?.length || 0,
+          withRating: data.stats?.with_rating || 0,
+          reported: data.stats?.reported || 0,
+          highQuality: data.stats?.high_quality || 0,
+          today: data.stats?.today || 0,
+        });
       }
     } catch (error) {
       console.error('Error fetching comments:', error);
@@ -749,8 +686,25 @@ export default function NewsCommentsModerationView() {
     setCurrentPage(1);
   };
 
+  // Updated: Luôn hiển thị ít nhất 1 trang
   const renderPaginationPages = () => {
-    if (!pagination) return null;
+    if (!pagination || pagination.last_page <= 1) {
+      return (
+        <motion.button
+          key={1}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setCurrentPage(1)}
+          className={`px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-wider transition-all ${
+            currentPage === 1
+              ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md'
+              : 'bg-white/5 hover:bg-white/10 text-slate-400'
+          }`}
+        >
+          1
+        </motion.button>
+      );
+    }
     
     const total = pagination.last_page;
     const current = pagination.current_page;
@@ -792,6 +746,150 @@ export default function NewsCommentsModerationView() {
     });
   };
 
+  // Render rows - luôn hiển thị đúng 10 dòng
+  const renderRows = () => {
+    const rows = [];
+    const totalRows = 10;
+    
+    if (comments.length === 0) {
+      // Không có dữ liệu -> 10 dòng trống, KHÔNG có gạch ngang
+      for (let i = 0; i < totalRows; i++) {
+        rows.push(
+          <tr key={`empty-${i}`} className="pointer-events-none">
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] text-center border-none">&nbsp;</td>
+          </tr>
+        );
+      }
+    } else {
+      // Có dữ liệu - TẤT CẢ các dòng có nội dung đều có gạch ngang
+      for (let i = 0; i < comments.length; i++) {
+        const comment = comments[i];
+        rows.push(
+          <motion.tr 
+            key={comment.comment_id} 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: Math.min(i * 0.03, 0.3) }}
+            className={`hover:bg-white/5 transition-all group ${comment.is_reported ? 'bg-red-500/5' : ''} border-b border-white/5`}
+          >
+            <td className="px-4 py-4">
+              <span className="text-indigo-400 font-black text-[11px] whitespace-nowrap">#{comment.comment_id}</span>
+            </td>
+            <td className="px-4 py-4">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+                  <span className="text-[8px] text-white font-black">
+                    {comment.user?.username?.[0]?.toUpperCase() || "?"}
+                  </span>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-white text-xs font-bold truncate">@{comment.user?.username || "Unknown"}</p>
+                  <p className="text-[7px] text-slate-500 font-mono truncate">{comment.user?.email || "No email"}</p>
+                </div>
+              </div>
+            </td>
+            <td className="px-4 py-4">
+              <Link 
+                href={`/news/${comment.news_id}`} 
+                target="_blank"
+                className="flex items-center gap-1.5 text-[9px] px-2 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-md text-indigo-400 hover:bg-indigo-500/20 transition-all font-mono font-bold group-hover:border-indigo-500/40 max-w-[120px] truncate whitespace-nowrap"
+                title={comment.news?.title || `News #${comment.news_id}`}
+              >
+                <Newspaper size={8} className="flex-shrink-0" />
+                {comment.news?.title?.slice(0, 15) || `News #${comment.news_id}`}
+                {comment.news?.title && comment.news.title.length > 15 && '...'}
+              </Link>
+            </td>
+            <td className="px-4 py-4 max-w-[300px]">
+              <div 
+                className="text-sm text-slate-300 line-clamp-2 font-sans"
+                dangerouslySetInnerHTML={{ 
+                  __html: DOMPurify.sanitize(
+                    comment.content.length > 120 
+                      ? comment.content.slice(0, 120) + '...' 
+                      : comment.content
+                  ) 
+                }}
+              />
+            </td>
+            <td className="px-4 py-4 text-center">
+              <div className="flex flex-col items-center gap-0.5">
+                {renderStars(comment.rating)}
+                {comment.rating && (
+                  <span className="text-[7px] text-slate-500 font-mono">{comment.rating}/5</span>
+                )}
+              </div>
+            </td>
+            <td className="px-4 py-4 text-center">
+              <div className="flex justify-center min-w-[90px]">
+                {getStatusBadge(comment)}
+              </div>
+            </td>
+            <td className="px-4 py-4">
+              <div className="flex flex-col whitespace-nowrap">
+                <span className="text-[9px] text-slate-400 font-mono">{formatDate(comment.created_at)}</span>
+                <span className="text-[7px] text-slate-600 font-mono">
+                  {new Date(comment.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+            </td>
+            <td className="px-4 py-4 text-center">
+              <div className="flex items-center justify-center gap-1.5">
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleViewDetail(comment)}
+                  className="p-2 bg-white/5 hover:bg-indigo-500/20 rounded-lg text-slate-400 hover:text-indigo-400 transition-all border border-transparent hover:border-indigo-500/30"
+                  title="View details"
+                >
+                  <Eye size={12} />
+                </motion.button>
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowDeleteConfirm(comment.comment_id)}
+                  className="p-2 bg-white/5 hover:bg-rose-500/20 rounded-lg text-slate-400 hover:text-rose-400 transition-all border border-transparent hover:border-rose-500/30"
+                  title="Delete comment"
+                >
+                  {isDeleting === comment.comment_id ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : (
+                    <Trash2 size={12} />
+                  )}
+                </motion.button>
+              </div>
+            </td>
+          </motion.tr>
+        );
+      }
+      
+      // Thêm các dòng trống phía dưới để đủ 10 dòng - KHÔNG CÓ gạch ngang
+      for (let i = comments.length; i < totalRows; i++) {
+        rows.push(
+          <tr key={`empty-${i}`} className="pointer-events-none">
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] text-center border-none">&nbsp;</td>
+          </tr>
+        );
+      }
+    }
+
+    return rows;
+  };
+
   return (
     <div className="min-h-screen bg-[#05050a] text-slate-100 flex flex-col font-sans pt-28 pb-20 selection:bg-indigo-500/30 overflow-x-hidden">
       
@@ -827,7 +925,6 @@ export default function NewsCommentsModerationView() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative w-full flex flex-col gap-8">
         
-        {/* Hiển thị Skeleton khi đang loading */}
         {isLoading ? (
           <PageSkeleton />
         ) : (
@@ -842,25 +939,48 @@ export default function NewsCommentsModerationView() {
               <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/30 via-purple-500/30 to-indigo-500/30 rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-100 transition duration-700" />
               <div className="relative bg-gradient-to-br from-[#11111a] to-[#0c0c12] rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl overflow-hidden">
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-                <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                  <div className="flex flex-col gap-3">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full w-fit">
-                      <ShieldAlert size={12} className="text-indigo-400" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 font-mono">News Comments Moderation</span>
+                <div className="relative z-10 flex flex-col gap-6">
+                  {/* Row 1: Title + Badge (trên cùng) */}
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div className="flex flex-col gap-3">
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full w-fit">
+                        <ShieldAlert size={12} className="text-indigo-400" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 font-mono">News Comments Moderation</span>
+                      </div>
+                      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tighter uppercase text-white leading-none">
+                        Comments <span className="text-indigo-400">Hub</span>
+                      </h1>
+                      <p className="text-xs text-slate-500 max-w-2xl">
+                        Manage and moderate all comments from news articles. Review reported content, maintain quality discussions, and ensure community guidelines are followed.
+                      </p>
                     </div>
-                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tighter uppercase text-white leading-none">
-                      Comments <span className="text-indigo-400">Hub</span>
-                    </h1>
-                    <p className="text-xs text-slate-500 max-w-2xl">
-                      Manage and moderate all comments from news articles. Review reported content, maintain quality discussions, and ensure community guidelines are followed.
-                    </p>
                   </div>
-                  <div className="flex items-center gap-3 flex-wrap">
+                  
+                  {/* Row 2: Refresh button + các thông số khác (phía dưới) */}
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-white/10">
+                    <div className="flex items-center gap-6 text-[11px] font-mono text-slate-500 uppercase tracking-wider">
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-400">Total:</span>
+                        <span className="text-white font-bold">{stats.total}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-yellow-400">●</span>
+                        <span>With Rating: {stats.withRating}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-red-400">●</span>
+                        <span>Reported: {stats.reported}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-emerald-400">●</span>
+                        <span>High Quality: {stats.highQuality}</span>
+                      </div>
+                    </div>
                     <motion.button 
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => fetchComments()}
-                      className="bg-white/5 hover:bg-white/10 text-slate-300 font-mono text-[9px] font-black uppercase tracking-widest px-4 py-3 rounded-xl transition-all flex items-center gap-2 border border-white/10"
+                      className="bg-white/5 hover:bg-white/10 text-slate-300 font-mono text-[9px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 border border-white/10 hover:border-white/20"
                     >
                       <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} /> 
                       {isLoading ? "Loading..." : "Refresh"}
@@ -928,7 +1048,6 @@ export default function NewsCommentsModerationView() {
                   <div className="relative bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-2xl p-6 shadow-xl">
                     <div className="absolute inset-0 rounded-2xl overflow-hidden bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
                     <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {/* Min Rating */}
                       <div>
                         <label className="text-[8px] font-mono text-slate-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
                           <Star size={10} className="text-yellow-500" />
@@ -948,7 +1067,6 @@ export default function NewsCommentsModerationView() {
                         />
                       </div>
 
-                      {/* Status */}
                       <div>
                         <label className="text-[8px] font-mono text-slate-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
                           <Flag size={10} className="text-red-400" />
@@ -964,7 +1082,6 @@ export default function NewsCommentsModerationView() {
                         />
                       </div>
 
-                      {/* From Date */}
                       <div>
                         <label className="text-[8px] font-mono text-slate-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
                           <Calendar size={10} className="text-indigo-400" />
@@ -976,7 +1093,6 @@ export default function NewsCommentsModerationView() {
                         />
                       </div>
 
-                      {/* To Date */}
                       <div>
                         <label className="text-[8px] font-mono text-slate-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
                           <Calendar size={10} className="text-indigo-400" />
@@ -1014,175 +1130,51 @@ export default function NewsCommentsModerationView() {
                       <th className="px-4 py-4 w-28 text-center">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {comments.length === 0 ? (
-                      <tr>
-                        <td colSpan={8} className="py-20 text-center">
-                          <div className="flex flex-col items-center gap-4">
-                            <div className="p-4 bg-indigo-500/10 rounded-2xl border border-indigo-500/20">
-                              <MessageSquare size={32} className="text-indigo-400" />
-                            </div>
-                            <p className="text-slate-400 font-mono text-sm font-bold">No comments found</p>
-                            <p className="text-slate-500 text-[9px] font-mono">Try adjusting your search or filters</p>
-                          </div>
-                        </td>
-                      </tr>
-                    ) : (
-                      comments.map((comment, idx) => (
-                        <motion.tr 
-                          key={comment.comment_id} 
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: Math.min(idx * 0.03, 0.3) }}
-                          className={`hover:bg-white/5 transition-all group ${comment.is_reported ? 'bg-red-500/5' : ''}`}
-                        >
-                          {/* ID */}
-                          <td className="px-4 py-4">
-                            <span className="text-indigo-400 font-black text-[11px] whitespace-nowrap">#{comment.comment_id}</span>
-                          </td>
-                          
-                          {/* User */}
-                          <td className="px-4 py-4">
-                            <div className="flex items-center gap-2">
-                              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0">
-                                <span className="text-[8px] text-white font-black">
-                                  {comment.user?.username?.[0]?.toUpperCase() || "?"}
-                                </span>
-                              </div>
-                              <div className="min-w-0">
-                                <p className="text-white text-xs font-bold truncate">@{comment.user?.username || "Unknown"}</p>
-                                <p className="text-[7px] text-slate-500 font-mono truncate">{comment.user?.email || "No email"}</p>
-                              </div>
-                            </div>
-                          </td>
-                          
-                          {/* Article */}
-                          <td className="px-4 py-4">
-                            <Link 
-                              href={`/news/${comment.news_id}`} 
-                              target="_blank"
-                              className="flex items-center gap-1.5 text-[9px] px-2 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-md text-indigo-400 hover:bg-indigo-500/20 transition-all font-mono font-bold group-hover:border-indigo-500/40 max-w-[120px] truncate whitespace-nowrap"
-                              title={comment.news?.title || `News #${comment.news_id}`}
-                            >
-                              <Newspaper size={8} className="flex-shrink-0" />
-                              {comment.news?.title?.slice(0, 15) || `News #${comment.news_id}`}
-                              {comment.news?.title && comment.news.title.length > 15 && '...'}
-                            </Link>
-                          </td>
-                          
-                          {/* Content */}
-                          <td className="px-4 py-4 max-w-[300px]">
-                            <div 
-                              className="text-sm text-slate-300 line-clamp-2 font-sans"
-                              dangerouslySetInnerHTML={{ 
-                                __html: DOMPurify.sanitize(
-                                  comment.content.length > 120 
-                                    ? comment.content.slice(0, 120) + '...' 
-                                    : comment.content
-                                ) 
-                              }}
-                            />
-                          </td>
-                          
-                          {/* Rating */}
-                          <td className="px-4 py-4 text-center">
-                            <div className="flex flex-col items-center gap-0.5">
-                              {renderStars(comment.rating)}
-                              {comment.rating && (
-                                <span className="text-[7px] text-slate-500 font-mono">{comment.rating}/5</span>
-                              )}
-                            </div>
-                          </td>
-                          
-                          {/* Status */}
-                          <td className="px-4 py-4 text-center">
-                            <div className="flex justify-center min-w-[90px]">
-                              {getStatusBadge(comment)}
-                            </div>
-                          </td>
-                          
-                          {/* Date */}
-                          <td className="px-4 py-4">
-                            <div className="flex flex-col whitespace-nowrap">
-                              <span className="text-[9px] text-slate-400 font-mono">{formatDate(comment.created_at)}</span>
-                              <span className="text-[7px] text-slate-600 font-mono">
-                                {new Date(comment.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
-                              </span>
-                            </div>
-                          </td>
-                          
-                          {/* Actions */}
-                          <td className="px-4 py-4 text-center">
-                            <div className="flex items-center justify-center gap-1.5">
-                              <motion.button 
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => handleViewDetail(comment)}
-                                className="p-2 bg-white/5 hover:bg-indigo-500/20 rounded-lg text-slate-400 hover:text-indigo-400 transition-all border border-transparent hover:border-indigo-500/30"
-                                title="View details"
-                              >
-                                <Eye size={12} />
-                              </motion.button>
-                              <motion.button 
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => setShowDeleteConfirm(comment.comment_id)}
-                                className="p-2 bg-white/5 hover:bg-rose-500/20 rounded-lg text-slate-400 hover:text-rose-400 transition-all border border-transparent hover:border-rose-500/30"
-                                title="Delete comment"
-                              >
-                                {isDeleting === comment.comment_id ? (
-                                  <Loader2 size={12} className="animate-spin" />
-                                ) : (
-                                  <Trash2 size={12} />
-                                )}
-                              </motion.button>
-                            </div>
-                          </td>
-                        </motion.tr>
-                      ))
-                    )}
+                  <tbody>
+                    {renderRows()}
                   </tbody>
                 </table>
               </div>
             </motion.div>
 
-            {/* Pagination */}
-            {pagination && pagination.last_page > 1 && (
-              <motion.div 
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2, duration: 0.4 }}
-                className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-xl p-4"
-              >
-                <div className="text-[8px] font-mono text-slate-500">
-                  Showing {((pagination.current_page - 1) * pagination.per_page) + 1} to{' '}
-                  {Math.min(pagination.current_page * pagination.per_page, pagination.total)} of {pagination.total} entries
-                </div>
-                <div className="flex items-center gap-1.5 flex-wrap justify-center">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    disabled={pagination.current_page === 1}
-                    className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
-                  >
-                    <ChevronLeft size={10} /> Prev
-                  </motion.button>
-                  
-                  {renderPaginationPages()}
-                  
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setCurrentPage(p => Math.min(pagination.last_page, p + 1))}
-                    disabled={pagination.current_page === pagination.last_page}
-                    className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
-                  >
-                    Next <ChevronRight size={10} />
-                  </motion.button>
-                </div>
-              </motion.div>
-            )}
+            {/* Pagination - Luôn hiển thị */}
+            <motion.div 
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+              className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-xl p-4"
+            >
+              <div className="text-[8px] font-mono text-slate-500">
+                {pagination && pagination.total > 0 ? (
+                  `Showing ${((pagination.current_page - 1) * pagination.per_page) + 1} to ${Math.min(pagination.current_page * pagination.per_page, pagination.total)} of ${pagination.total} entries`
+                ) : (
+                  `Showing 0 of 0 entries`
+                )}
+              </div>
+              <div className="flex items-center gap-1.5 flex-wrap justify-center">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={!pagination || pagination.current_page === 1}
+                  className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
+                >
+                  <ChevronLeft size={10} /> Prev
+                </motion.button>
+                
+                {renderPaginationPages()}
+                
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setCurrentPage(p => Math.min(pagination?.last_page || 1, p + 1))}
+                  disabled={!pagination || pagination.current_page === pagination.last_page || pagination.total === 0}
+                  className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
+                >
+                  Next <ChevronRight size={10} />
+                </motion.button>
+              </div>
+            </motion.div>
           </>
         )}
 
@@ -1285,7 +1277,6 @@ export default function NewsCommentsModerationView() {
                 </div>
 
                 <div className="space-y-4">
-                  {/* User Info */}
                   <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0">
                       <span className="text-sm text-white font-black">
@@ -1306,7 +1297,6 @@ export default function NewsCommentsModerationView() {
                     </div>
                   </div>
 
-                  {/* Content */}
                   <div className="p-4 bg-black/30 rounded-xl border border-white/10">
                     <p className="text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-2">Content</p>
                     <div 
@@ -1315,7 +1305,6 @@ export default function NewsCommentsModerationView() {
                     />
                   </div>
 
-                  {/* Meta Info */}
                   <div className="grid grid-cols-2 gap-3">
                     <div className="p-3 bg-white/5 rounded-xl border border-white/10">
                       <p className="text-[7px] font-mono text-slate-500 uppercase tracking-widest">Article</p>
@@ -1342,7 +1331,6 @@ export default function NewsCommentsModerationView() {
                     </div>
                   </div>
 
-                  {/* Actions */}
                   <div className="flex gap-3 pt-2 border-t border-white/10">
                     <button
                       onClick={() => {

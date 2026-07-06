@@ -1,3 +1,4 @@
+// app/admin/news/page.tsx
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
@@ -69,15 +70,17 @@ const CustomSelect = ({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className={`w-full flex items-center justify-between bg-black/40 border rounded-xl pl-4 pr-3 py-2.5 text-[11px] font-mono text-white transition-all focus:outline-none ${
-          open ? "border-emerald-500/50 bg-black/60" : "border-white/10 hover:border-white/20"
+        className={`w-full flex items-center justify-between bg-black/40 border rounded-xl pl-3.5 pr-3 py-3 text-[12px] font-mono text-white transition-all focus:outline-none ${
+          open
+            ? "border-emerald-500/60 bg-black/60 shadow-[0_0_0_3px_rgba(16,185,129,0.12)]"
+            : "border-white/10 hover:border-white/20"
         }`}
       >
         <span className="truncate">{selected?.label}</span>
         <ChevronRight
           size={12}
           className={`text-slate-500 transition-transform duration-200 flex-shrink-0 ml-2 ${
-            open ? "-rotate-90" : "rotate-90"
+            open ? "rotate-90" : "-rotate-90"
           }`}
         />
       </button>
@@ -88,7 +91,7 @@ const CustomSelect = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.98 }}
             transition={{ duration: 0.15 }}
-            className="absolute z-50 mt-2 w-full bg-[#15151f] border border-white/10 rounded-xl shadow-2xl overflow-hidden py-1.5"
+            className="absolute z-50 mt-2 w-full bg-[#13131c] border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden py-1.5"
           >
             {options.map((opt) => (
               <button
@@ -98,14 +101,14 @@ const CustomSelect = ({
                   onChange(opt.value);
                   setOpen(false);
                 }}
-                className={`w-full text-left px-4 py-2.5 text-[11px] font-mono transition-colors flex items-center justify-between ${
+                className={`w-full text-left px-3.5 py-2.5 text-[12px] font-mono transition-colors flex items-center justify-between ${
                   opt.value === value
                     ? "bg-emerald-500/15 text-emerald-300"
-                    : "text-slate-300 hover:bg-white/5 hover:text-white"
+                    : "text-slate-300 hover:bg-white/[0.06] hover:text-white"
                 }`}
               >
-                <span>{opt.label}</span>
-                {opt.value === value && <CheckCircle2 size={12} className="text-emerald-400" />}
+                <span className="truncate">{opt.label}</span>
+                {opt.value === value && <CheckCircle2 size={13} className="text-emerald-400 flex-shrink-0" />}
               </button>
             ))}
           </motion.div>
@@ -288,50 +291,6 @@ const CustomDatePicker = ({
 };
 
 // ---------- Skeleton Components ----------
-const HeaderSkeleton = () => (
-  <div className="relative group">
-    <div className="relative bg-gradient-to-br from-[#11111a] to-[#0c0c12] rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-      <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="flex flex-col gap-3 w-full md:w-2/3">
-          <div className="h-6 w-48 bg-white/5 rounded-full animate-pulse" />
-          <div className="h-12 w-3/4 bg-white/5 rounded-xl animate-pulse" />
-          <div className="h-4 w-full max-w-2xl bg-white/5 rounded-lg animate-pulse" />
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="h-12 w-28 bg-white/5 rounded-xl animate-pulse" />
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-const SearchSkeleton = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
-  return (
-    <div 
-      className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-end"
-      style={{
-        opacity: isVisible ? 1 : 0,
-        transform: isVisible ? 'translateX(0)' : 'translateX(50px)',
-        transition: 'all 0.4s ease-out'
-      }}
-    >
-      <div className="relative w-full sm:w-80">
-        <div className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-10 pr-4 h-12 animate-pulse" />
-      </div>
-      <div className="flex items-center gap-2">
-        <div className="h-12 w-28 bg-white/5 rounded-xl animate-pulse" />
-      </div>
-    </div>
-  );
-};
-
 const TableHeaderSkeleton = () => (
   <tr className="border-b border-white/10 bg-white/5">
     <th className="px-4 py-4 w-16"><div className="h-3 w-8 bg-white/5 rounded animate-pulse" /></th>
@@ -392,6 +351,9 @@ const TableSkeleton = () => {
                     </div>
                   </td>
                   <td className="px-4 py-4 text-center">
+                    <div className="h-3 w-24 bg-white/5 rounded animate-pulse mx-auto" />
+                  </td>
+                  <td className="px-4 py-4 text-center">
                     <div className="flex items-center justify-center gap-1.5">
                       <div className="w-8 h-8 bg-white/5 rounded-lg animate-pulse" />
                       <div className="w-8 h-8 bg-white/5 rounded-lg animate-pulse" />
@@ -435,11 +397,54 @@ const PaginationSkeleton = () => {
   );
 };
 
+// Skeleton tổng thể cho trang
 const PageSkeleton = () => (
   <div className="flex flex-col gap-8">
-    <HeaderSkeleton />
-    <SearchSkeleton />
+    {/* Header Skeleton */}
+    <div className="relative group">
+      <div className="relative bg-gradient-to-br from-[#11111a] to-[#0c0c12] rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+        <div className="relative z-10 flex flex-col gap-6">
+          {/* Row 1 */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex flex-col gap-3 w-full md:w-2/3">
+              <div className="h-6 w-32 bg-white/5 rounded-full animate-pulse" />
+              <div className="h-12 w-3/4 bg-white/5 rounded-xl animate-pulse" />
+              <div className="h-4 w-full max-w-2xl bg-white/5 rounded-lg animate-pulse" />
+            </div>
+          </div>
+          {/* Row 2 */}
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-white/10">
+            <div className="flex items-center gap-6">
+              <div className="h-3 w-20 bg-white/5 rounded animate-pulse" />
+              <div className="h-3 w-20 bg-white/5 rounded animate-pulse" />
+              <div className="h-3 w-20 bg-white/5 rounded animate-pulse" />
+              <div className="h-3 w-20 bg-white/5 rounded animate-pulse" />
+              <div className="h-3 w-20 bg-white/5 rounded animate-pulse" />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-10 w-28 bg-white/5 rounded-xl animate-pulse" />
+              <div className="h-10 w-36 bg-white/5 rounded-xl animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Search & Filters Skeleton */}
+    <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-end">
+      <div className="relative w-full sm:w-80">
+        <div className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-10 pr-4 h-12 animate-pulse" />
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="h-12 w-24 bg-white/5 rounded-xl animate-pulse" />
+      </div>
+    </div>
+
+    {/* Table Skeleton */}
     <TableSkeleton />
+
+    {/* Pagination Skeleton */}
     <PaginationSkeleton />
   </div>
 );
@@ -480,6 +485,7 @@ export default function NewsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [newsStats, setNewsStats] = useState<{ total: number; categories: Record<string, number> }>({ total: 0, categories: { Markets: 0, Forex: 0, Crypto: 0, Policy: 0 } });
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
   const [toast, setToast] = useState<ToastState>({ 
     message: '', 
@@ -552,6 +558,15 @@ export default function NewsPage() {
         setNews(data.data);
         setTotalPages(data.pagination?.last_page || 1);
         setTotalItems(data.pagination?.total || 0);
+        setNewsStats({
+          total: data.stats?.total || data.pagination?.total || 0,
+          categories: {
+            Markets: data.stats?.categories?.Markets || 0,
+            Forex: data.stats?.categories?.Forex || 0,
+            Crypto: data.stats?.categories?.Crypto || 0,
+            Policy: data.stats?.categories?.Policy || 0,
+          },
+        });
       }
     } catch (error) {
       console.error('Error fetching news:', error);
@@ -670,13 +685,15 @@ export default function NewsPage() {
     }
   };
 
+  // FIXED: Sử dụng POST cho cả create và update
   const handleNewsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
       const token = localStorage.getItem("token");
       const url = `${API_BASE}/admin/news`;
-      const method = newsModal.mode === "edit" ? 'PUT' : 'POST';
+      // Luôn dùng POST vì backend xử lý cả create và update dựa trên news_id
+      const method = 'POST';
 
       const response = await fetch(url, {
         method,
@@ -745,8 +762,25 @@ export default function NewsPage() {
 
   const categories = ["All", "Markets", "Forex", "Crypto", "Policy"];
 
+  // Updated: Luôn hiển thị ít nhất 1 trang
   const renderPaginationPages = () => {
-    if (!totalPages || totalPages <= 1) return null;
+    if (!totalPages || totalPages <= 1) {
+      return (
+        <motion.button
+          key={1}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setCurrentPage(1)}
+          className={`px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-wider transition-all ${
+            currentPage === 1
+              ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-md'
+              : 'bg-white/5 hover:bg-white/10 text-slate-400'
+          }`}
+        >
+          1
+        </motion.button>
+      );
+    }
     
     const total = totalPages;
     const current = currentPage;
@@ -788,6 +822,137 @@ export default function NewsPage() {
     });
   };
 
+  // Render rows - luôn hiển thị đúng 10 dòng
+  const renderRows = () => {
+    const rows = [];
+    const totalRows = 10;
+    
+    if (news.length === 0) {
+      for (let i = 0; i < totalRows; i++) {
+        rows.push(
+          <tr key={`empty-${i}`} className="pointer-events-none">
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] text-center border-none">&nbsp;</td>
+          </tr>
+        );
+      }
+    } else {
+      for (let i = 0; i < news.length; i++) {
+        const item = news[i];
+        rows.push(
+          <motion.tr 
+            key={item.news_id} 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: Math.min(i * 0.03, 0.3) }}
+            onMouseEnter={() => setHoveredRow(item.news_id)}
+            onMouseLeave={() => setHoveredRow(null)}
+            className="hover:bg-white/5 transition-all group border-b border-white/5"
+          >
+            <td className="px-4 py-4">
+              <div className="relative w-14 h-12 rounded-lg overflow-hidden border border-white/10 bg-black/30 flex-shrink-0">
+                {item.image_url ? (
+                  <img 
+                    src={item.image_url} 
+                    alt="" 
+                    className="w-full h-full object-cover grayscale-[60%] opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300" 
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <ImageIcon size={16} className="text-slate-600" />
+                  </div>
+                )}
+              </div>
+            </td>
+            <td className="px-4 py-4">
+              <div className="flex flex-col gap-1 max-w-md">
+                <span className="text-white font-black text-sm font-sans tracking-tight line-clamp-1 group-hover:text-emerald-400 transition-colors">
+                  {item.title}
+                </span>
+                <div className="flex items-center gap-2 text-[7px] text-slate-500 font-mono">
+                  <Clock size={8} />
+                  <span>{new Date(item.published_at).toLocaleDateString()}</span>
+                  <Eye size={8} />
+                  <span>1.2k views</span>
+                </div>
+              </div>
+            </td>
+            <td className="px-4 py-4">
+              <span className={`px-2 py-1 rounded-lg text-[7px] font-black uppercase border ${getCategoryColor(item.category)}`}>
+                {item.category}
+              </span>
+            </td>
+            <td className="px-4 py-4">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
+                  <span className="text-[8px] text-emerald-400 font-black">
+                    {item.author?.username?.[0]?.toUpperCase() || "?"}
+                  </span>
+                </div>
+                <span className="text-slate-300 text-[9px] font-black uppercase tracking-tighter truncate max-w-[80px]">
+                  @{item.author?.username || "Unknown"}
+                </span>
+              </div>
+            </td>
+            <td className="px-4 py-4">
+              <div className="flex flex-col whitespace-nowrap">
+                <span className="text-[9px] text-slate-400 font-mono">{formatDate(item.published_at)}</span>
+                <span className="text-[7px] text-slate-600 font-mono">
+                  {new Date(item.published_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+            </td>
+            <td className="px-4 py-4 text-center">
+              <div className="flex items-center justify-center gap-1.5">
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => openNewsModal("edit", item)} 
+                  className="p-2 bg-white/5 hover:bg-emerald-500/20 rounded-lg text-slate-400 hover:text-emerald-400 transition-all border border-transparent hover:border-emerald-500/30"
+                  title="Edit news"
+                >
+                  <Edit size={12} />
+                </motion.button>
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowDeleteConfirm(item.news_id)} 
+                  className="p-2 bg-white/5 hover:bg-rose-500/20 rounded-lg text-slate-400 hover:text-rose-400 transition-all border border-transparent hover:border-rose-500/30"
+                  title="Delete news"
+                >
+                  {isDeleting === item.news_id ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : (
+                    <Trash2 size={12} />
+                  )}
+                </motion.button>
+              </div>
+            </td>
+          </motion.tr>
+        );
+      }
+      
+      for (let i = news.length; i < totalRows; i++) {
+        rows.push(
+          <tr key={`empty-${i}`} className="pointer-events-none">
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
+            <td className="px-4 py-4 h-[73px] text-center border-none">&nbsp;</td>
+          </tr>
+        );
+      }
+    }
+
+    return rows;
+  };
+
   return (
     <div className="min-h-screen bg-[#05050a] text-slate-100 flex flex-col font-sans pt-28 pb-20 selection:bg-emerald-500/30 overflow-x-hidden">
       
@@ -823,7 +988,6 @@ export default function NewsPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative w-full flex flex-col gap-8">
         
-        {/* Hiển thị Skeleton khi đang loading */}
         {isLoading ? (
           <PageSkeleton />
         ) : (
@@ -838,38 +1002,68 @@ export default function NewsPage() {
               <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/30 via-teal-500/30 to-emerald-500/30 rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-100 transition duration-700" />
               <div className="relative bg-gradient-to-br from-[#11111a] to-[#0c0c12] rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl overflow-hidden">
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-                <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                  <div className="flex flex-col gap-3">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full w-fit">
-                      <Newspaper size={12} className="text-emerald-400" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400 font-mono">News Intelligence Dispatch</span>
+                <div className="relative z-10 flex flex-col gap-6">
+                  {/* Row 1: Title + Badge (trên cùng) */}
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div className="flex flex-col gap-3">
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full w-fit">
+                        <Newspaper size={12} className="text-emerald-400" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400 font-mono">News Intelligence Dispatch</span>
+                      </div>
+                      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tighter uppercase text-white leading-none">
+                        Intelligence <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-400 to-cyan-400">Chronicles</span>
+                      </h1>
+                      <p className="text-xs text-slate-500 max-w-2xl">
+                        Management of market insights, economic bulletins, and financial reports. Broadcast high-fidelity intelligence across the terminal network.
+                      </p>
                     </div>
-                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tighter uppercase text-white leading-none">
-                      Intelligence <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-400 to-cyan-400">Chronicles</span>
-                    </h1>
-                    <p className="text-xs text-slate-500 max-w-2xl">
-                      Management of market insights, economic bulletins, and financial reports. Broadcast high-fidelity intelligence across the terminal network.
-                    </p>
                   </div>
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <motion.button 
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => fetchNews()}
-                      className="bg-white/5 hover:bg-white/10 text-slate-300 font-mono text-[9px] font-black uppercase tracking-widest px-4 py-3 rounded-xl transition-all flex items-center gap-2 border border-white/10"
-                    >
-                      <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} /> 
-                      {isLoading ? "Loading..." : "Refresh"}
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => openNewsModal("create")}
-                      className="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-mono text-[9px] font-black uppercase tracking-widest px-6 py-3 rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-emerald-600/30"
-                    >
-                      <Plus size={14} />
-                      <span>Draft Dispatch</span>
-                    </motion.button>
+                  
+                  {/* Row 2: Stats + Buttons (phía dưới) */}
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-white/10">
+                    <div className="flex items-center gap-6 text-[11px] font-mono text-slate-500 uppercase tracking-wider">
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-400">Total:</span>
+                        <span className="text-white font-bold">{totalItems}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-indigo-400">●</span>
+                        <span>Markets: {newsStats.categories.Markets}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-emerald-400">●</span>
+                        <span>Forex: {newsStats.categories.Forex}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-amber-400">●</span>
+                        <span>Crypto: {newsStats.categories.Crypto}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-purple-400">●</span>
+                        <span>Policy: {newsStats.categories.Policy}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {/* Refresh bên trái, Draft Dispatch bên phải */}
+                      <motion.button 
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => fetchNews()}
+                        className="bg-white/5 hover:bg-white/10 text-slate-300 font-mono text-[9px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 border border-white/10 hover:border-white/20"
+                      >
+                        <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} /> 
+                        {isLoading ? "Loading..." : "Refresh"}
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => openNewsModal("create")}
+                        className="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-mono text-[9px] font-black uppercase tracking-widest px-5 py-2.5 rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-emerald-600/30"
+                      >
+                        <Plus size={14} />
+                        <span>Draft Dispatch</span>
+                      </motion.button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1001,178 +1195,50 @@ export default function NewsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {news.length === 0 ? (
-                      // Hiển thị 10 dòng trống khi không có dữ liệu
-                      [...Array(10)].map((_, idx) => (
-                        <tr key={`empty-${idx}`} className="pointer-events-none">
-                          <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
-                          <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
-                          <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
-                          <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
-                          <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
-                          <td className="px-4 py-4 h-[73px] text-center border-none">&nbsp;</td>
-                        </tr>
-                      ))
-                    ) : (
-                      <>
-                        {news.map((item, idx) => (
-                          <motion.tr 
-                            key={item.news_id} 
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: Math.min(idx * 0.03, 0.3) }}
-                            onMouseEnter={() => setHoveredRow(item.news_id)}
-                            onMouseLeave={() => setHoveredRow(null)}
-                            className="hover:bg-white/5 transition-all group border-b border-white/5"
-                          >
-                            {/* Image */}
-                            <td className="px-4 py-4">
-                              <div className="relative w-14 h-12 rounded-lg overflow-hidden border border-white/10 bg-black/30 flex-shrink-0">
-                                {item.image_url ? (
-                                  <img 
-                                    src={item.image_url} 
-                                    alt="" 
-                                    className="w-full h-full object-cover grayscale-[60%] opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300" 
-                                  />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center">
-                                    <ImageIcon size={16} className="text-slate-600" />
-                                  </div>
-                                )}
-                              </div>
-                            </td>
-                            
-                            {/* Title */}
-                            <td className="px-4 py-4">
-                              <div className="flex flex-col gap-1 max-w-md">
-                                <span className="text-white font-black text-sm font-sans tracking-tight line-clamp-1 group-hover:text-emerald-400 transition-colors">
-                                  {item.title}
-                                </span>
-                                <div className="flex items-center gap-2 text-[7px] text-slate-500 font-mono">
-                                  <Clock size={8} />
-                                  <span>{new Date(item.published_at).toLocaleDateString()}</span>
-                                  <Eye size={8} />
-                                  <span>1.2k views</span>
-                                </div>
-                              </div>
-                            </td>
-                            
-                            {/* Category */}
-                            <td className="px-4 py-4">
-                              <span className={`px-2 py-1 rounded-lg text-[7px] font-black uppercase border ${getCategoryColor(item.category)}`}>
-                                {item.category}
-                              </span>
-                            </td>
-                            
-                            {/* Author */}
-                            <td className="px-4 py-4">
-                              <div className="flex items-center gap-2">
-                                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
-                                  <span className="text-[8px] text-emerald-400 font-black">
-                                    {item.author?.username?.[0]?.toUpperCase() || "?"}
-                                  </span>
-                                </div>
-                                <span className="text-slate-300 text-[9px] font-black uppercase tracking-tighter truncate max-w-[80px]">
-                                  @{item.author?.username || "Unknown"}
-                                </span>
-                              </div>
-                            </td>
-                            
-                            {/* Published */}
-                            <td className="px-4 py-4">
-                              <div className="flex flex-col whitespace-nowrap">
-                                <span className="text-[9px] text-slate-400 font-mono">{formatDate(item.published_at)}</span>
-                                <span className="text-[7px] text-slate-600 font-mono">
-                                  {new Date(item.published_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
-                                </span>
-                              </div>
-                            </td>
-                            
-                            {/* Actions */}
-                            <td className="px-4 py-4 text-center">
-                              <div className="flex items-center justify-center gap-1.5">
-                                <motion.button 
-                                  whileHover={{ scale: 1.05 }}
-                                  whileTap={{ scale: 0.95 }}
-                                  onClick={() => openNewsModal("edit", item)} 
-                                  className="p-2 bg-white/5 hover:bg-emerald-500/20 rounded-lg text-slate-400 hover:text-emerald-400 transition-all border border-transparent hover:border-emerald-500/30"
-                                  title="Edit news"
-                                >
-                                  <Edit size={12} />
-                                </motion.button>
-                                <motion.button 
-                                  whileHover={{ scale: 1.05 }}
-                                  whileTap={{ scale: 0.95 }}
-                                  onClick={() => setShowDeleteConfirm(item.news_id)} 
-                                  className="p-2 bg-white/5 hover:bg-rose-500/20 rounded-lg text-slate-400 hover:text-rose-400 transition-all border border-transparent hover:border-rose-500/30"
-                                  title="Delete news"
-                                >
-                                  {isDeleting === item.news_id ? (
-                                    <Loader2 size={12} className="animate-spin" />
-                                  ) : (
-                                    <Trash2 size={12} />
-                                  )}
-                                </motion.button>
-                              </div>
-                            </td>
-                          </motion.tr>
-                        ))}
-                        
-                        {/* Thêm dòng trống để đủ 10 dòng - KHÔNG CÓ GẠCH NGANG */}
-                        {news.length < 10 && [...Array(10 - news.length)].map((_, idx) => (
-                          <tr key={`empty-${idx}`} className="pointer-events-none">
-                            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
-                            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
-                            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
-                            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
-                            <td className="px-4 py-4 h-[73px] border-none">&nbsp;</td>
-                            <td className="px-4 py-4 h-[73px] text-center border-none">&nbsp;</td>
-                          </tr>
-                        ))}
-                      </>
-                    )}
+                    {renderRows()}
                   </tbody>
                 </table>
               </div>
             </motion.div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <motion.div 
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2, duration: 0.4 }}
-                className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-xl p-4"
-              >
-                <div className="text-[8px] font-mono text-slate-500">
-                  Showing {((currentPage - 1) * 10) + 1} to{' '}
-                  {Math.min(currentPage * 10, totalItems)} of {totalItems} entries
-                </div>
-                <div className="flex items-center gap-1.5 flex-wrap justify-center">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
-                  >
-                    <ChevronLeft size={10} /> Prev
-                  </motion.button>
-                  
-                  {renderPaginationPages()}
-                  
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
-                  >
-                    Next <ChevronRight size={10} />
-                  </motion.button>
-                </div>
-              </motion.div>
-            )}
+            {/* Pagination - Luôn hiển thị */}
+            <motion.div 
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+              className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 rounded-xl p-4"
+            >
+              <div className="text-[8px] font-mono text-slate-500">
+                {totalItems > 0 ? (
+                  `Showing ${((currentPage - 1) * 10) + 1} to ${Math.min(currentPage * 10, totalItems)} of ${totalItems} entries`
+                ) : (
+                  `Showing 0 of 0 entries`
+                )}
+              </div>
+              <div className="flex items-center gap-1.5 flex-wrap justify-center">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
+                >
+                  <ChevronLeft size={10} /> Prev
+                </motion.button>
+                
+                {renderPaginationPages()}
+                
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setCurrentPage(p => Math.min(totalPages || 1, p + 1))}
+                  disabled={currentPage === totalPages || totalPages === 0}
+                  className="px-3 py-1.5 bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-1"
+                >
+                  Next <ChevronRight size={10} />
+                </motion.button>
+              </div>
+            </motion.div>
           </>
         )}
 
@@ -1249,127 +1315,135 @@ export default function NewsPage() {
                 exit={{ scale: 0.95, opacity: 0, y: 20 }}
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-gradient-to-br from-[#11111a] to-[#0c0c12] border border-white/10 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+                className="relative bg-gradient-to-b from-[#131320] to-[#0a0a10] border border-white/10 w-full max-w-2xl rounded-3xl shadow-2xl shadow-black/60 flex flex-col max-h-[92vh]"
               >
-                <div className="p-6 border-b border-white/10 flex justify-between items-center bg-gradient-to-r from-white/5 to-transparent sticky top-0 bg-[#11111a]/95 backdrop-blur-sm z-10">
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 bg-emerald-500/10 rounded-lg">
-                      {newsModal.mode === "edit" ? <Edit size={14} className="text-emerald-400" /> : <Sparkles size={14} className="text-emerald-400" />}
+                {/* Ambient glow */}
+                <div className="pointer-events-none absolute -top-24 -left-16 w-56 h-56 bg-indigo-600/15 blur-[90px] rounded-full" />
+                <div className="pointer-events-none absolute -bottom-20 -right-10 w-48 h-48 bg-emerald-500/10 blur-[90px] rounded-full" />
+
+                {/* Header */}
+                <div className="relative px-7 py-5 flex justify-between items-center border-b border-white/[0.06] rounded-t-3xl flex-shrink-0">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/25 to-emerald-500/5 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                      {newsModal.mode === "edit" ? <Edit size={16} className="text-emerald-400" /> : <Sparkles size={16} className="text-emerald-400" />}
                     </div>
                     <div>
-                      <h3 className="text-base font-black uppercase text-white">
+                      <h3 className="text-[15px] font-black uppercase text-white tracking-wide leading-tight">
                         {newsModal.mode === "edit" ? "Refine Dispatch" : "New Intelligence"}
                       </h3>
-                      <p className="text-[7px] text-slate-500 font-mono">Drafting Terminal</p>
+                      <p className="text-[10px] text-slate-500 font-mono mt-0.5">Drafting Terminal</p>
                     </div>
                   </div>
                   <button 
                     onClick={() => setNewsModal({ show: false, mode: "create", data: null })} 
-                    className="text-slate-500 hover:text-white p-1.5 rounded-lg bg-white/5 transition-all"
+                    className="text-slate-500 hover:text-white p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all flex-shrink-0"
                   >
                     <X size={16} />
                   </button>
                 </div>
 
-                <form onSubmit={handleNewsSubmit} className="p-6 flex flex-col gap-5">
-                  <div className="space-y-2">
-                    <label className="text-[7px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                      <Newspaper size={8} /> Headline Title
-                    </label>
-                    <input 
-                      required 
-                      value={newsForm.title}
-                      onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })}
-                      className="w-full bg-black/40 border border-white/10 focus:border-emerald-500/50 rounded-xl p-3 text-sm font-black text-white outline-none transition-all"
-                      placeholder="Enter news title..."
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
+                <form onSubmit={handleNewsSubmit} className="relative flex flex-col flex-1 min-h-0">
+                  <div className="p-7 flex flex-col gap-6 overflow-y-auto custom-scrollbar">
                     <div className="space-y-2">
-                      <label className="text-[7px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                        <User size={8} /> Author
+                      <label className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <Newspaper size={11} className="text-emerald-400" /> Headline Title
                       </label>
                       <input 
                         required 
-                        value={newsForm.author?.username || ""}
-                        onChange={(e) => setNewsForm({ ...newsForm, author: { username: e.target.value.toUpperCase() } })}
-                        className="w-full bg-black/40 border border-white/10 focus:border-emerald-500/50 rounded-xl p-3 text-sm font-mono font-black text-white outline-none transition-all"
-                        placeholder="USERNAME"
+                        value={newsForm.title}
+                        onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })}
+                        className="w-full bg-black/40 border border-white/10 focus:border-emerald-500/60 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.12)] rounded-xl px-3.5 py-3 text-sm font-bold text-white outline-none transition-all placeholder:text-slate-600 placeholder:font-normal"
+                        placeholder="Enter news title..."
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[7px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                        <Tag size={8} /> Category
-                      </label>
-                      <CustomSelect
-                        value={newsForm.category}
-                        onChange={(v) => setNewsForm({ ...newsForm, category: v })}
-                        options={[
-                          { value: "Markets", label: "Markets" },
-                          { value: "Forex", label: "Forex" },
-                          { value: "Crypto", label: "Crypto" },
-                          { value: "Policy", label: "Policy" },
-                        ]}
-                      />
-                    </div>
-                  </div>
 
-                  <div className="space-y-2">
-                    <label className="text-[7px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                      <ImageIcon size={8} /> Image
-                    </label>
-                    <div className="flex flex-col gap-2">
-                      <label className="flex items-center gap-3 bg-black/40 border border-white/10 hover:border-emerald-500/40 rounded-xl p-3 cursor-pointer transition-all group">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          disabled={uploadingImage}
-                          className="hidden"
+                    <div className="grid grid-cols-2 gap-5">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                          <User size={11} className="text-emerald-400" /> Author
+                        </label>
+                        <input 
+                          required 
+                          value={newsForm.author?.username || ""}
+                          onChange={(e) => setNewsForm({ ...newsForm, author: { username: e.target.value.toUpperCase() } })}
+                          className="w-full bg-black/40 border border-white/10 focus:border-emerald-500/60 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.12)] rounded-xl px-3.5 py-3 text-sm font-mono font-bold text-white outline-none transition-all placeholder:text-slate-600 placeholder:font-normal"
+                          placeholder="USERNAME"
                         />
-                        <div className={`p-1.5 rounded-lg ${uploadingImage ? 'bg-emerald-500/20' : 'bg-white/5'} group-hover:bg-white/10 transition-all`}>
-                          {uploadingImage ? <Loader2 size={12} className="animate-spin text-emerald-400" /> : <Upload size={12} className="text-slate-400" />}
-                        </div>
-                        <span className="text-[10px] font-mono text-slate-400 group-hover:text-white transition-colors">
-                          {uploadingImage ? "Uploading..." : selectedFile ? selectedFile.name : "Click to upload image"}
-                        </span>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                          <Tag size={11} className="text-emerald-400" /> Category
+                        </label>
+                        <CustomSelect
+                          value={newsForm.category}
+                          onChange={(v) => setNewsForm({ ...newsForm, category: v })}
+                          options={[
+                            { value: "Markets", label: "Markets" },
+                            { value: "Forex", label: "Forex" },
+                            { value: "Crypto", label: "Crypto" },
+                            { value: "Policy", label: "Policy" },
+                          ]}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <ImageIcon size={11} className="text-emerald-400" /> Image
                       </label>
-                      {newsForm.image_url && (
-                        <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 p-2 rounded-lg">
-                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                          <span className="text-[8px] text-emerald-400 font-mono">Image uploaded successfully</span>
-                          <button
-                            type="button"
-                            onClick={() => setNewsForm({ ...newsForm, image_url: "" })}
-                            className="ml-auto p-1 text-slate-400 hover:text-rose-400 transition-all"
-                          >
-                            <X size={10} />
-                          </button>
-                        </div>
-                      )}
+                      <div className="flex flex-col gap-2.5">
+                        <label className="flex items-center gap-3 bg-black/40 border border-white/10 hover:border-emerald-500/40 rounded-xl px-3.5 py-3.5 cursor-pointer transition-all group">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            disabled={uploadingImage}
+                            className="hidden"
+                          />
+                          <div className={`p-2 rounded-lg ${uploadingImage ? 'bg-emerald-500/20' : 'bg-white/5'} group-hover:bg-white/10 transition-all flex-shrink-0`}>
+                            {uploadingImage ? <Loader2 size={14} className="animate-spin text-emerald-400" /> : <Upload size={14} className="text-slate-400" />}
+                          </div>
+                          <span className="text-[12px] font-mono text-slate-400 group-hover:text-white transition-colors truncate">
+                            {uploadingImage ? "Uploading..." : selectedFile ? selectedFile.name : "Click to upload image"}
+                          </span>
+                        </label>
+                        {newsForm.image_url && (
+                          <div className="flex items-center gap-2.5 bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-2.5 rounded-xl">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+                            <span className="text-[10px] text-emerald-400 font-mono">Image uploaded successfully</span>
+                            <button
+                              type="button"
+                              onClick={() => setNewsForm({ ...newsForm, image_url: "" })}
+                              className="ml-auto p-1 text-slate-400 hover:text-rose-400 transition-all flex-shrink-0"
+                            >
+                              <X size={12} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <Globe size={11} className="text-emerald-400" /> Content
+                      </label>
+                      <textarea 
+                        required 
+                        rows={8} 
+                        value={newsForm.content}
+                        onChange={(e) => setNewsForm({ ...newsForm, content: e.target.value })}
+                        className="w-full bg-black/40 border border-white/10 focus:border-emerald-500/60 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.12)] rounded-xl px-3.5 py-3 text-sm font-mono text-white outline-none transition-all resize-none leading-relaxed placeholder:text-slate-600"
+                        placeholder="Write the news content here..."
+                      />
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-[7px] font-mono font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                      <Globe size={8} /> Content
-                    </label>
-                    <textarea 
-                      required 
-                      rows={8} 
-                      value={newsForm.content}
-                      onChange={(e) => setNewsForm({ ...newsForm, content: e.target.value })}
-                      className="w-full bg-black/40 border border-white/10 focus:border-emerald-500/50 rounded-xl p-3 text-sm font-mono text-white outline-none transition-all resize-none"
-                      placeholder="Write the news content here..."
-                    />
-                  </div>
-
-                  <div className="flex justify-end gap-3 mt-2">
+                  {/* Footer */}
+                  <div className="relative px-7 py-5 border-t border-white/[0.06] bg-black/20 rounded-b-3xl flex justify-end gap-3 flex-shrink-0">
                     <button
                       type="button"
                       onClick={() => setNewsModal({ show: false, mode: "create", data: null })}
-                      className="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl text-[8px] font-black uppercase tracking-wider transition-all"
+                      className="px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all"
                     >
                       Cancel
                     </button>
@@ -1377,9 +1451,9 @@ export default function NewsPage() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       type="submit" 
-                      className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-xl text-[8px] font-black uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-emerald-600/30"
+                      className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-emerald-600/30"
                     >
-                      <Save size={12} /> {newsModal.mode === "edit" ? "Commit Changes" : "Broadcast"}
+                      <Save size={13} /> {newsModal.mode === "edit" ? "Commit Changes" : "Broadcast"}
                     </motion.button>
                   </div>
                 </form>

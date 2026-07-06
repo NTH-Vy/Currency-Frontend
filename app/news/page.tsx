@@ -40,7 +40,8 @@ import {
   ThumbsUp,
   Share2,
   Bookmark,
-  MoreHorizontal
+  MoreHorizontal,
+  ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -184,11 +185,24 @@ export default function NewsPage() {
   const [emailSubscribed, setEmailSubscribed] = useState(false);
   const [subscribeEmail, setSubscribeEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const searchDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const scrollPositionRef = useRef<number>(0);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || `${BACK_END}/api`;
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const showToast = (message: string) => {
     setToast({ message, visible: true });
@@ -311,6 +325,7 @@ export default function NewsPage() {
   const handleCategoryChange = (cat: string) => {
     setActiveCategory(cat);
     setCurrentPage(1);
+    setIsDropdownOpen(false);
     scrollPositionRef.current = 0;
     window.scrollTo({ top: 0, behavior: 'smooth' });
     track('category_change', { category: cat });
@@ -506,39 +521,64 @@ export default function NewsPage() {
             {/* LEFT SIDEBAR */}
             <div className="lg:col-span-8 flex flex-col gap-8">
               
-              {/* Categories & Search */}
+{/* Categories Dropdown & Search */}
               <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
-                <div className="flex bg-white/[0.02] border border-white/10 p-1 rounded-xl backdrop-blur-sm overflow-x-auto gap-1 scrollbar-none" role="tablist">
-                  {newsCategories.map(cat => (
-                    <motion.button
-                      key={cat}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleCategoryChange(cat)}
-                      role="tab"
-                      aria-selected={activeCategory === cat}
-                      aria-label={`Filter by ${cat}`}
-                      className={`px-3 py-1.5 text-[10px] font-bold font-mono tracking-wide rounded-lg transition-all whitespace-nowrap cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/50 ${
-                        activeCategory === cat
-                          ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-600/30'
-                          : 'text-slate-400 hover:text-white hover:bg-white/5'
-                      }`}
-                    >
-                      {cat}
-                    </motion.button>
-                  ))}
-                </div>
-
-                <div className="relative group">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" size={12} />
+                {/* Search Box - Chiếm nhiều không gian hơn */}
+                <div className="relative group flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" size={14} />
                   <input
                     type="text"
                     placeholder="Search terminal..."
                     value={searchQuery}
                     onChange={(e) => handleSearchChange(e.target.value)}
                     aria-label="Search news articles"
-                    className="w-full md:w-56 bg-black/40 border border-white/10 focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 rounded-xl py-2 pl-8 pr-3 text-[11px] font-mono text-white outline-none transition-all focus:bg-black/60"
+                    className="w-full bg-black/40 border border-white/10 focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 rounded-xl py-2.5 pl-10 pr-4 text-sm font-mono text-white outline-none transition-all focus:bg-black/60 placeholder:text-slate-500"
                   />
+                </div>
+
+                {/* Dropdown Category Selector - Đẹp hơn */}
+                <div className="relative shrink-0" ref={dropdownRef}>
+                  <button
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    aria-expanded={isDropdownOpen}
+                    aria-haspopup="listbox"
+                    className="flex items-center gap-3 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white rounded-xl text-sm font-semibold font-mono tracking-wide shadow-lg shadow-indigo-600/25 hover:from-indigo-500 hover:to-indigo-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 min-w-[160px] justify-between"
+                  >
+                    <span className="truncate">{activeCategory}</span>
+                    <ChevronDown 
+                      size={16} 
+                      className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} 
+                    />
+                  </button>
+
+                  <AnimatePresence>
+                    {isDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
+                        role="listbox"
+                        className="absolute top-full right-0 mt-2 w-full min-w-[180px] bg-[#1a1a2e] border border-white/10 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl z-50 py-1.5"
+                      >
+                        {newsCategories.map((cat) => (
+                          <button
+                            key={cat}
+                            onClick={() => handleCategoryChange(cat)}
+                            role="option"
+                            aria-selected={activeCategory === cat}
+                            className={`w-full text-left px-4 py-2.5 text-sm font-mono font-medium tracking-wide transition-all duration-150 hover:bg-white/5 ${
+                              activeCategory === cat
+                                ? 'text-indigo-400 bg-indigo-500/10 border-l-2 border-indigo-400'
+                                : 'text-slate-300 hover:text-white'
+                            }`}
+                          >
+                            {cat}
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
 

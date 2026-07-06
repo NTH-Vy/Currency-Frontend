@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { 
   ShieldAlert, RotateCcw, Globe, Newspaper, ShieldCheck, 
@@ -17,8 +17,53 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import "../css/Admin/Dashboard.css";
 import { BACK_END } from "@/lib/echo";
+import { buildDashboardCsv } from "@/lib/adminDashboard";
+import { fetchJsonWithRetry } from "@/lib/adminApi";
+import { trackPerformanceMetric } from "@/lib/perf";
 
-// Định nghĩa cấu trúc dữ liệu triệt để cho Activity Log
+const REFRESH_INTERVAL_MS = 5_000;
+const TOAST_DURATION_MS = 3_000;
+const ORACLE_REFRESH_DELAY_MS = 300;
+
+interface AdminStatisticsResponse {
+  success: boolean;
+  data: {
+    rates_count: number;
+    news_count: number;
+    users_count: number;
+    posts_count: number;
+    rates_trend: number;
+    news_trend: number;
+    users_trend: number;
+    posts_trend: number;
+  };
+}
+
+interface AdminActivityLogsResponse {
+  success: boolean;
+  data: ActivityLog[];
+}
+
+interface SystemHealthResponse {
+  success: boolean;
+  data: {
+    cpu: number;
+    cpu_cores: { core_1: number; core_2: number; core_3: number; core_4: number };
+    db: string;
+    latency: number;
+    memory: { usage_percent: number; total: number; free: number };
+    disk: { usage_percent: number; total: number; free: number; used: number };
+    network_throughput: number;
+    system_health: number;
+    security: {
+      firewall: string;
+      ddos_protection: string;
+      ssl: string;
+    };
+    uptime: string;
+  };
+}
+
 interface ActivityLog {
   log_id: number;
   user_id: string;
@@ -43,10 +88,10 @@ export default function AdminDashboardView() {
   const [usersTrend, setUsersTrend] = useState(0);
   const [postsTrend, setPostsTrend] = useState(0);
   
-  // Sửa lỗi: Chỉ định rõ mảng chứa các ActivityLog[] thay vì để trống [] (never[])
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<{ role?: string; username?: string } | null>(null);
+  const [oracleRateDraft, setOracleRateDraft] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [time, setTime] = useState(new Date());
   const [broadcastTitle, setBroadcastTitle] = useState("");
@@ -56,7 +101,6 @@ export default function AdminDashboardView() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   
-  // System health stats
   const [systemStats, setSystemStats] = useState<{
     cpu: number;
     cpu_cores: { core_1: number; core_2: number; core_3: number; core_4: number };
@@ -91,14 +135,13 @@ export default function AdminDashboardView() {
 
   const [lastSyncTime, setLastSyncTime] = useState<Date>(new Date());
   
-  // Oracle Override state
   const [oraclePair, setOraclePair] = useState("EUR/USD");
   const [oracleRate, setOracleRate] = useState("");
   const [isOverriding, setIsOverriding] = useState(false);
   const [currentRateInfo, setCurrentRateInfo] = useState<{ price: string; change: string; trend: string; volume: string; lastUpdated: string } | null>(null);
+  const [oracleInput, setOracleInput] = useState("");
 
-  // Ép kiểu chuẩn cho mảng dữ liệu mẫu mock data
-  const mockActivityLogs: ActivityLog[] = [
+  const mockActivityLogs = useMemo<ActivityLog[]>(() => [
     { log_id: 1, user_id: "U001", username: "0xKaelen", activity_type: "RATE_UPDATE", description: "Modified EUR/USD spread parameters", target_type: "rate", target_id: "eur_usd", created_at: new Date().toISOString(), avatar: "K", status: "success" },
     { log_id: 2, user_id: "U002", username: "VY123", activity_type: "COMMENT", description: "Posted analysis on NFP report", target_type: "post", target_id: "post_42", created_at: new Date(Date.now() - 2*60000).toISOString(), avatar: "V", status: "info" },
     { log_id: 3, user_id: "U003", username: "CipherVault", activity_type: "SECURITY", description: "Two-factor authentication enabled", target_type: "user", target_id: "user_89", created_at: new Date(Date.now() - 7*60000).toISOString(), avatar: "C", status: "warning" },
@@ -111,7 +154,7 @@ export default function AdminDashboardView() {
     { log_id: 10, user_id: "U009", username: "QuantTrader", activity_type: "RATE_UPDATE", description: "Updated USD/JPY leverage limits", target_type: "rate", target_id: "usd_jpy", created_at: new Date(Date.now() - 95*60000).toISOString(), avatar: "Q", status: "success" },
     { log_id: 11, user_id: "U010", username: "AlphaSignal", activity_type: "COMMENT", description: "Shared technical analysis on S&P 500", target_type: "post", target_id: "post_101", created_at: new Date(Date.now() - 110*60000).toISOString(), avatar: "A", status: "info" },
     { log_id: 12, user_id: "U011", username: "BetaTrader", activity_type: "TRADE_EXEC", description: "Closed position: +342 pips", target_type: "trade", target_id: "tx_9012", created_at: new Date(Date.now() - 125*60000).toISOString(), avatar: "B", status: "success" },
-  ];
+  ], []);
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -129,25 +172,26 @@ export default function AdminDashboardView() {
     const loadData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`${BACK_END}/api/admin/statistics`, {
-          headers: { "Authorization": `Bearer ${token}` },
+        const startedAt = performance.now();
+        const data = await fetchJsonWithRetry<AdminStatisticsResponse>(`${BACK_END}/api/admin/statistics`, {
+          authToken: token,
+          cacheKey: 'admin-statistics-cache',
+          cacheTtlMs: 15_000,
         });
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success) {
-            setRatesCount(data.data.rates_count);
-            setNewsCount(data.data.news_count);
-            setUsersCount(data.data.users_count);
-            setPostsCount(data.data.posts_count);
-            setRatesTrend(data.data.rates_trend || 0);
-            setNewsTrend(data.data.news_trend || 0);
-            setUsersTrend(data.data.users_trend || 0);
-            setPostsTrend(data.data.posts_trend || 0);
-          }
+
+        if (data.success) {
+          setRatesCount(data.data.rates_count);
+          setNewsCount(data.data.news_count);
+          setUsersCount(data.data.users_count);
+          setPostsCount(data.data.posts_count);
+          setRatesTrend(data.data.rates_trend || 0);
+          setNewsTrend(data.data.news_trend || 0);
+          setUsersTrend(data.data.users_trend || 0);
+          setPostsTrend(data.data.posts_trend || 0);
+          trackPerformanceMetric('admin.statistics.load', performance.now() - startedAt);
         }
       } catch (error) {
         console.error("Error fetching statistics:", error);
-        // Fallback to localStorage if API fails
         setRatesCount(JSON.parse(localStorage.getItem("sandbox-rates-cache") || "[]").length || 6);
         setNewsCount(JSON.parse(localStorage.getItem("sandbox-news-articles") || "[]").length || 2);
         setUsersCount(JSON.parse(localStorage.getItem("sandbox-users-cache") || "[]").length || 4);
@@ -161,30 +205,51 @@ export default function AdminDashboardView() {
     loadData();
   }, [router]);
 
-  const fetchActivityLogs = async () => {
+  const logAdminAction = useCallback(async (action: string, details: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      await fetchJsonWithRetry(`${BACK_END}/api/admin/audit-logs`, {
+        method: 'POST',
+        authToken: token,
+        body: {
+          action,
+          details,
+        },
+      });
+    } catch (error) {
+      console.warn('Failed to record admin audit log', error);
+    }
+  }, []);
+
+  const fetchActivityLogs = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${BACK_END}/api/admin/activity-logs`, {
-        headers: { "Authorization": `Bearer ${token}` },
+      const data = await fetchJsonWithRetry<AdminActivityLogsResponse>(`${BACK_END}/api/admin/activity-logs`, {
+        authToken: token,
+        cacheKey: 'admin-activity-logs-cache',
+        cacheTtlMs: 10_000,
       });
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data.length > 0) {
-          setActivityLogs(data.data);
-          return;
-        }
+
+      if (data.success && data.data.length > 0) {
+        setActivityLogs(data.data);
+        return;
       }
       setActivityLogs(mockActivityLogs);
     } catch (error) {
       console.error("Error fetching activity logs:", error);
       setActivityLogs(mockActivityLogs);
     }
-  };
+  }, [mockActivityLogs]);
 
-  // Initial fetch of activity logs
   useEffect(() => {
-    fetchActivityLogs();
-  }, []);
+    void fetchActivityLogs();
+
+    const interval = window.setInterval(() => {
+      void fetchActivityLogs();
+    }, REFRESH_INTERVAL_MS * 3);
+
+    return () => window.clearInterval(interval);
+  }, [fetchActivityLogs]);
 
   const handlePublishBroadcast = async () => {
     if (!broadcastContent.trim()) return;
@@ -207,6 +272,7 @@ export default function AdminDashboardView() {
       if (response.ok) {
         setBroadcastTitle("");
         setBroadcastContent("");
+        await logAdminAction('publish_broadcast', broadcastContent.trim());
         showToast("Broadcast notice published successfully!", "success");
       } else {
         showToast("Failed to publish broadcast notice", "error");
@@ -219,10 +285,10 @@ export default function AdminDashboardView() {
     }
   };
 
-  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+  const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToast({ message, type, visible: true });
-    setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 3000);
-  };
+    window.setTimeout(() => setToast(prev => ({ ...prev, visible: false })), TOAST_DURATION_MS);
+  }, []);
 
   const handleFactoryReset = async () => {
     setIsResetting(true);
@@ -239,8 +305,8 @@ export default function AdminDashboardView() {
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
+          await logAdminAction('factory_reset', 'Triggered factory reset');
           showToast("Factory reset completed successfully!", "success");
-          // Reload the page after a short delay
           setTimeout(() => {
             window.location.reload();
           }, 2000);
@@ -259,8 +325,28 @@ export default function AdminDashboardView() {
     }
   };
 
-  // Fetch current rate info for Oracle Override
-  const fetchCurrentRateInfo = async (pair: string) => {
+  const handleExportDashboard = useCallback(() => {
+    const csv = buildDashboardCsv({
+      metrics: [
+        { label: 'Rates', value: ratesCount },
+        { label: 'News', value: newsCount },
+        { label: 'Users', value: usersCount },
+        { label: 'Posts', value: postsCount },
+      ],
+      activityLogs,
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `admin-dashboard-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    showToast('Dashboard export started', 'success');
+  }, [activityLogs, newsCount, postsCount, ratesCount, showToast, usersCount]);
+
+  const fetchCurrentRateInfo = useCallback(async (pair: string) => {
     try {
       const response = await fetch(`${BACK_END}/api/rates/current`);
       const data = await response.json();
@@ -280,7 +366,6 @@ export default function AdminDashboardView() {
       }
     } catch (error) {
       console.error('Error fetching current rate:', error);
-      // Set default values if API fails
       setCurrentRateInfo({
         price: '1.08542',
         change: '+0.23%',
@@ -290,9 +375,8 @@ export default function AdminDashboardView() {
       });
       setOracleRate('1.0854');
     }
-  };
+  }, []);
 
-  // Handle Oracle Override
   const handleOracleOverride = async () => {
     if (!oraclePair || !oracleRate) {
       showToast('Please select a pair and enter a rate', 'error');
@@ -327,10 +411,9 @@ export default function AdminDashboardView() {
 
       const data = await response.json();
       if (data.success) {
+        await logAdminAction('oracle_override', `${oraclePair} -> ${oracleRate}`);
         showToast(`Oracle override successful: ${oraclePair} → ${oracleRate}`, 'success');
-        // Refresh rate info
         await fetchCurrentRateInfo(oraclePair);
-        // Update rates count
         setRatesCount(prev => prev + 1);
       } else {
         showToast('Failed to override rate', 'error');
@@ -343,40 +426,44 @@ export default function AdminDashboardView() {
     }
   };
 
-  // Fetch rate info when pair changes
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setOracleRateDraft(oracleRate);
+    }, ORACLE_REFRESH_DELAY_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [oracleRate]);
+
   useEffect(() => {
     fetchCurrentRateInfo(oraclePair);
-  }, [oraclePair]);
+  }, [fetchCurrentRateInfo, oraclePair]);
 
-  // Poll server health stats every 5 seconds
   useEffect(() => {
     const fetchSystemHealth = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`${BACK_END}/api/admin/health`, {
-          headers: { "Authorization": `Bearer ${token}` },
+        const data = await fetchJsonWithRetry<SystemHealthResponse>(`${BACK_END}/api/admin/health`, {
+          authToken: token,
+          cacheKey: 'admin-health-cache',
+          cacheTtlMs: 10_000,
         });
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success) {
-            setSystemStats(data.data);
-            setLastSyncTime(new Date());
-          }
+
+        if (data.success) {
+          setSystemStats(data.data);
+          setLastSyncTime(new Date());
         }
       } catch (error) {
         console.error("Error fetching system health:", error);
-        // Keep using default values if API fails
       }
     };
 
-    // Initial fetch
     fetchSystemHealth();
-
-    // Poll every 5 seconds
-    const interval = setInterval(fetchSystemHealth, 5000);
-
+    const interval = setInterval(fetchSystemHealth, REFRESH_INTERVAL_MS);
     return () => clearInterval(interval);
   }, []);
+
+  // ✅ ĐÃ DI CHUYỂN LÊN ĐÂY: Khai báo useMemo trước khối kiểm tra isLoading để tuân thủ quy tắc Hooks của React
+  const extendedLogs = useMemo(() => [...activityLogs, ...activityLogs.slice(0, 4)], [activityLogs]);
 
   if (isLoading) {
     return (
@@ -391,9 +478,6 @@ export default function AdminDashboardView() {
       </div>
     );
   }
-
-  // Tạo danh sách logs với 16 logs (vừa đẹp cho chiều cao 910px)
-  const extendedLogs = [...activityLogs, ...activityLogs.slice(0, 4)];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#02020a] via-[#050510] to-[#02020a] text-slate-100 selection:bg-indigo-500/30 font-sans overflow-x-hidden pb-20">
@@ -641,7 +725,7 @@ export default function AdminDashboardView() {
               </div>
               
               {/* Content */}
-              <div className="flex-grow p-4" style={{ minHeight: '1025px' }}>
+              <div className="flex-grow p-4" style={{ minHeight: '1300px' }}>
                 {extendedLogs.length === 0 ? (
                   <motion.div 
                     initial={{ opacity: 0, scale: 0.95 }}
@@ -673,7 +757,7 @@ export default function AdminDashboardView() {
                     </div>
                     
                     {/* Scrollable list */}
-                    <div className="flex-grow overflow-y-auto overflow-x-hidden pr-1 space-y-2 mt-2 custom-scrollbar" style={{ maxHeight: '910px' }}>
+                    <div className="flex-grow overflow-y-auto overflow-x-hidden pr-1 space-y-2 mt-2 custom-scrollbar" style={{ maxHeight: '1200px' }}>
                       {extendedLogs.map((log: any, idx: number) => (
                         <motion.div
                           key={`${log.log_id || idx}-${idx}`}
@@ -857,10 +941,18 @@ export default function AdminDashboardView() {
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest font-mono flex items-center gap-2">
                     <Gauge size={8} /> New Exchange Rate
                   </label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={oracleRate}
                     onChange={(e) => setOracleRate(e.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        event.preventDefault();
+                        void handleOracleOverride();
+                      }
+                    }}
+                    inputMode="decimal"
+                    aria-label="Oracle rate"
                     className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm font-mono font-bold text-white outline-none focus:border-indigo-500/50 transition-all" 
                     placeholder="Enter new rate..."
                   />
