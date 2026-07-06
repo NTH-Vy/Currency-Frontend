@@ -89,14 +89,12 @@ export default function RootLayout({
             __html: `
               if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js').then(
-                    function(registration) {
-                      console.log('Service Worker registration successful');
-                    },
-                    function(err) {
-                      console.log('Service Worker registration failed: ', err);
+                  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) {
+                      registration.unregister();
+                      console.log('Service Worker unregistered successfully');
                     }
-                  );
+                  });
                 });
               }
             `,
