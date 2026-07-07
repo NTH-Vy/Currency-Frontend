@@ -176,11 +176,14 @@ export default function Header() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<NotificationItem | null>(null);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
   const API_BASE = `${BACK_END}/api`;
   
   const userMenuRef = useRef<HTMLDivElement>(null);
   const notifyRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
@@ -288,6 +291,18 @@ export default function Header() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Auto-focus search input when opened, close with Escape
+  useEffect(() => {
+    if (isSearchOpen) {
+      searchInputRef.current?.focus();
+    }
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") setIsSearchOpen(false);
+    }
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isSearchOpen]);
 
   useEffect(() => {
     const fetchBroadcastNotices = async () => {
@@ -616,16 +631,32 @@ export default function Header() {
             </nav>
 
             {/* Actions */}
-            <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-4 ml-auto">
-              {/* Search Desktop */}
-              <div className="relative hidden xl:flex items-center">
-                <Search className="absolute left-3 text-slate-500" size={14} />
+            <div className="flex items-center gap-1 sm:gap-2 lg:gap-3 xl:gap-4 ml-auto">
+              {/* Search Desktop - inline, grows on focus */}
+              <div className="relative hidden lg:flex items-center">
+                <Search className="absolute left-3 text-slate-500 pointer-events-none" size={14} />
                 <input 
                   type="text" 
                   placeholder="Search assets..." 
-                  className="bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-xs w-40 focus:outline-none focus:border-indigo-500/50 transition-all focus:w-60 text-white"
+                  className="bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-xs w-32 xl:w-40 focus:outline-none focus:border-indigo-500/50 focus:bg-white/[0.07] transition-all duration-300 focus:w-48 xl:focus:w-64 text-white placeholder:text-slate-500"
                 />
               </div>
+
+              {/* Search Toggle - mobile & tablet */}
+              <button
+                onClick={() => setIsSearchOpen((prev) => !prev)}
+                className={`lg:hidden relative p-1.5 sm:p-2 rounded-xl transition-all duration-200 group ${
+                  isSearchOpen ? 'bg-indigo-500/15 text-indigo-400' : 'hover:bg-white/5 text-slate-400'
+                }`}
+                aria-label="Search"
+                aria-expanded={isSearchOpen}
+              >
+                {isSearchOpen ? (
+                  <X size={18} className="sm:w-[20px] sm:h-[20px]" />
+                ) : (
+                  <Search size={18} className="sm:w-[20px] sm:h-[20px] group-hover:text-white transition-colors" />
+                )}
+              </button>
 
               {/* Notification Button & Box */}
               <div className="relative" ref={notifyRef}>
@@ -656,7 +687,7 @@ export default function Header() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 8, scale: 0.98 }}
                       transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="absolute right-[-40px] sm:right-0 mt-2 w-[280px] sm:w-[340px] md:w-[380px] bg-[#0f0f1a] border border-white/5 rounded-2xl shadow-2xl shadow-black/70 overflow-hidden z-50"
+                      className="fixed sm:absolute left-3 right-3 sm:left-auto sm:right-0 top-[64px] sm:top-auto mt-0 sm:mt-2 w-auto sm:w-[340px] md:w-[380px] max-w-[420px] mx-auto sm:mx-0 bg-[#0f0f1a] border border-white/5 rounded-2xl shadow-2xl shadow-black/70 overflow-hidden z-50"
                     >
                       {/* Header */}
                       <div className="flex flex-wrap items-center justify-between px-3 sm:px-5 py-2.5 sm:py-3.5 border-b border-white/5 bg-[#0a0a14] gap-1">
@@ -907,6 +938,37 @@ export default function Header() {
             </div>
 
           </div>
+
+          {/* Expandable Search Bar - mobile & tablet */}
+          <AnimatePresence>
+            {isSearchOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="lg:hidden overflow-hidden"
+              >
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setIsSearchOpen(false);
+                  }}
+                  className="relative pt-3 pb-1"
+                >
+                  <Search className="absolute left-3 top-[1.15rem] text-slate-500 pointer-events-none" size={15} />
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search assets, pairs, news..."
+                    className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs sm:text-sm focus:outline-none focus:border-indigo-500/50 focus:bg-white/[0.07] transition-all text-white placeholder:text-slate-500"
+                  />
+                </form>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 

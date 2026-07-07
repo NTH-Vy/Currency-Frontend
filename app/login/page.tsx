@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "@/components/layout/header";
@@ -15,6 +15,16 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // --- CHECK AUTHENTICATION ON MOUNT ---
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const userStr = localStorage.getItem("user");
+    if (token && userStr) {
+      const user = JSON.parse(userStr);
+      user.role === "admin" ? router.push("/Admin") : router.push("/");
+    }
+  }, [router]);
 
   // --- LOGIC XỬ LÝ ĐĂNG NHẬP EMAIL/PASS ---
   const handleLogin = async (e: React.FormEvent) => {

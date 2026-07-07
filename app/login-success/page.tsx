@@ -2,7 +2,6 @@
 import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
 
 // 1. Tách logic xử lý Token & URL vào component con này
 function LoginSuccessContent() {
@@ -40,11 +39,42 @@ function LoginSuccessContent() {
     <motion.div
       initial={{ opacity: 0 }} 
       animate={{ opacity: 1 }}
-      className="flex flex-col items-center gap-4"
+      className="flex flex-col items-center gap-6 w-full max-w-md"
     >
-      <Loader2 className="animate-spin text-indigo-500" size={40} />
-      <h2 className="text-xl font-bold tracking-widest uppercase">Initializing Session...</h2>
-      <p className="text-slate-500 text-sm">Synchronizing with Secure Terminal</p>
+      {/* Skeleton Card */}
+      <div className="w-full bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl p-8 space-y-6">
+        {/* Skeleton Header */}
+        <div className="space-y-3">
+          <div className="h-8 bg-slate-800 rounded-lg animate-pulse w-3/4 mx-auto" />
+          <div className="h-4 bg-slate-800 rounded animate-pulse w-1/2 mx-auto" />
+        </div>
+
+        {/* Skeleton Body */}
+        <div className="space-y-4">
+          <div className="h-4 bg-slate-800 rounded animate-pulse" />
+          <div className="h-4 bg-slate-800 rounded animate-pulse w-5/6" />
+          <div className="h-4 bg-slate-800 rounded animate-pulse w-4/6" />
+        </div>
+
+        {/* Skeleton Progress Bar */}
+        <div className="space-y-2">
+          <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+            <motion.div 
+              initial={{ width: "0%" }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
+              className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
+            />
+          </div>
+          <div className="h-3 bg-slate-800 rounded animate-pulse w-1/3 mx-auto" />
+        </div>
+      </div>
+
+      {/* Skeleton Status */}
+      <div className="flex items-center gap-3">
+        <div className="w-3 h-3 bg-indigo-500 rounded-full animate-pulse" />
+        <div className="h-4 bg-slate-800 rounded animate-pulse w-32" />
+      </div>
     </motion.div>
   );
 }
@@ -55,9 +85,36 @@ export default function LoginSuccess() {
     <div className="min-h-screen bg-[#05050a] flex items-center justify-center text-white font-mono" suppressHydrationWarning>
       <Suspense 
         fallback={
-          <div className="flex flex-col items-center gap-4">
-            <Loader2 className="animate-spin text-indigo-500" size={40} />
-            <h2 className="text-xl font-bold tracking-widest uppercase text-slate-500">Loading Secure Boundary...</h2>
+          <div className="flex flex-col items-center gap-6 w-full max-w-md">
+            {/* Skeleton Card */}
+            <div className="w-full bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl p-8 space-y-6">
+              {/* Skeleton Header */}
+              <div className="space-y-3">
+                <div className="h-8 bg-slate-800 rounded-lg animate-pulse w-3/4 mx-auto" />
+                <div className="h-4 bg-slate-800 rounded animate-pulse w-1/2 mx-auto" />
+              </div>
+
+              {/* Skeleton Body */}
+              <div className="space-y-4">
+                <div className="h-4 bg-slate-800 rounded animate-pulse" />
+                <div className="h-4 bg-slate-800 rounded animate-pulse w-5/6" />
+                <div className="h-4 bg-slate-800 rounded animate-pulse w-4/6" />
+              </div>
+
+              {/* Skeleton Progress Bar */}
+              <div className="space-y-2">
+                <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full animate-pulse" />
+                </div>
+                <div className="h-3 bg-slate-800 rounded animate-pulse w-1/3 mx-auto" />
+              </div>
+            </div>
+
+            {/* Skeleton Status */}
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 bg-indigo-500 rounded-full animate-pulse" />
+              <div className="h-4 bg-slate-800 rounded animate-pulse w-32" />
+            </div>
           </div>
         }
       >
