@@ -1,11 +1,11 @@
-// header.tsx - Responsive hoàn chỉnh
+// header.tsx - Bản cập nhật: Thanh điều hướng mảnh & Hiệu ứng lướt mượt mà
 "use client";
 
 import {
   Search, Globe, User, TrendingUp, Menu, X, LogOut,
   ArrowRightLeft, LayoutDashboard, Newspaper, Bell,
   ChevronDown, ThumbsUp, MessageSquare, AlertTriangle, ShieldAlert,
-  ChevronRight
+  ChevronRight, ShieldCheck
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -73,7 +73,7 @@ type AuthUser = {
   google_id?: string | null;
 };
 
-// --- HELPER FUNCTIONS (Được đưa lên trên để tránh lỗi Hoisting / Temporal Dead Zone) ---
+// --- HELPER FUNCTIONS ---
 
 function readStoredUser(): AuthUser | null {
   if (typeof window === "undefined") return null;
@@ -322,7 +322,6 @@ export default function Header() {
     return () => clearInterval(interval);
   }, [API_BASE]);
 
-
   useEffect(() => {
     const fetchUnreadCount = async () => {
       const token = localStorage.getItem("token");
@@ -474,7 +473,6 @@ export default function Header() {
       }
     }
 
-    // Admin notifications (broadcast, warning, ban, report) only show modal, no redirect
     const isAdminNotification = notif.isBroadcast || ['warning', 'ban', 'report'].includes(notif.type || '');
     
     if (!isAdminNotification && notif.postId) {
@@ -511,11 +509,36 @@ export default function Header() {
   };
 
   const navLinks = [
-    { name: "Home", href: "/", icon: <LayoutDashboard size={18} /> },
-    { name: "Converter", href: "/converter", icon: <ArrowRightLeft size={18} /> },
-    { name: "Rates", href: "/rates", icon: <TrendingUp size={18} /> },
-    { name: "News", href: "/news", icon: <Newspaper size={18} /> },
+    { name: "Home", href: "/", icon: <LayoutDashboard size={14} /> },
+    { name: "Converter", href: "/converter", icon: <ArrowRightLeft size={14} /> },
+    { name: "Rates", href: "/rates", icon: <TrendingUp size={14} /> },
+    { name: "News", href: "/news", icon: <Newspaper size={14} /> },
   ];
+
+  // Khai báo biến thể cho hiệu ứng mở menu mượt mà (Stagger)
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.04,
+        delayChildren: 0.05
+      }
+    },
+    exit: {
+      opacity: 0,
+      transition: {
+        staggerChildren: 0.03,
+        staggerDirection: -1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: -12, opacity: 0 },
+    show: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 24 } },
+    exit: { y: -8, opacity: 0, transition: { duration: 0.15 } }
+  };
 
   useEffect(() => {
     syncUser();
@@ -563,7 +586,7 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 z-50 w-full transition-all duration-300">
-      {/* Ticker Bar - Hidden on mobile */}
+      {/* Ticker Bar */}
       <div className="hidden md:block bg-black text-slate-500 py-2 border-b border-white/10 relative z-20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center text-[8px] sm:text-[10px] uppercase tracking-widest font-bold">
           <div className="flex animate-ticker whitespace-nowrap gap-8 sm:gap-12">
@@ -585,9 +608,9 @@ export default function Header() {
       </div>
 
       {/* Main Navigation Bar */}
-      <div className={`transition-all duration-500 ${
-        scrolled 
-        ? 'bg-[#0a0a0f]/90 backdrop-blur-xl border-b border-white/10 py-2 sm:py-3' 
+      <div className={`transition-all duration-300 relative z-50 ${
+        scrolled || isMenuOpen
+        ? 'bg-[#0a0a0f] border-b border-white/10 py-2 sm:py-3' 
         : 'bg-transparent border-b border-white/5 py-3 sm:py-5'
       }`}>
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
@@ -606,7 +629,7 @@ export default function Header() {
               </span>
             </Link>
 
-            {/* Desktop Navigation - Hidden on mobile/tablet */}
+            {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
               {navLinks.map((link) => {
                 const isActive = pathname === link.href;
@@ -632,7 +655,7 @@ export default function Header() {
 
             {/* Actions */}
             <div className="flex items-center gap-1 sm:gap-2 lg:gap-3 xl:gap-4 ml-auto">
-              {/* Search Desktop - inline, grows on focus */}
+              {/* Search Desktop */}
               <div className="relative hidden lg:flex items-center">
                 <Search className="absolute left-3 text-slate-500 pointer-events-none" size={14} />
                 <input 
@@ -642,23 +665,22 @@ export default function Header() {
                 />
               </div>
 
-              {/* Search Toggle - mobile & tablet */}
+              {/* Search Toggle Mobile */}
               <button
                 onClick={() => setIsSearchOpen((prev) => !prev)}
-                className={`lg:hidden relative p-1.5 sm:p-2 rounded-xl transition-all duration-200 group ${
+                className={`lg:hidden relative p-2 rounded-xl transition-all duration-200 group ${
                   isSearchOpen ? 'bg-indigo-500/15 text-indigo-400' : 'hover:bg-white/5 text-slate-400'
                 }`}
                 aria-label="Search"
-                aria-expanded={isSearchOpen}
               >
                 {isSearchOpen ? (
-                  <X size={18} className="sm:w-[20px] sm:h-[20px]" />
+                  <X size={20} className="sm:w-[22px] sm:h-[22px]" />
                 ) : (
-                  <Search size={18} className="sm:w-[20px] sm:h-[20px] group-hover:text-white transition-colors" />
+                  <Search size={20} className="sm:w-[22px] sm:h-[22px] group-hover:text-white transition-colors" />
                 )}
               </button>
 
-              {/* Notification Button & Box */}
+              {/* Notification Button */}
               <div className="relative" ref={notifyRef}>
                 <button
                   onClick={async () => {
@@ -669,12 +691,12 @@ export default function Header() {
                       await markVisibleUserNotificationsRead();
                     }
                   }}
-                  className="relative p-1.5 sm:p-2 rounded-xl hover:bg-white/5 transition-all duration-200 group"
+                  className="relative p-2 rounded-xl hover:bg-white/5 transition-all duration-200 group"
                   aria-label="Notifications"
                 >
-                  <Bell size={18} className={`sm:w-[20px] sm:h-[20px] transition-colors duration-200 ${isNotifyOpen ? 'text-indigo-400' : 'text-slate-400 group-hover:text-white'}`} />
+                  <Bell size={20} className={`sm:w-[22px] sm:h-[22px] transition-colors duration-200 ${isNotifyOpen ? 'text-indigo-400' : 'text-slate-400 group-hover:text-white'}`} />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 min-w-[18px] sm:min-w-[20px] h-[18px] sm:h-[20px] flex items-center justify-center bg-indigo-500 text-white text-[8px] sm:text-[10px] font-bold rounded-full border-2 border-[#0a0a0f] px-1">
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[20px] sm:min-w-[22px] h-[20px] sm:h-[22px] flex items-center justify-center bg-indigo-500 text-white text-[10px] sm:text-[11px] font-bold rounded-full border-2 border-[#0a0a0f] px-1">
                       {formatNotificationCount(unreadCount)}
                     </span>
                   )}
@@ -689,7 +711,7 @@ export default function Header() {
                       transition={{ duration: 0.2, ease: "easeOut" }}
                       className="fixed sm:absolute left-3 right-3 sm:left-auto sm:right-0 top-[64px] sm:top-auto mt-0 sm:mt-2 w-auto sm:w-[340px] md:w-[380px] max-w-[420px] mx-auto sm:mx-0 bg-[#0f0f1a] border border-white/5 rounded-2xl shadow-2xl shadow-black/70 overflow-hidden z-50"
                     >
-                      {/* Header */}
+                      {/* Dropdown Header */}
                       <div className="flex flex-wrap items-center justify-between px-3 sm:px-5 py-2.5 sm:py-3.5 border-b border-white/5 bg-[#0a0a14] gap-1">
                         <div className="flex items-center gap-1.5 sm:gap-2">
                           <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide">Notifications</h3>
@@ -706,16 +728,13 @@ export default function Header() {
                           >
                             Mark all read
                           </button>
-                          <button
-                            onClick={() => setIsNotifyOpen(false)}
-                            className="text-slate-500 hover:text-white transition-colors duration-200 p-0.5"
-                          >
-                            <X size={13} className="sm:w-[15px] sm:h-[15px]" />
+                          <button onClick={() => setIsNotifyOpen(false)} className="text-slate-500 hover:text-white transition-colors duration-200 p-0.5">
+                            <X size={14} className="sm:w-[16px] sm:h-[16px]" />
                           </button>
                         </div>
                       </div>
 
-                      {/* Notification List */}
+                      {/* Dropdown List */}
                       <div className="max-h-[280px] sm:max-h-[380px] md:max-h-[420px] overflow-y-auto scrollbar-thin">
                         {allNotifications.length === 0 ? (
                           <div className="flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-5">
@@ -734,31 +753,20 @@ export default function Header() {
                                 transition={{ delay: index * 0.01 }}
                                 onClick={() => handleNotificationClick(notif)}
                                 className={`group flex items-center gap-2 sm:gap-3 mx-1 sm:mx-1.5 my-0.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg cursor-pointer transition-all duration-150 relative ${
-                                  !notif.read 
-                                    ? 'bg-indigo-500/[0.03] hover:bg-white/[0.03]' 
-                                    : 'hover:bg-white/[0.03]'
+                                  !notif.read ? 'bg-indigo-500/[0.03] hover:bg-white/[0.03]' : 'hover:bg-white/[0.03]'
                                 }`}
                               >
-                                {/* Left: Avatar */}
                                 <div className="relative flex-shrink-0">
                                   {notif.isBroadcast ? (
                                     <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-inner">
                                       <Globe size={12} className="sm:w-[15px] sm:h-[15px]" />
                                     </div>
                                   ) : (() => {
-                                    const avatarUrl = getNotificationAvatarUrl(
-                                      notif.actorAvatar,
-                                      notif.actorFacebookId,
-                                      notif.actorGoogleId
-                                    );
+                                    const avatarUrl = getNotificationAvatarUrl(notif.actorAvatar, notif.actorFacebookId, notif.actorGoogleId);
                                     if (avatarUrl) {
                                       return (
                                         <div className="relative">
-                                          <img
-                                            src={avatarUrl}
-                                            alt={notif.actorUsername || 'User'}
-                                            className="w-7 h-7 sm:w-9 sm:h-9 rounded-full object-cover ring-1 ring-white/5"
-                                          />
+                                          <img src={avatarUrl} alt={notif.actorUsername || 'User'} className="w-7 h-7 sm:w-9 sm:h-9 rounded-full object-cover ring-1 ring-white/5" />
                                           {getNotifIcon(notif.type)}
                                         </div>
                                       );
@@ -772,7 +780,6 @@ export default function Header() {
                                   })()}
                                 </div>
 
-                                {/* Middle: Text */}
                                 <div className="flex-1 min-w-0 pr-0.5 sm:pr-1">
                                   <p className="text-[10px] sm:text-[11.5px] leading-snug font-light text-slate-300">
                                     {notif.isBroadcast ? (
@@ -796,14 +803,11 @@ export default function Header() {
                                       </>
                                     )}
                                   </p>
-                                  
-                                  {/* Time */}
                                   <span className={`text-[8px] sm:text-[10px] block mt-0.5 ${!notif.read ? 'text-indigo-400/90 font-medium' : 'text-slate-500'}`}>
                                     {notif.time}
                                   </span>
                                 </div>
 
-                                {/* Right: Unread Indicator */}
                                 {!notif.read && (
                                   <div className="flex-shrink-0 flex items-center justify-center pr-0.5">
                                     <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-sm" />
@@ -815,13 +819,8 @@ export default function Header() {
                         )}
                       </div>
 
-                      {/* Footer */}
                       <div className="border-t border-white/5 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#0c0c16]">
-                        <Link
-                          href="/notifications"
-                          onClick={() => setIsNotifyOpen(false)}
-                          className="flex items-center justify-center gap-1 text-[9px] sm:text-[11px] text-slate-400 hover:text-white font-light transition-colors duration-200 group"
-                        >
+                        <Link href="/notifications" onClick={() => setIsNotifyOpen(false)} className="flex items-center justify-center gap-1 text-[9px] sm:text-[11px] text-slate-400 hover:text-white font-light transition-colors duration-200 group">
                           <span>See all notifications</span>
                           <span className="group-hover:translate-x-0.5 transition-transform text-[8px] sm:text-[10px]">→</span>
                         </Link>
@@ -838,16 +837,11 @@ export default function Header() {
                     <button 
                       onClick={() => setIsUserOpen(!isUserOpen)}
                       className={`flex items-center gap-1 sm:gap-2 pl-1 pr-1.5 sm:pr-2 py-0.5 sm:py-1 rounded-full border transition-all duration-200 ${
-                        isUserOpen 
-                        ? "bg-indigo-600/15 border-indigo-500/60" 
-                        : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+                        isUserOpen ? "bg-indigo-600/15 border-indigo-500/60" : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
                       }`}
-                      aria-label="User menu"
                     >
                       <Avatar user={user} size="sm" />
-                      <ChevronDown 
-                        size={12} className={`sm:w-[14px] sm:h-[14px] text-slate-400 transition-transform duration-300 ${isUserOpen ? 'rotate-180 text-white' : ''}`} 
-                      />
+                      <ChevronDown size={12} className={`sm:w-[14px] sm:h-[14px] text-slate-400 transition-transform duration-300 ${isUserOpen ? 'rotate-180 text-white' : ''}`} />
                     </button>
                     
                     <AnimatePresence>
@@ -859,39 +853,25 @@ export default function Header() {
                           transition={{ duration: 0.15, ease: "easeOut" }}
                           className="absolute right-0 mt-2 sm:mt-3 w-64 sm:w-72 md:w-80 rounded-2xl bg-[#12121c]/95 border border-white/10 shadow-2xl shadow-black/50 p-2.5 sm:p-3 space-y-2 sm:space-y-3 z-50 backdrop-blur-2xl"
                         >
-                          {/* Profile Summary - Link to Profile page */}
                           <div className="relative overflow-hidden p-2.5 sm:p-3 rounded-xl bg-gradient-to-br from-indigo-600/15 via-white/[0.02] to-transparent border border-indigo-500/25">
                             <Link href="/Profile" onClick={() => setIsUserOpen(false)} className="flex items-center gap-2 sm:gap-3">
                               <Avatar user={user} size="sm" />
                               <div className="flex flex-col min-w-0">
-                                <span className="text-[10px] sm:text-xs font-black text-white uppercase tracking-tight truncate">
-                                  @{user.username}
-                                </span>
-                                <div className="flex items-center gap-1 sm:gap-1.5 mt-0.5 sm:mt-1">
-                                  <span className="w-1 sm:w-1.5 h-1 sm:h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                  <span className="text-[7px] sm:text-[9px] text-slate-400 font-mono uppercase tracking-wider font-bold">
-                                    {user.role || 'USER'} NODE
-                                  </span>
+                                <span className="text-[10px] sm:text-xs font-black text-white uppercase tracking-tight truncate">@{user.username}</span>
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                  <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                                  <span className="text-[7px] sm:text-[9px] text-slate-400 font-mono uppercase tracking-wider font-bold">{user.role || 'USER'} NODE</span>
                                 </div>
                               </div>
                             </Link>
-                            <Link
-                              href="/Profile"
-                              onClick={() => setIsUserOpen(false)}
-                              className="mt-2 sm:mt-3 w-full flex items-center justify-center gap-1.5 sm:gap-2 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg bg-white/[0.06] hover:bg-white/10 text-[10px] sm:text-[11px] font-bold text-slate-200 transition-colors text-center"
-                            >
+                            <Link href="/Profile" onClick={() => setIsUserOpen(false)} className="mt-2 sm:mt-3 w-full flex items-center justify-center gap-1.5 sm:gap-2 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg bg-white/[0.06] hover:bg-white/10 text-[10px] sm:text-[11px] font-bold text-slate-200 transition-colors text-center">
                               <User size={11} className="sm:w-[13px] sm:h-[13px]" />
                               <span>Profile Settings</span>
                             </Link>
                           </div>
 
-                          {/* Nav Rows */}
                           <div className="space-y-0.5 sm:space-y-1">
-                            <Link
-                              href="/Profile"
-                              onClick={() => setIsUserOpen(false)}
-                              className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-xl hover:bg-white/5 text-slate-300 hover:text-white transition-colors group"
-                            >
+                            <Link href="/Profile" onClick={() => setIsUserOpen(false)} className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-xl hover:bg-white/5 text-slate-300 hover:text-white transition-colors group">
                               <div className="flex items-center gap-2 sm:gap-3">
                                 <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/5 text-slate-300 group-hover:bg-indigo-600/20 group-hover:text-indigo-400 flex items-center justify-center transition-colors">
                                   <LayoutDashboard size={14} className="sm:w-[17px] sm:h-[17px]" />
@@ -900,13 +880,8 @@ export default function Header() {
                               </div>
                               <ChevronRight size={13} className="sm:w-[15px] sm:h-[15px] text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
                             </Link>
-
                             <div className="h-px bg-white/[0.06] my-0.5 sm:my-1" />
-
-                            <button
-                              onClick={handleLogout}
-                              className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-xl hover:bg-rose-500/10 text-slate-300 hover:text-rose-400 transition-colors group"
-                            >
+                            <button onClick={handleLogout} className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-xl hover:bg-rose-500/10 text-slate-300 hover:text-rose-400 transition-colors group">
                               <div className="flex items-center gap-2 sm:gap-3">
                                 <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/5 text-slate-300 group-hover:bg-rose-500/20 group-hover:text-rose-400 flex items-center justify-center transition-colors">
                                   <LogOut size={14} className="sm:w-[17px] sm:h-[17px]" />
@@ -915,6 +890,17 @@ export default function Header() {
                               </div>
                               <ChevronRight size={13} className="sm:w-[15px] sm:h-[15px] text-slate-500 group-hover:text-rose-400 group-hover:translate-x-0.5 transition-all" />
                             </button>
+                            {(user.role === 'ADMIN' || user.role === 'ROOT') && (
+                              <Link href="/Admin" onClick={() => setIsUserOpen(false)} className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-xl hover:bg-indigo-500/10 text-slate-300 hover:text-indigo-400 transition-colors group">
+                                <div className="flex items-center gap-2 sm:gap-3">
+                                  <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/5 text-slate-300 group-hover:bg-indigo-600/20 group-hover:text-indigo-400 flex items-center justify-center transition-colors">
+                                    <ShieldCheck size={14} className="sm:w-[17px] sm:h-[17px]" />
+                                  </div>
+                                  <span className="text-[10px] sm:text-xs font-semibold">Admin Dashboard</span>
+                                </div>
+                                <ChevronRight size={13} className="sm:w-[15px] sm:h-[15px] text-slate-500 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all" />
+                              </Link>
+                            )}
                           </div>
                         </motion.div>
                       )}
@@ -927,19 +913,26 @@ export default function Header() {
                 )}
               </div>
 
-              {/* Hamburger Button (Mobile / Tablet) */}
+              {/* Hamburger Button / Close Button */}
               <button 
-                className="lg:hidden p-1.5 sm:p-2 text-white hover:bg-white/5 rounded-xl transition-colors"
+                className="lg:hidden relative p-2.5 rounded-xl text-white hover:bg-white/5 transition-all duration-300 group"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                aria-label="Toggle menu"
               >
-                {isMenuOpen ? <X size={20} className="sm:w-[24px] sm:h-[24px]" /> : <Menu size={20} className="sm:w-[24px] sm:h-[24px]" />}
+                <div className="relative w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center">
+                  {isMenuOpen ? (
+                    <X size={22} className="sm:w-[26px] sm:h-[26px] text-indigo-400" />
+                  ) : (
+                    <Menu size={22} className="sm:w-[26px] sm:h-[26px] group-hover:text-indigo-400 transition-colors" />
+                  )}
+                </div>
+                {unreadCount > 0 && !isMenuOpen && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-indigo-500 rounded-full ring-2 ring-[#0a0a0f] animate-pulse" />
+                )}
               </button>
             </div>
-
           </div>
 
-          {/* Expandable Search Bar - mobile & tablet */}
+          {/* Expandable Search Bar Mobile */}
           <AnimatePresence>
             {isSearchOpen && (
               <motion.div
@@ -949,21 +942,12 @@ export default function Header() {
                 transition={{ duration: 0.2, ease: "easeOut" }}
                 className="lg:hidden overflow-hidden"
               >
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    setIsSearchOpen(false);
-                  }}
-                  className="relative pt-3 pb-1"
-                >
-                  <Search className="absolute left-3 top-[1.15rem] text-slate-500 pointer-events-none" size={15} />
+                <form onSubmit={(e) => { e.preventDefault(); setIsSearchOpen(false); }} className="relative pt-3 pb-1">
+                  <Search className="absolute left-4 top-[1.2rem] text-slate-500 pointer-events-none" size={18} />
                   <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    ref={searchInputRef} type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search assets, pairs, news..."
-                    className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs sm:text-sm focus:outline-none focus:border-indigo-500/50 focus:bg-white/[0.07] transition-all text-white placeholder:text-slate-500"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-sm sm:text-base focus:outline-none focus:border-indigo-500/50 focus:bg-white/[0.07] transition-all text-white placeholder:text-slate-500"
                   />
                 </form>
               </motion.div>
@@ -972,66 +956,110 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile Menu Drawer */}
+      {/* Mobile Menu Drawer - Cải tiến: Thiết kế thanh mảnh & Hiệu ứng lướt cực mượt */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 top-0 z-40 lg:hidden"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-x-0 bottom-0 top-[57px] sm:top-[69px] z-40 lg:hidden"
           >
-            <div className="absolute inset-0 bg-[#0a0a0f]/95 backdrop-blur-md" onClick={() => setIsMenuOpen(false)} />
+            {/* Lớp overlay làm mờ */}
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-[4px]" onClick={() => setIsMenuOpen(false)} />
+            
             <motion.div 
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -20, opacity: 0 }}
-              className="absolute inset-x-0 top-[72px] sm:top-[80px] lg:top-[88px] bg-[#12121c] border-b border-white/10 shadow-2xl p-4 sm:p-6 max-h-[calc(100vh-5rem)] overflow-y-auto"
+              transition={{ type: "spring", damping: 28, stiffness: 260 }}
+              className="absolute top-0 inset-x-0 bg-[#0a0a0f]/95 backdrop-blur-xl border-b border-white/10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] p-4 pt-3 space-y-4"
             >
-              {/* User Block inside Mobile Menu - Link to Profile page */}
-              {user ? (
-                <div className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
-                  <Link href="/Profile" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 sm:gap-3 flex-1">
-                    <Avatar user={user} size="sm" />
-                    <div className="flex flex-col">
-                      <span className="text-[10px] sm:text-xs font-bold text-white">@{user.username}</span>
-                      <span className="text-[8px] sm:text-[10px] text-slate-400 font-mono">{user.role || 'USER'}</span>
-                    </div>
-                  </Link>
-                  <button 
-                    onClick={handleLogout}
-                    className="p-1.5 sm:p-2 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-colors"
-                    aria-label="Logout"
-                  >
-                    <LogOut size={14} className="sm:w-[16px] sm:h-[16px]" />
-                  </button>
-                </div>
-              ) : (
-                <Link 
-                  href="/login" 
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block w-full text-center text-[10px] sm:text-xs font-bold bg-indigo-600 text-white py-3 sm:py-3.5 rounded-xl mb-4 sm:mb-6 uppercase tracking-wider"
-                >
-                  Open Account
-                </Link>
-              )}
+              {/* Navigation Links - Dáng dọc thanh mảnh kết hợp Stagger Animation */}
+              <motion.div 
+                variants={containerVariants}
+                initial="hidden"
+                animate="show"
+                exit="exit"
+                className="flex flex-col gap-1.5"
+              >
+                {navLinks.map((link) => {
+                  const isActive = pathname === link.href;
+                  return (
+                    <motion.div 
+                      key={link.name} 
+                      variants={itemVariants}
+                      whileHover={{ x: 4 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Link 
+                        href={link.href}
+                        onClick={() => setIsMenuOpen(false)}
+                        className={`flex items-center gap-3.5 px-3 py-2 rounded-lg transition-all duration-200 border w-full ${
+                          isActive 
+                            ? 'bg-indigo-600/[0.08] border-indigo-500/20 text-white font-bold' 
+                            : 'bg-white/[0.01] border-white/[0.02] text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]'
+                        }`}
+                      >
+                        {/* Icon thu nhỏ siêu mảnh */}
+                        <div className={`w-6 h-6 rounded-md flex items-center justify-center transition-all ${
+                          isActive ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10' : 'bg-white/5 text-slate-400'
+                        }`}>
+                          {link.icon}
+                        </div>
+                        <span className="text-[11px] uppercase tracking-wider font-medium">
+                          {link.name}
+                        </span>
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
 
-              {/* Navigation Grid */}
-              <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                {navLinks.map((link) => (
-                  <Link 
-                    key={link.name} 
-                    href={link.href}
-                    onClick={() => setIsMenuOpen(false)}
-                    className="flex flex-col gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-indigo-500/30 group"
-                  >
-                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                      {link.icon}
-                    </div>
-                    <span className="font-bold text-white text-[10px] sm:text-xs uppercase tracking-wide">{link.name}</span>
-                  </Link>
-                ))}
+              {/* Bottom Block */}
+              <div className="pt-1.5 space-y-3">
+                {user ? (
+                  <div className="flex items-center justify-between bg-white/[0.01] border border-white/[0.03] p-2.5 rounded-lg">
+                    <Link href="/Profile" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2.5 min-w-0">
+                      <Avatar user={user} size="sm" />
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-[11px] font-bold text-white truncate">@{user.username}</span>
+                        <span className="text-[7px] text-indigo-400/80 font-mono tracking-wider uppercase font-bold">
+                          {user.role || 'USER'} NODE
+                        </span>
+                      </div>
+                    </Link>
+                    <button 
+                      onClick={() => { handleLogout(); setIsMenuOpen(false); }}
+                      className="p-2 rounded-md bg-rose-500/5 hover:bg-rose-500/10 text-rose-400/90 transition-colors"
+                      title="Log Out"
+                    >
+                      <LogOut size={12} />
+                    </button>
+                  </div>
+                ) : (
+                  <motion.div whileTap={{ scale: 0.985 }}>
+                    <Link 
+                      href="/login" 
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block w-full text-center text-[11px] font-bold bg-indigo-600 text-white py-2.5 rounded-lg uppercase tracking-wider shadow-md hover:bg-indigo-500 transition-all"
+                    >
+                      Open Account
+                    </Link>
+                  </motion.div>
+                )}
+
+                {/* Footer thông số */}
+                <div className="flex items-center justify-between text-[8px] text-slate-500 font-mono tracking-widest uppercase px-0.5">
+                  <span>v2.0 • LIVE MATRIX</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-emerald-400/90 font-bold">Connected</span>
+                  </div>
+                </div>
               </div>
+
             </motion.div>
           </motion.div>
         )}
@@ -1041,21 +1069,11 @@ export default function Header() {
       <AnimatePresence>
         {showNotificationModal && selectedNotification && (
           <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]" onClick={() => setShowNotificationModal(false)} />
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
-              onClick={() => setShowNotificationModal(false)}
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} transition={{ duration: 0.2, ease: "easeOut" }}
               className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-1.5rem)] sm:w-[calc(100%-2rem)] max-w-md bg-[#0f0f1a] border border-white/5 rounded-2xl shadow-2xl shadow-black/70 z-[70] overflow-hidden"
             >
-              {/* Modal Header */}
               <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-white/5">
                 <div className="flex items-center gap-2 sm:gap-3">
                   {selectedNotification.isBroadcast ? (
@@ -1063,20 +1081,8 @@ export default function Header() {
                       <Globe size={14} className="sm:w-[16px] sm:h-[16px] text-indigo-400" />
                     </div>
                   ) : (() => {
-                    const avatarUrl = getNotificationAvatarUrl(
-                      selectedNotification.actorAvatar,
-                      selectedNotification.actorFacebookId,
-                      selectedNotification.actorGoogleId
-                    );
-                    if (avatarUrl) {
-                      return (
-                        <img
-                          src={avatarUrl}
-                          alt={selectedNotification.actorUsername || 'User'}
-                          className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover ring-1 ring-white/5"
-                        />
-                      );
-                    }
+                    const avatarUrl = getNotificationAvatarUrl(selectedNotification.actorAvatar, selectedNotification.actorFacebookId, selectedNotification.actorGoogleId);
+                    if (avatarUrl) return <img src={avatarUrl} alt={selectedNotification.actorUsername || 'User'} className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover ring-1 ring-white/5" />;
                     return (
                       <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-500/10 flex items-center justify-center">
                         <Bell size={14} className="sm:w-[16px] sm:h-[16px] text-slate-400" />
@@ -1088,15 +1094,11 @@ export default function Header() {
                     <span className="text-[8px] sm:text-[10px] text-slate-500">{selectedNotification.time}</span>
                   </div>
                 </div>
-                <button
-                  onClick={() => setShowNotificationModal(false)}
-                  className="p-1 hover:bg-white/5 rounded-lg transition-colors text-slate-400 hover:text-white"
-                >
+                <button onClick={() => setShowNotificationModal(false)} className="p-1 hover:bg-white/5 rounded-lg transition-colors text-slate-400 hover:text-white">
                   <X size={16} className="sm:w-[18px] sm:h-[18px]" />
                 </button>
               </div>
 
-              {/* Modal Content */}
               <div className="px-4 sm:px-6 py-4 sm:py-5">
                 <div className="mb-3 sm:mb-4">
                   <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
@@ -1109,7 +1111,6 @@ export default function Header() {
                     </p>
                   )}
                 </div>
-
                 {selectedNotification.actorUsername && (
                   <div className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 bg-white/5 rounded-xl">
                     <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-[9px] sm:text-xs font-bold">
@@ -1121,46 +1122,24 @@ export default function Header() {
                     </div>
                   </div>
                 )}
-
                 <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-3 sm:mt-4">
-                  {selectedNotification.isBroadcast && (
-                    <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-indigo-500/10 text-indigo-400 text-[8px] sm:text-[10px] font-medium rounded-lg">
-                      System
-                    </span>
-                  )}
-                  {selectedNotification.type === 'like' && (
-                    <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-rose-500/10 text-rose-400 text-[8px] sm:text-[10px] font-medium rounded-lg">
-                      ❤️ Like
-                    </span>
-                  )}
-                  {selectedNotification.type === 'reply' && (
-                    <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-emerald-500/10 text-emerald-400 text-[8px] sm:text-[10px] font-medium rounded-lg">
-                      💬 Reply
-                    </span>
-                  )}
+                  {selectedNotification.isBroadcast && <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-indigo-500/10 text-indigo-400 text-[8px] sm:text-[10px] font-medium rounded-lg">System</span>}
+                  {selectedNotification.type === 'like' && <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-rose-500/10 text-rose-400 text-[8px] sm:text-[10px] font-medium rounded-lg">❤️ Like</span>}
+                  {selectedNotification.type === 'reply' && <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-emerald-500/10 text-emerald-400 text-[8px] sm:text-[10px] font-medium rounded-lg">💬 Reply</span>}
                 </div>
               </div>
 
-              {/* Actions */}
               <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-white/5 bg-[#0c0c16]">
                 <div className="flex flex-col sm:flex-row gap-2">
                   {selectedNotification.postId && (
                     <button
-                      onClick={() => {
-                        setShowNotificationModal(false);
-                        router.push(`/post/${selectedNotification.postId}`);
-                      }}
+                      onClick={() => { setShowNotificationModal(false); router.push(`/post/${selectedNotification.postId}`); }}
                       className="w-full sm:flex-1 py-2 sm:py-2.5 bg-indigo-600 text-white text-xs sm:text-sm font-medium rounded-xl hover:bg-indigo-500 transition-all"
                     >
                       View Post
                     </button>
                   )}
-                  <button
-                    onClick={() => setShowNotificationModal(false)}
-                    className={`w-full py-2 sm:py-2.5 bg-white/5 text-slate-300 text-xs sm:text-sm font-medium rounded-xl hover:bg-white/10 transition-all border border-white/5 ${!selectedNotification.postId ? 'sm:w-full' : 'sm:flex-1'}`}
-                  >
-                    Close
-                  </button>
+                  <button onClick={() => setShowNotificationModal(false)} className={`w-full py-2 sm:py-2.5 bg-white/5 text-slate-300 text-xs sm:text-sm font-medium rounded-xl hover:bg-white/10 transition-all border border-white/5 ${!selectedNotification.postId ? 'sm:w-full' : 'sm:flex-1'}`}>Close</button>
                 </div>
               </div>
             </motion.div>

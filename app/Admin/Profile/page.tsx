@@ -3,7 +3,6 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Footer from "@/components/layout/footer";
 import "../../css/Admin/Profile.css";
 import {
   User,
@@ -1317,7 +1316,6 @@ export default function AdminProfileDashboard() {
           </>
         )}
       </AnimatePresence>
-      <Footer />
     </div>
   );
 }
